@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
   <img src="https://img.shields.io/badge/Tests-93122%20checks-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.4.0-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.4.1-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturité">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Version | `0.4.0` |
+| Version | `0.4.1` |
 | Maturité | Fonctionnel |
 | Rôle | Panneau tactile mural pour ARMOR-SERVER (famille : Clients, parent : ARMOR-SERVER) |
 | Technologie | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
