@@ -215,8 +215,8 @@ hmi::Sound sound_of(Tone tone) {
 }
 
 // Plays the samples with g_lock held. An alarm sound is played at least at the volume the settings give to alarms; anything less important than an alarm sound stops, between two chunks,
-// when one is waiting in the queue (the siren does not wait for a spoken answer to end).
-void play_locked(const std::int16_t* samples, std::size_t count, hmi::Sound sound) {
+// when one is waiting in the queue (the siren does not wait for a spoken answer to end). The clip that says an alarm is played as an alarm sound but also stops for a siren (`stop_for_siren`).
+void play_locked(const std::int16_t* samples, std::size_t count, hmi::Sound sound, bool stop_for_siren = false) {
   if (!open_speaker()) return;
   apply_volume(hmi::effective_volume(g_volume, g_alarm_min_volume, sound));
   boardio::set_amplifier(true);
@@ -224,7 +224,7 @@ void play_locked(const std::int16_t* samples, std::size_t count, hmi::Sound soun
   constexpr std::size_t kChunk = 512;
   std::vector<std::int16_t> stereo(kChunk * 2);
   for (std::size_t done = 0; done < count; done += kChunk) {
-    if (!hmi::is_alarm_sound(sound)) {
+    if (stop_for_siren || !hmi::is_alarm_sound(sound)) {
       std::lock_guard<std::mutex> queue_guard(g_queue_lock);
       if (g_queue.interrupts(sound)) break;
     }
@@ -322,7 +322,7 @@ void play(const std::int16_t* samples, std::size_t count) {
 bool play_clip(const std::int16_t* samples, std::size_t count) {
   if (!g_ready || g_speaker == nullptr || samples == nullptr || count == 0) return false;
   std::lock_guard<std::mutex> guard(g_lock);
-  play_locked(samples, count, hmi::Sound::kAlarm);
+  play_locked(samples, count, hmi::Sound::kAlarm, true);   // a siren that arrives while the clip plays cuts it: a critical alarm never waits
   return true;
 }
 
