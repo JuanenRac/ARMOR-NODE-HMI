@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.0] - The Overview boxes line up and the inter-processor tasks have more stack
+
+- **The framed values of the Overview page have the same width:** each value fills the column next to its label, so the boxes of a card line up instead of having the width of their text.
+- **The inter-processor call tasks have more stack:** `CONFIG_ESP_IPC_TASK_STACK_SIZE` is 2048 (the default left 532 bytes free in `ipc0` on a running node).
+
 ## [0.3.9] - The system event task has room to work: its stack grows from 2304 to 4096 bytes
 
 - **The system event task gets 4096 bytes of stack instead of 2304:** every network, Wi-Fi and Bluetooth handler runs in that task, and a running node left only 276 bytes free in it, which the live smoke test of the panel reports as too little. The setting is `CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE` in sdkconfig.defaults, so a build directory made before it must be regenerated (tools/check_sdkconfig.py says whether the generated file carries it).
