@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/ARMOR_BANNER.svg" alt="ARMOR-NODE-HMI banner" width="100%">
+  <img src="images/ARMOR_BANNER.svg" alt="Bannière d'ARMOR-NODE-HMI" width="100%">
 </p>
 
 # 🖥️ ARMOR-NODE-HMI
@@ -18,17 +18,18 @@
 ### Le panneau tactile de la maison : un écran de 7 pouces au mur qui montre l'état du système, l'arme et le désarme et acquitte les alarmes, avec un micro et un haut-parleur pour l'assistant vocal à venir (un nœud de la famille sur l'ESP32-S3-Touch-LCD-7C-BOX, avec sa propre page web de réglages)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/License-GPL%203.0-blue.svg" alt="GPL 3.0">
-  <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
+  <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 ou ultérieure">
+  <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Langage">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
+  <img src="https://img.shields.io/badge/Tests-93081%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.0-0f6cbd.svg" alt="Version">
-  <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
+  <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturité">
 </p>
 
 ---
 
-**Vérification d'honnêteté - ce qui fonctionne aujourd'hui:** Ce qui ne dépend pas de la carte est réel et testé sur un ordinateur (les réglages, ce que le panneau sait du serveur et quand cela est périmé, l'alarme de contrainte qui n'est jamais affichée, la conversation vocale et la longue réponse du service vocal, les broches de la carte, les textes de l'écran en huit langues et les glyphes de ses polices, les contrôles de version et de signature : 30,783 vérifications en 14 programmes de test), de même que la page web (exécutée contre un substitut dans un vrai navigateur). **Le firmware a été compilé une fois (ESP-IDF 5.5.5, non vérifié par l'intégration continue) et n'a jamais tourné sur une carte :** l'écran, le tactile, le son et la liaison avec le serveur sont écrits d'après les exemples de Waveshare pour cette famille de cartes et attendent leur première mise sous tension. Le service vocal (ARMOR-VOICE-AI) répond aux requêtes de ce panneau ; il n'y a pas de mot d'activation : c'est appuyer pour parler.
+**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Ce qui ne dépend pas de la carte est réel et testé sur un ordinateur (les réglages, ce que le panneau sait du serveur et quand cela est périmé, l'alarme de contrainte qui n'est jamais affichée, la conversation vocale et la longue réponse du service vocal, les broches de la carte, les textes de l'écran en huit langues et les glyphes de ses polices, les contrôles de version et de signature : 30,783 vérifications en 18 programmes de test), de même que la page web (exécutée contre un substitut dans un vrai navigateur). **Le firmware a été compilé une fois (ESP-IDF 5.5.5, non vérifié par l'intégration continue) et n'a jamais tourné sur une carte :** l'écran, le tactile, le son et la liaison avec le serveur sont écrits d'après les exemples de Waveshare pour cette famille de cartes et attendent leur première mise sous tension. Le service vocal (ARMOR-VOICE-AI) répond aux requêtes de ce panneau ; il n'y a pas de mot d'activation : c'est appuyer pour parler.
 
 ---
 
@@ -38,9 +39,15 @@
 |---|---|
 | Version | `0.4.0` |
 | Maturité | Fonctionnel |
-| Tests | 30 783 vérifications dans 14 programmes (`ctest`) |
-| Technologie | C++17 (host-tested core); ESP-IDF firmware for the ESP32-S3 with LVGL, with its web page |
+| Rôle | Panneau tactile mural pour ARMOR-SERVER (famille : Clients, parent : ARMOR-SERVER) |
+| Technologie | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
+| Tests | 93081 vérifications dans 18 programmes hôte et 6 contrôles Python (`ctest`) |
+| Carte | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
+| Fonctionne sur | Une Waveshare ESP32-S3-Touch-LCD-7C-BOX ; tests sur hôte sur n'importe quel ordinateur |
 | Sur matériel réel | Aucun pour l'instant : le firmware se compile (ESP-IDF 5.5.5, non vérifié par la CI) mais n'a pas tourné sur la carte |
+| Licence | GPL-3.0-or-later |
+
+**Aller à :** [Présentation](#-présentation) · [Architecture](#-architecture) · [Sécurité](#-sécurité-et-protection) · [Interfaces](#-interfaces) · [Configuration](#-configuration) · [Démarrage rapide](#-démarrage-rapide) · [Tests](#-tests) · [Dépannage](#-dépannage) · [Structure](#-structure-du-dépôt) · [Liés](#-projets-liés)
 
 ## 🚦 État du projet
 
@@ -51,7 +58,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟠 | Le firmware a été compilé une fois (ESP-IDF 5.5.5), mais la compilation n'est pas contrôlée par l'intégration continue et il n'a jamais tourné sur une carte. |
-| Tests | 🟢 | 30 783 vérifications dans 14 programmes d'hôte réussissent (`ctest`) : les réglages, ce que le panneau sait du serveur et quand c'est périmé, l'alarme sous contrainte qui n'est jamais affichée, l'échange vocal, les broches, les textes de l'écran en huit langues et les glyphes de ses polices. |
+| Tests | 🟢 | 93 081 vérifications dans 18 programmes d'hôte réussissent (`ctest`) : les réglages, ce que le panneau sait du serveur et quand c'est périmé, l'alarme sous contrainte qui n'est jamais affichée, l'échange vocal, les broches, les textes de l'écran en huit langues et les glyphes de ses polices. |
 | Protocoles et données | 🟡 | L'échange avec le serveur et avec le service vocal ARMOR-VOICE-AI est testé contre des simulations ; c'est du push-to-talk, sans mot d'activation. |
 | Interface | 🟠 | La page web a tourné contre une simulation dans un vrai navigateur ; l'écran, le tactile et le son sont écrits d'après les exemples de Waveshare et attendent leur première mise sous tension. |
 | Matériel | 🔴 | Le firmware n'a pas tourné sur la carte : rien n'a encore tourné sur de vrais équipements. |
@@ -81,6 +88,23 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 * **L'état d'un ordre, à l'écran :** le pied de page dit que l'ordre est en cours d'envoi tant qu'il est en route et qu'il a été confirmé pendant quelques secondes lorsqu'il est passé ; un refus y garde sa raison, comme avant.
 * **Scellement facultatif des secrets enregistrés :** désactivé par défaut (`security.seal_secrets`, ou `nodes.nvs_encryption` du serveur). Activé, les mots de passe, jetons, clés, codes PIN et empreintes de mots de passe que le nœud enregistre sont scellés avec ChaCha20-Poly1305 et tout le reste reste lisible ; l'activer ou le désactiver les réécrit sans rien perdre, même si le nœud s'arrête en route. Aucun eFuse n'est brûlé et la flash n'est pas chiffrée : la clé est dans une partition de la même puce, donc cela ne protège **pas** contre quelqu'un qui tient la carte, et un nœud installé avant cette partition garde ses secrets tels quels jusqu'à ce qu'il soit flashé avec la nouvelle table de partitions.
 
+## 🧩 Rôle dans A.R.M.O.R.
+
+ARMOR-NODE-HMI est le panneau mural : un client d'[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER), comme l'application Android, avec un écran de 7 pouces, un microphone et un haut-parleur. Il montre le mode, les nœuds en ligne et les alarmes qui demandent une personne, arme et désarme (avec le PIN) et acquitte les alarmes. C'est là que vivra l'assistant vocal ([ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)) quand son service vocal existera et, comme tout nœud, il se configure et se met à jour depuis [ARMOR-STUDIO](https://github.com/JuanenRac/ARMOR-STUDIO).
+
+| Nom | Comment | À quoi ça sert |
+|---|---|---|
+| ARMOR-SERVER | HTTPS `GET /api/v1/panel/summary`, WebSocket `/api/v1/panel/events` | Le résumé de la maison (modes, alarmes, nœuds, énergie) et ses changements ; le serveur décide de ce que fait un ordre |
+| ARMOR-VOICE-AI | via le serveur | L'audio d'un tour va au service vocal ; la réponse est affichée et dite |
+| ARMOR-STUDIO | menu Panneau tactile | Montre la santé du panneau et ouvre son panneau web |
+| ARMOR-COMMON | base de firmware | Le firmware commun (panneau, connexions, mise à jour signée, configuration Bluetooth) en est copié |
+
+## 🏛️ Architecture
+
+<p align="center">
+  <img src="images/architecture.svg" alt="Architecture de ARMOR-NODE-HMI : qui l'appelle, ce qu'il contient et de quoi il dépend" width="100%">
+</p>
+
 ## 🖼️ Captures d'écran
 
 Capturées en 1920×1080 sur un banc d'essai, avec des données d'exemple et sans installation réelle derrière.
@@ -90,35 +114,52 @@ Capturées en 1920×1080 sur un banc d'essai, avec des données d'exemple et san
 <tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="Assistant vocal : appuyer pour parler, désactivé par défaut, et le service vers lequel va son audio." width="100%"><br><sub>Assistant vocal : appuyer pour parler, désactivé par défaut, et le service vers lequel va son audio.</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation." width="100%"><br><sub>Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation.</sub></td></tr>
 </table>
 
-## 🧩 Rôle dans A.R.M.O.R.
+## 🔒 Sécurité et protection
 
-ARMOR-NODE-HMI est le panneau mural : un client d'[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER), comme l'application Android, avec un écran de 7 pouces, un microphone et un haut-parleur. Il montre le mode, les nœuds en ligne et les alarmes qui demandent une personne, arme et désarme (avec le PIN) et acquitte les alarmes. C'est là que vivra l'assistant vocal ([ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)) quand son service vocal existera et, comme tout nœud, il se configure et se met à jour depuis [ARMOR-STUDIO](https://github.com/JuanenRac/ARMOR-STUDIO).
+| Menace | Défense |
+|---|---|
+| Mots de passe en clair ou compilés | PBKDF2-HMAC-SHA256 avec 10 000 tours ; aucun mot de passe dans le firmware (un nœud sans utilisateur passe en configuration) ; au plus 4 utilisateurs (admin ou lecteur) et de 8 à 64 caractères ; au plus 6 sessions, 30 minutes d'inactivité |
+| Prendre un nœud tout juste flashé | La configuration exige un code de démarrage : celui du build (`CONFIG_ARMOR_SETUP_CODE`) ou un code aléatoire gardé en flash et affiché sur la console USB ; avec un secret de flotte c'est `HMAC-SHA256(secret, MAC)` ; c'est aussi la clé du Wi-Fi de configuration (WPA2, jamais ponté) |
+| Le panneau atteint depuis Internet | Il répond par défaut aux réseaux privés d'une maison (10/8, 172.16/12, 192.168/16, 169.254/16, 127/8 et 100.64/10 où vivent certains VPN) ; le réglage `web.admin_sources` liste d'autres adresses et réseaux IPv4 (8 entrées, 120 caractères) ; tout le reste est refusé sauf l'identité publique `GET /api/v1/session` ; une liste qui exclurait celui qui l'enregistre est rejetée |
+| Le panneau en clair en HTTP | HTTPS sur le 443 avec un certificat que le nœud fabrique lui-même (autosigné, en flash, empreinte SHA-256 visible pour comparer) ; le panneau peut être http, https ou les deux ; le cookie de session est toujours HttpOnly et SameSite=Strict (et Secure en TLS) |
+| Un faux firmware depuis GitHub | Une image n'est installée qu'avec un SHA-256 concordant et une signature Ed25519 valide faite avec la clé du mainteneur (`no_checksum`, `no_signature`, `bad_signature`, `checksum_mismatch`, `wrong_firmware`, `not_newer`, `version_mismatch` la refusent) ; un envoi manuel par un administrateur n'est pas vérifié : une limite explicite |
+| Détournement de la configuration Bluetooth | Un PIN à 6 chiffres dérivé du code de configuration, visible sur la console USB et pour un administrateur ; le téléphone doit le saisir avant d'écrire des réglages ; la fenêtre dure `CONFIG_ARMOR_BLE_SETUP_MINUTES` (10 par défaut, de 1 à 120) |
+| Secrets stockés lus par qui a la carte | Optionnel (désactivé par défaut, interrupteur `security.seal_secrets` ou `nodes.nvs_encryption` du serveur) : ChaCha20-Poly1305 pour mots de passe, jetons, clés, PIN et hachages. Il ne chiffre pas la flash et ne grille aucun eFuse : la clé est dans une partition de la même puce, il ne protège donc pas contre qui tient la carte |
+| Le lien avec le broker en clair | TLS optionnel (`mqtts://`) avec l'autorité propre du propriétaire (PEM jusqu'à 2 Ko) et vérification du nom ; désactivé par défaut. Le handshake n'a tourné qu'en tests sur hôte, pas sur une carte |
+| L'alarme de contrainte affichée à l'écran | Elle n'est jamais affichée (un test sur hôte le vérifie) ; et ce que le panneau sait du serveur est marqué périmé quand il est ancien |
+| Un serveur qui n'est pas le serveur | Le certificat du serveur est épinglé (`server_pin`), pour les requêtes et pour le WebSocket du canal en direct ; le panneau se connecte avec son propre utilisateur, créé par un administrateur, avec le rôle `panel` (il ne peut pas utiliser Studio) |
+| Désarmer sans PIN | Armer et désarmer demandent d'abord et prennent le PIN à l'écran (`pin_entry`) ; le serveur le revérifie |
+| Audio vocal vers un endroit inattendu | Désactivée par défaut (`voice.enabled` faux) ; l'audio ne va qu'au service dont l'adresse est dans les réglages (l'adresse est validée et changer d'hôte efface le jeton) ; le panneau n'exécute aucun ordre de lui-même et il n'y a pas de mot d'activation : c'est appuyer pour parler |
+| Une sirène que personne n'entend | Une seule file de priorité (sirène, alarme, voix, confirmation, avis) ; la sirène se répète tant que des alarmes critiques ne sont pas acquittées (`audio.siren_repeat_s` 30, de 10 à 600, 0 = pas de répétition ; `audio.siren_max_repeats` 10) et le volume critique ne descend jamais sous `audio.critical_min_volume` (40 %) |
 
-## 📂 Structure du dépôt
+Le firmware a été compilé une fois et n'a jamais tourné sur une carte : l'écran, le tactile, le son et la liaison avec le serveur sont écrits d'après les exemples de Waveshare, en attendant la première mise sous tension. Lisez [SECURITY.md](SECURITY.md) pour signaler une vulnérabilité.
 
-```text
-ARMOR-NODE-HMI/
-├── main/    the ESP-IDF component: app_main, display (RGB panel, GT911, LVGL), ui (the screen), audio (I2S, ES7210, ES8389), voice, server_link (HTTP to ARMOR-SERVER), board_io (I2C and the expander),
-│            network, web_server, api_shared, mqtt_link, node_store, tls_cert, ble_provision (the shared node firmware), fonts/ (generated)
-├── core/    hmi_config (the settings), server_view (the summary, the link, what is new), voice_session (the conversation), screen_text (eight languages), board_s3 (the pins), auth, netplan, json...
-├── panel/   the web page: index.html, app.js, text.js (8 languages), style.css
-├── tests/   test_config, test_mqtt_tls, test_view, test_voice, test_voice_binary, test_live, test_board
-├── tools/   build_node.sh, check_sdkconfig.py, make_fonts.py, pack_panel.py, panel_mock.mjs, panel_browser_test.mjs, the shared CI checks (armor_ci_validate.py, armor_project_tool.py, _armor_readme_parity.py)
-├── secrets/ node.conf.example (the real files are git-ignored)
-├── CMakeLists.txt, partitions.csv, sdkconfig.defaults, sdkconfig.board.lcd7box, dependencies.lock   the ESP-IDF project, the flash layout, the settings of the board and the pinned components
-├── docs/    DESIGN, HARDWARE, VOICE, NODE_FIRMWARE, FONTS, BLE_PROVISIONING, FIRMWARE_BUILD_ACTIONS, BENCH_TESTS, SETUP_CODE
-└── images/  brand assets
-```
+## 🔌 Interfaces
 
-## 🛠️ Environnement de développement
+| Partie | Ce qu'elle règle |
+|---|---|
+| ARMOR-SERVER | `GET /api/v1/panel/summary` toutes les `server.poll_s` (3 s, de 1 à 60) seulement quand le canal en direct est tombé, et le WebSocket `/api/v1/panel/events` tant que `server.live_events` est vrai (par défaut) : le résumé arrive quand le mode, les alarmes, les nœuds ou l'énergie changent ; l'utilisateur propre du panneau a le rôle `panel` |
+| Voix | L'audio d'un tour va à ARMOR-VOICE-AI via le serveur (`/api/v1/voice/turn`, avec un corps multipart facultatif) ; `core/voice_session.hpp` est la machine d'états (ordre des étapes, limites de temps, ce que fait un toucher) ; voir [docs/VOICE.md](docs/VOICE.md) |
+| Matériel | Waveshare ESP32-S3-Touch-LCD-7C-BOX : écran RGB 7 pouces 800x480, tactile GT911, quatre microphones, un haut-parleur, RTC PCF85063A (`time.rtc_enabled`, vrai par défaut), 32 Mo de flash et 16 Mo de PSRAM ; un test prouve qu'aucune fonction ne partage un GPIO |
 
-**Prérequis:** un compilateur C++17 pour les tests sur l'ordinateur, le conteneur ESP-IDF 5.5.5 pour compiler l'image, un Waveshare ESP32-S3-Touch-LCD-7C-BOX
+## ⚙️ Configuration
+
+| Variable | Par défaut | Ce qu'elle règle |
+|---|---|---|
+| `server.poll_s`, `server.live_events` | 3 (1-60), true | La période d'interrogation du résumé et le canal en direct par WebSocket |
+| `display.sleep_s` | 300 (0-3600) | Secondes avant la mise en veille de l'écran (0 = jamais) ; la luminosité et la luminosité de nuit sont aussi des réglages |
+| `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | Le volume minimal d'un son critique, la période de répétition de la sirène (0 ou de 10 à 600 s) et ses répétitions maximales |
+| `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Le service vocal : désactivé par défaut ; l'adresse fait au plus 160 caractères et est validée (sinon `required` ou `invalid`) ; le jeton est effacé quand l'hôte change |
+| `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Les réglages que tous les nœuds partagent : le nom (vide donne `armor-` et les derniers octets de la MAC), le code de configuration (vide : aléatoire), le secret de flotte (16+ caractères, jamais dans le dépôt), les premiers réglages du broker, le battement (de 2 à 300 s), les minutes de configuration Bluetooth (de 1 à 120) et la réinitialisation avec BOOT (8 s dans les 30 premières s) |
+
+## 🚀 Démarrage rapide
+
+**Prérequis:** un compilateur C++17 pour les tests sur hôte ; le conteneur ESP-IDF 5.5.5 pour construire l'image ; une Waveshare ESP32-S3-Touch-LCD-7C-BOX.
 
 ```bash
-cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir build/host   # the settings, the server view, the voice conversation, the board's pins and the screen's words
-node tools/panel_mock.mjs --user admin:adminpass123                                       # the web page without a board
-node tools/panel_browser_test.mjs                                                         # the page in a real browser, every page in eight languages
-tools/build_node.sh generic                                                               # the firmware image in the ESP-IDF container: dist/generic-lcd7box.bin (never built yet)
+cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir build/host   # host tests, -Werror
+node tools/panel_mock.mjs --user admin:adminpass123   # the panel of the node without a board
+tools/build_node.sh                                   # the image in the ESP-IDF container
 ```
 
 See the [firmware guide](docs/NODE_FIRMWARE.md) and the [Bluetooth channel](docs/BLE_PROVISIONING.md).
@@ -126,6 +167,92 @@ See the [firmware guide](docs/NODE_FIRMWARE.md) and the [Bluetooth channel](docs
 Voir la [conception](docs/DESIGN.md), la [carte](docs/HARDWARE.md), l'[assistant vocal](docs/VOICE.md), le [guide du firmware](docs/NODE_FIRMWARE.md) et les [polices](docs/FONTS.md).
 
 Pour compiler le firmware à la main dans GitHub Actions, voir [compiler dans GitHub Actions](docs/FIRMWARE_BUILD_ACTIONS.md).
+
+## 🧪 Tests
+
+```bash
+cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir build/host
+python -I tools/armor_ci_validate.py
+```
+
+18 programmes de test sur hôte et 6 contrôles Python tournent sous `ctest` ; 93081 vérifications comptées par les programmes hôte, compilés avec `-Werror`.
+
+Contrôles Python : les textes du panneau en huit langues, les tâches, les chemins de sauvegarde, la session Bluetooth sous son verrou et les routes appelées par le panneau (et, dans certains nœuds, les codes HTTP ou les glyphes des polices)
+
+Les tests sur hôte demandent un compilateur C++17 quelconque (Linux, WSL, MSYS2) ; le panneau web est aussi exercé dans un vrai navigateur contre un nœud de substitution (`tools/panel_mock.mjs`, `tools/panel_browser_test.mjs`).
+
+`check_font_glyphs.py` vérifie que les polices ont tous les glyphes des huit langues (98 lignes) ; `test_clock` n'imprime que `ok`.
+
+## 🏗️ Compilation et publication
+
+`tools/build_node.sh` construit l'image dans le conteneur ESP-IDF 5.5.5 et la version porte l'image, son SHA-256 et sa signature Ed25519, une par carte ; l'image est écrite par USB-C la première fois, puis mise à jour depuis le panneau.
+
+## 🩺 Dépannage
+
+| Vous voyez | Parce que | Faites |
+|---|---|---|
+| Vous avez perdu le mot de passe ou le nœud ne rejoint plus le réseau | Un nœud en configuration sans adresse après 90 s ouvre son propre Wi-Fi `ARMOR-SETUP-xxxxxx` (ouvrez `http://192.168.4.1/`) | Pour recommencer, maintenez BOOT 8 secondes dans les 30 premières secondes après la mise sous tension (efface réglages et utilisateurs), ou utilisez *Réinitialisation d'usine* dans le panneau |
+| Une mise à jour depuis GitHub est refusée | La version n'a ni somme de contrôle ni signature, elles ne concordent pas (`e_no_checksum`, `e_no_signature`, `e_checksum_mismatch`, `e_bad_signature`), n'a pas d'image pour cette carte (`e_no_asset_for_board`) ou est d'un autre projet (`e_wrong_firmware`) | Le nœud n'a pas changé ; réessayez ou laissez un administrateur envoyer le fichier à la main |
+| La voix ne démarre pas | `voice.enabled` est désactivé, ou `voice.url` est `required` ou `invalid` | Activez-la dans le panneau et donnez une adresse valide ; changer d'hôte efface le jeton |
+| Le pied d'écran dit envoi, puis confirmée ou le motif | Un ordre est en route, a été confirmé quelques secondes, ou refusé et garde son motif | Lisez le motif ; c'est le serveur qui décide, pas le panneau |
+
+## 📂 Structure du dépôt
+
+<p align="center">
+  <img src="images/repository-structure.svg" alt="Structure du dépôt de ARMOR-NODE-HMI" width="100%">
+</p>
+
+<details>
+<summary>Version texte de l'arborescence</summary>
+
+```text
+ARMOR-NODE-HMI/
+├── main/                                le firmware : un composant ESP-IDF
+├── core/                                la logique sans ESP-IDF, testée sur ordinateur
+├── panel/                               le panneau web intégré au firmware
+├── tests/                               tests sur hôte et contrôles Python
+├── docs/                                9 guides : conception, voix, polices, matériel
+├── tools/                               outils de build, d'empaquetage et de contrôle
+├── .github/                             workflow CI et modèles d'issues et de pull requests
+├── images/                              bannière, icône et les deux images de ce README
+├── build.sh build.bat                   build par le flux de projet partagé
+├── test.sh test.bat                     lancer les tests par le flux partagé
+├── run.sh run.bat                       démarrer par le flux de projet partagé
+├── armor.project.json                   manifeste : version, rôle, maturité, commande de build
+├── CHANGELOG.md                         ce qui a changé à chaque version
+├── SECURITY.md SUPPORT.md LICENSE       politique de sécurité, support et licence
+├── CONTRIBUTING.md CODE_OF_CONDUCT.md   comment contribuer et le code de conduite
+├── CMakeLists.txt                       le projet ESP-IDF
+├── partitions.csv                       la table de la flash
+├── sdkconfig.defaults                   les réglages du firmware
+├── sdkconfig.board.lcd7box              les réglages d'une carte
+├── secrets/                             exemple du fichier de nœud (les vrais ne sont pas versionnés)
+├── dependencies.lock                    les versions épinglées des composants ESP-IDF
+├── build-test.sh build-test.bat         lancer les tests par le flux partagé
+└── .gitattributes .gitignore            réglages Git
+```
+
+</details>
+
+## 🗺️ Feuille de route et limites connues
+
+**Limites connues aujourd'hui**
+
+* Le firmware a été compilé une fois (ESP-IDF 5.5.5), mais la compilation n'est pas contrôlée par l'intégration continue et il n'a jamais tourné sur une carte.
+* L'échange avec le serveur et avec le service vocal ARMOR-VOICE-AI est testé contre des simulations ; c'est du push-to-talk, sans mot d'activation.
+* La page web a tourné contre une simulation dans un vrai navigateur ; l'écran, le tactile et le son sont écrits d'après les exemples de Waveshare et attendent leur première mise sous tension.
+* Le firmware n'a pas tourné sur la carte : rien n'a encore tourné sur de vrais équipements.
+* Le code de configuration, la limite de connexions, le PIN Bluetooth, la gestion de la contrainte et les mises à jour signées sont testés sur l'hôte ; il n'y a pas eu de revue indépendante.
+* Les contrôles de hash et de signature réussissent sur l'hôte ; une mise à jour par voie hertzienne n'a jamais été exécutée sur une carte.
+* Les messages sont validés par rapport aux schémas partagés d'ARMOR-COMMON ; la liaison avec le serveur et avec le service vocal n'a pas été essayée depuis une carte.
+
+**Ensuite**
+
+* Faire la première compilation complète et la première mise sous tension sur la carte, puis le service vocal sur le Jetson, un mot d'activation et la vue des caméras à l'écran.
+
+## 🌍 Langues
+
+Le README et les textes existent en anglais, espagnol, français, italien, allemand, chinois, japonais et portugais européen.
 
 ## 🔗 Projets liés
 
@@ -151,15 +278,23 @@ Pour compiler le firmware à la main dans GitHub Actions, voir [compiler dans Gi
 * **[ARMOR-UPDATER](https://github.com/JuanenRac/ARMOR-UPDATER)** - Détecte, installe et met à jour les propres dépôts de l'écosystème
 * **[ARMOR-DOCS](https://github.com/JuanenRac/ARMOR-DOCS)** - Architecture, base de sécurité et matrice des capacités
 
-## 📚 Documentation et communauté
+## 📚 Documentation
 
-Pour en savoir plus :
-
+* [Conception](docs/DESIGN.md) et [matériel](docs/HARDWARE.md) : ce que montre le panneau et la carte
+* [Voix](docs/VOICE.md) et [polices](docs/FONTS.md)
+* [Firmware du nœud](docs/NODE_FIRMWARE.md) et [actions de build](docs/FIRMWARE_BUILD_ACTIONS.md)
+* [Essais de banc](docs/BENCH_TESTS.md), [code de configuration](docs/SETUP_CODE.md) et [mise en service Bluetooth](docs/BLE_PROVISIONING.md)
 * [Matrice des capacités : ce qui est prouvé et ce qui ne l'est pas](https://github.com/JuanenRac/ARMOR-DOCS/blob/main/docs/CAPABILITY_MATRIX.md)
 * [Catalogue des projets : versions et dépendances entre les dépôts](https://github.com/JuanenRac/ARMOR-DOCS/blob/main/docs/PROJECT_CATALOG.md)
 * [Historique des modifications de ce dépôt](CHANGELOG.md)
-* [Licence (GPL-3.0-or-later)](LICENSE)
-* Questions, idées et rapports : electrohobby3d@gmail.com
+
+## 🤝 Contribuer et communauté
+
+* Avant une pull request, lancez `ctest --test-dir build/host` and `python -I tools/armor_ci_validate.py` : il doit réussir. Voir [CONTRIBUTING.md](CONTRIBUTING.md) et le [code de conduite](CODE_OF_CONDUCT.md).
+* Le README existe en huit langues et est généré à partir des sources d'ARMOR-DOCS : une modification du texte se fait là-bas.
+* Une modification d'un message entre composants commence dans ARMOR-COMMON.
+* Ne décrivez pas comme fonctionnant sur une carte ce qui a seulement été compilé.
+* Signalez une vulnérabilité en privé : [SECURITY.md](SECURITY.md). Questions, idées et rapports : electrohobby3d@gmail.com ([SUPPORT.md](SUPPORT.md)).
 
 ## 👤 AUTEUR
 

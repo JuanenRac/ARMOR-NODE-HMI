@@ -1,0 +1,210 @@
+{
+  "repo": "ARMOR-NODE-HMI",
+  "ecosystem": "armor",
+  "tagline": "The touch panel of the house: it shows what the server knows, takes the PIN on the screen and talks to the assistant; it carries out no command by itself.",
+  "description": "The firmware of ARMOR-NODE-HMI drives a 7-inch touch screen, a speaker and four microphones on a Waveshare ESP32-S3 board, shows the summary that ARMOR-SERVER sends, marks it stale when it is old and never shows the duress alarm. The firmware has been built once with ESP-IDF 5.5.5 and has never run on a board.",
+  "columns": [
+    "WHAT IS CONNECTED",
+    "THIS FIRMWARE",
+    "WHO IT TALKS TO"
+  ],
+  "nodes": [
+    {
+      "id": "screen",
+      "column": 0,
+      "level": "untested",
+      "title": "Screen, touch, audio",
+      "lines": [
+        "7 inch RGB 800x480, GT911 touch,",
+        "four microphones, a speaker and",
+        "an RTC; written from examples"
+      ]
+    },
+    {
+      "id": "people",
+      "column": 0,
+      "level": "external",
+      "title": "Browser, phone",
+      "lines": [
+        "the panel of the node, and the",
+        "set-up over Bluetooth"
+      ]
+    },
+    {
+      "id": "view",
+      "column": 1,
+      "level": "tested",
+      "title": "view_model, server_view",
+      "lines": [
+        "what the panel knows, when it",
+        "is stale, the duress alarm never",
+        "shown; the PIN entry"
+      ],
+      "code": [
+        "core/view_model.hpp",
+        "core/server_view.hpp",
+        "core/pin_entry.hpp"
+      ]
+    },
+    {
+      "id": "link",
+      "column": 1,
+      "level": "contract",
+      "title": "server_link, panel_feed",
+      "lines": [
+        "summary by WebSocket, polling as",
+        "a fallback; the certificate of the",
+        "server is pinned"
+      ],
+      "code": [
+        "main/server_link.cpp",
+        "core/panel_feed.hpp",
+        "core/server_pin.hpp"
+      ]
+    },
+    {
+      "id": "audio",
+      "column": 1,
+      "level": "tested",
+      "title": "audio, audio_queue",
+      "lines": [
+        "one priority queue: siren, alarm,",
+        "voice, confirmation, notice; the",
+        "siren repeats while unconfirmed"
+      ],
+      "code": [
+        "main/audio.cpp",
+        "core/audio_queue.hpp"
+      ]
+    },
+    {
+      "id": "voice",
+      "column": 1,
+      "level": "config",
+      "title": "voice",
+      "lines": [
+        "push to talk, off by default; the",
+        "audio goes only to the configured",
+        "service, through the server"
+      ],
+      "code": [
+        "main/voice.cpp",
+        "core/voice_session.hpp",
+        "core/hmi_config.hpp"
+      ]
+    },
+    {
+      "id": "web",
+      "column": 1,
+      "level": "tested",
+      "title": "web_server, panel/",
+      "lines": [
+        "panel in eight languages, logins,",
+        "own HTTPS certificate, private",
+        "networks only by default"
+      ],
+      "code": [
+        "main/web_server.cpp",
+        "core/auth.hpp",
+        "panel/text.js"
+      ]
+    },
+    {
+      "id": "ota",
+      "column": 1,
+      "level": "contract",
+      "title": "github_update, ble",
+      "lines": [
+        "signed updates with rollback;",
+        "Bluetooth set-up with a PIN;",
+        "never run on a board"
+      ],
+      "code": [
+        "main/github_update.cpp",
+        "main/ble_provision.cpp"
+      ]
+    },
+    {
+      "id": "server",
+      "column": 2,
+      "level": "external",
+      "title": "ARMOR-SERVER",
+      "lines": [
+        "panel/summary by GET and",
+        "panel/events by WebSocket"
+      ]
+    },
+    {
+      "id": "voiceai",
+      "column": 2,
+      "level": "untested",
+      "title": "ARMOR-VOICE-AI",
+      "lines": [
+        "the speech service, through",
+        "the server; no wake word"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "screen",
+      "to": "view",
+      "label": "",
+      "level": "untested"
+    },
+    {
+      "from": "people",
+      "to": "web",
+      "label": "",
+      "level": "tested"
+    },
+    {
+      "from": "view",
+      "to": "link",
+      "label": "",
+      "level": "tested"
+    },
+    {
+      "from": "view",
+      "to": "audio",
+      "label": "",
+      "level": "tested"
+    },
+    {
+      "from": "link",
+      "to": "voice",
+      "label": "",
+      "level": "config"
+    },
+    {
+      "from": "audio",
+      "to": "voice",
+      "label": "",
+      "level": "config"
+    },
+    {
+      "from": "voice",
+      "to": "ota",
+      "label": "",
+      "level": "config"
+    },
+    {
+      "from": "web",
+      "to": "ota",
+      "label": "",
+      "level": "tested"
+    },
+    {
+      "from": "link",
+      "to": "server",
+      "label": "HTTPS",
+      "level": "contract"
+    },
+    {
+      "from": "voice",
+      "to": "voiceai",
+      "label": "audio",
+      "level": "untested"
+    }
+  ]
+}
