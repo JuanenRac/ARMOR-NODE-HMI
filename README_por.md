@@ -149,6 +149,7 @@ O firmware foi compilado uma vez e nunca correu numa placa: o ecrã, o tátil, o
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | O período de consulta do resumo e o canal em direto por WebSocket |
 | `display.sleep_s` | 300 (0-3600) | Segundos até o ecrã adormecer (0 = nunca); o brilho e o brilho noturno também são definições |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | O volume mínimo de um som crítico, o período de repetição da sirene (0 ou de 10 a 600 s) e as suas repetições máximas |
+| `audio.tone_by_source` | conforme a gravidade | O som de cada origem de alarme (dispositivo, solar, elétrico, rede, central, outro): o que a sua gravidade indica, como aviso, como alarme, como sirene ou sem som; um som escolhido toca mesmo abaixo da gravidade mínima |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | O serviço de voz: desligado por omissão; o endereço tem no máximo 160 caracteres e é validado (senão `required` ou `invalid`); o token apaga-se quando o anfitrião muda |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | As definições que todos os nós partilham: o nome (vazio dá `armor-` e os últimos bytes do MAC), o código de configuração (vazio: aleatório), o segredo de frota (16+ caracteres, nunca no repositório), as primeiras definições do broker, o batimento (de 2 a 300 s), os minutos de configuração Bluetooth (de 1 a 120) e a reposição com BOOT (8 s nos primeiros 30 s) |
 

@@ -149,6 +149,7 @@ ARMOR-NODE-HMI 是壁挂面板：与 Android 应用一样是 [ARMOR-SERVER](http
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | 概要的轮询周期以及通过 WebSocket 的实时通道 |
 | `display.sleep_s` | 300 (0-3600) | 屏幕休眠前的秒数（0 = 从不）；亮度和夜间亮度也是设置项 |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | 严重提示音的最低音量、警笛重复周期（0 或 10 到 600 秒）及其最大重复次数 |
+| `audio.tone_by_source` | 按严重程度 | 每个告警来源(设备、太阳能、电气、网络、中心、其他)的声音:按其严重程度、作为通知、作为告警、作为警笛或静音;所选声音即使严重程度低于最低值也会响起 |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | 语音服务：默认关闭；地址最长 160 个字符并会被校验（否则为 `required` 或 `invalid`）；更换主机时令牌会被清除 |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | 所有节点共有的设置：名称（为空则为 `armor-` 加 MAC 的最后字节）、设置码（为空则随机）、机群密钥（16 个字符以上，绝不放入仓库）、最初的代理设置、心跳（2 到 300 秒）、蓝牙设置的分钟数（1 到 120）以及用 BOOT 重置（前 30 秒内按 8 秒） |
 

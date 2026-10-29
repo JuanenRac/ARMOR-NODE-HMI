@@ -149,6 +149,7 @@ ARMOR-NODE-HMI は壁掛けパネルです。Android アプリと同じく [ARMO
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | 概要の問い合わせ周期と WebSocket のライブチャネル |
 | `display.sleep_s` | 300 (0-3600) | 画面がスリープするまでの秒数（0 = なし）。明るさと夜間の明るさも設定です |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | 重大な音の最小音量、サイレンの繰り返し周期（0 または 10〜600 秒）、最大繰り返し回数 |
+| `audio.tone_by_source` | 重大度に従う | 警報の発生元ごと(デバイス、ソーラー、電気、ネットワーク、中央、その他)の音:重大度どおり、通知、警報、サイレン、または無音。選んだ音は最低重大度を下回っても鳴ります |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | 音声サービス：初期はオフ。アドレスは 160 文字以内で検証され（満たさないと `required` か `invalid`）、ホストが変わるとトークンは消えます |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | すべてのノードに共通する設定：名前（空なら `armor-` と MAC の下位バイト）、セットアップコード（空ならランダム）、フリートシークレット（16 文字以上、リポジトリには置かない）、最初のブローカー設定、ハートビート（2〜300 秒）、Bluetooth セットアップの分数（1〜120）、BOOT によるリセット（最初の 30 秒に 8 秒） |
 

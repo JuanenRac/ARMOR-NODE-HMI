@@ -149,6 +149,7 @@ The firmware has been built once and has never run on a board: the screen, the t
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | The polling period of the summary and the live channel by WebSocket |
 | `display.sleep_s` | 300 (0-3600) | Seconds until the screen sleeps (0 = never); the brightness and the night brightness are also settings |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | The lowest volume of a critical sound, the siren repeat period (0 or 10 to 600 s) and its maximum repeats |
+| `audio.tone_by_source` | by severity | The sound of each alarm source (device, solar, electrical, network, central, other): as its severity says, as a notice, as an alarm, as a siren, or no sound; a chosen sound plays even below the minimum severity |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | The voice service: off by default; the address is at most 160 characters and is validated (`required` or `invalid` otherwise); the token is erased when the host changes |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | The settings every node shares: the name (empty gives `armor-` and the last bytes of the MAC), the set-up code (empty: random), the fleet secret (16+ characters, never in the repository), the first broker settings, the heartbeat (2 to 300 s), the minutes of Bluetooth set-up (1 to 120) and the reset with BOOT (8 s in the first 30 s) |
 
