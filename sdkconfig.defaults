@@ -58,6 +58,8 @@ CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT=y
 CONFIG_ESP_MAIN_TASK_STACK_SIZE=16384
 # the system event task runs every network, Wi-Fi and Bluetooth handler: the default 2304 bytes left 276 bytes free on a running node
 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE=4096
+# the inter-processor call tasks (ipc0, ipc1) run what one core asks of the other (a flash write, a Wi-Fi call): the default left 532 bytes free on a running node
+CONFIG_ESP_IPC_TASK_STACK_SIZE=2048
 
 # The link to ARMOR-SERVER and to the speech service: HTTPS is always checked - against the usual certificate authorities, or against the fingerprint of the server's own
 # certificate fixed in the settings (main/server_link.cpp). There is NO option to skip the check, so the two switches below stay off.
