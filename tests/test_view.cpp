@@ -1,5 +1,6 @@
 // ARMOR-NODE-HMI - host tests of what the panel knows of the server: the summary, the state of the link, what is new and the colour of the screen.
 // Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+#include <array>
 #include <string>
 #include <vector>
 
@@ -187,6 +188,29 @@ static void test_cue() {
   CHECK(cue_for({warning, critical}, 2) == Cue::kSiren);
 }
 
+// The tone by origin: a kind with a tone chosen makes it whatever the severity and the floor, "none" keeps it silent, and the rest go by severity.
+static void test_cue_by_source() {
+  const auto line = [](const char* source, Severity severity) { AlarmLine alarm; alarm.source_type = source; alarm.severity = severity; return alarm; };
+  std::array<ToneChoice, kSourceKinds> tones{};
+  CHECK(cue_for({line("device", Severity::kHigh)}, 0, tones) == Cue::kAlarm);          // nothing chosen: as before
+  CHECK(cue_for({line("device", Severity::kWarning)}, 1, tones) == Cue::kNone);
+  tones[static_cast<std::size_t>(source_kind("device"))] = ToneChoice::kSiren;
+  CHECK(cue_for({line("device", Severity::kWarning)}, 2, tones) == Cue::kSiren);       // a chosen tone sounds even under the floor
+  CHECK(cue_for({line("network", Severity::kWarning)}, 2, tones) == Cue::kNone);       // the other origins keep their floor
+  tones[static_cast<std::size_t>(source_kind("network"))] = ToneChoice::kOff;
+  CHECK(cue_for({line("network", Severity::kCritical)}, 0, tones) == Cue::kNone);      // "none" is silent even for a critical alarm
+  CHECK(cue_for({line("network", Severity::kCritical), line("solar", Severity::kWarning)}, 0, tones) == Cue::kNotice);
+  CHECK(cue_for({line("network", Severity::kCritical), line("device", Severity::kInfo)}, 0, tones) == Cue::kSiren);   // the most serious of the ones that sound
+  tones[static_cast<std::size_t>(source_kind("solar"))] = ToneChoice::kNotice;
+  CHECK(cue_for({line("solar", Severity::kCritical)}, 0, tones) == Cue::kNotice);      // a quiet tone chosen for a critical origin is the one it gets
+  CHECK(source_kind("device") == 0 && source_kind("alarm") == 4 && source_kind("other") == 5 && source_kind("something new") == 5 && source_kind("") == 5);
+  ToneChoice back = ToneChoice::kAuto;
+  for (ToneChoice tone : {ToneChoice::kAuto, ToneChoice::kNotice, ToneChoice::kAlarm, ToneChoice::kSiren, ToneChoice::kOff}) {
+    CHECK(tone_from_name(tone_name(tone), back) && back == tone);
+  }
+  CHECK(!tone_from_name("loud", back) && !tone_from_name("", back));
+}
+
 // The alarm of a duress PIN is silent: it is neither shown nor counted nor heard, whatever the server sends.
 static void test_duress_is_silent() {
   const std::string head = "{\"mode\":\"disarmed\",\"revision\":7,\"time_ms\":1790000000000,\"nodes\":{\"online\":3,\"total\":4},";
@@ -233,6 +257,7 @@ int main() {
   test_link_denied();
   test_new_alarms_and_tone();
   test_cue();
+  test_cue_by_source();
   test_night_brightness();
   FINISH("test_view");
 }

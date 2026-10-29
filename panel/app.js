@@ -485,12 +485,19 @@ function serverPage() {
 }
 
 function screenPage() {
+  const toneSelect = { type: "select", options: [["auto", t("toneAuto")], ["notice", t("toneNotice")], ["alarm", t("toneAlarm")], ["siren", t("toneSiren")], ["off", t("toneOff")]] };   // the same five choices for every origin of an alarm
   return el("div", { class: "grid wide" },
     card(t("screenTitle"), el("div", { class: "row" }, field("brightness", "display.brightness", { type: "number", min: 5, max: 100 }), field("sleepAfter", "display.sleep_s", { type: "number", min: 0, max: 3600 })),
       el("div", { class: "row" }, field("nightBrightness", "display.night_brightness", { type: "number", min: 1, max: 100 }), field("nightFrom", "display.night_from", { type: "number", min: 0, max: 23 }), field("nightTo", "display.night_to", { type: "number", min: 0, max: 23 })),
       note(t("screenNote"), "info")),
     card(t("soundTitle"), field("volume", "audio.volume", { type: "number", min: 0, max: 100 }), field("alarmSound", "audio.alarm_sound", { type: "checkbox" }), field("alarmFloor", "audio.min_severity", { type: "select", options: [["warning", t("floorWarning")], ["high", t("floorHigh")], ["critical", t("floorCritical")]] }),
-      field("criticalMinVolume", "audio.critical_min_volume", { type: "number", min: 0, max: 100 }), field("sirenRepeat", "audio.siren_repeat_s", { type: "number", min: 0, max: 600 }), field("sirenMaxRepeats", "audio.siren_max_repeats", { type: "number", min: 1, max: 100 })));
+      field("criticalMinVolume", "audio.critical_min_volume", { type: "number", min: 0, max: 100 }), field("sirenRepeat", "audio.siren_repeat_s", { type: "number", min: 0, max: 600 }), field("sirenMaxRepeats", "audio.siren_max_repeats", { type: "number", min: 1, max: 100 }),
+      field("toneDevice", "audio.tone_by_source.device", toneSelect),
+      field("toneSolar", "audio.tone_by_source.solar", toneSelect),
+      field("toneElectrical", "audio.tone_by_source.electrical", toneSelect),
+      field("toneNetwork", "audio.tone_by_source.network", toneSelect),
+      field("toneAlarmPanel", "audio.tone_by_source.alarm", toneSelect),
+      field("toneOther", "audio.tone_by_source.other", toneSelect)));
 }
 
 function voicePage() {

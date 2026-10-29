@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The tone of an alarm can be chosen by where it comes from:** `audio.tone_by_source` gives each origin of an alarm (device, solar, electrical, network, alarm panel, other) its own tone: by severity as before (the default), the notice tone, the alarm tone, the siren, or no sound. A tone chosen sounds even below the least severity of the Sound card, and "no sound" keeps that origin silent while the screen still shows it. The six choices are on the Sound card in the eight languages, and the host tests cover the choice, the setting and its refusals.
 - **The Wi-Fi page warns when the node's own network is switched on next to the router connection:** the same notice the Overview shows (one radio, the network forced onto the router's channel) appears in the form as soon as both are on, in the eight languages.
 - **The README follows the universal layout:** security, interfaces, configuration, testing, troubleshooting and roadmap sections and the architecture and repository-structure pictures, in the eight languages; the host test counts are the ones of a fresh run (18 programs, 6 Python checks).
 - **The layout of the README is checked in the CI:** the validator runs the shared `tools/universal_readme_check.py` and lists, as a warning, what differs from the universal layout of the README.

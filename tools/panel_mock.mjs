@@ -37,7 +37,7 @@ const config = {
   mqtt: { enabled: true, uri: "mqtt://192.168.0.180:18883", username: "hmi-node-hmi-a1b2c3", password_set: true, heartbeat_s: 10, ntp: "pool.ntp.org", backup: [] },
   server: { enabled: true, host: "192.168.0.180", port: 18080, tls: false, cert_sha256: "", cert_pem: "", user: "panel-salon", password_set: true, poll_s: 3, live_events: true },
   display: { brightness: 80, sleep_s: 300, night_brightness: 15, night_from: 22, night_to: 7 },
-  audio: { volume: 60, alarm_sound: true, min_severity: "warning", critical_min_volume: 40, siren_repeat_s: 30, siren_max_repeats: 10 },
+  audio: { volume: 60, alarm_sound: true, min_severity: "warning", critical_min_volume: 40, siren_repeat_s: 30, siren_max_repeats: 10, tone_by_source: { device: "auto", solar: "auto", electrical: "auto", network: "auto", alarm: "auto", other: "auto" } },
   voice: { enabled: false, url: "", wake_name: "armor", listen_s: 8, binary_turn: true, token_set: false },
   time: { ntp_enabled: true, rtc_enabled: true, ntp: "pool.ntp.org", zone: "CET-1CEST,M3.5.0,M10.5.0/3" },
   system: { auto_restart_hours: 0, login_limit_per_minute: 30 },

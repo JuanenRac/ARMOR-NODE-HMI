@@ -116,6 +116,7 @@ struct Audio {
   int critical_min_volume = 40;   // percent: a siren or an alarm tone is never played quieter than this, even when the volume is lower or 0 (0 here: the volume decides, always)
   int siren_repeat_s = 30;        // seconds between the siren and its repeats while a critical alarm is unacknowledged (0: no repeats, 10 to 600)
   int siren_max_repeats = 10;     // how many times it repeats (1 to 100)
+  std::array<hmi::ToneChoice, hmi::kSourceKinds> tone_by_source{};   // the tone of the alarms of each origin (device, solar, electrical, network, alarm, other): by severity (the default), a tone, or none
 };
 
 // The voice assistant: the microphone is listened to only after a touch on the microphone button (there is no wake word yet), and what is heard goes only to the speech service of the installation.
@@ -407,6 +408,18 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
       if (!hmi::repeat_every_is_valid(every)) bad(problems, "audio.siren_repeat_s", "range"); else s.audio.siren_repeat_s = every;
     }
     read_int(*audio, "siren_max_repeats", s.audio.siren_max_repeats, hmi::kRepeatsMin, hmi::kRepeatsMax, "audio.siren_max_repeats", problems);
+    if (const json::Value* tones = audio->get("tone_by_source"); tones != nullptr) {
+      if (!tones->is_object()) bad(problems, "audio.tone_by_source", "invalid");
+      else {
+        for (int kind = 0; kind < hmi::kSourceKinds; ++kind) {
+          const json::Value* chosen = tones->get(hmi::source_name(kind));
+          if (chosen == nullptr) continue;
+          hmi::ToneChoice tone = hmi::ToneChoice::kAuto;
+          if (!chosen->is_string() || !hmi::tone_from_name(chosen->text, tone)) bad(problems, std::string("audio.tone_by_source.") + hmi::source_name(kind), "invalid");
+          else s.audio.tone_by_source[static_cast<std::size_t>(kind)] = tone;
+        }
+      }
+    }
     if (audio->get("min_severity") != nullptr && !read_choice<AlarmFloor>(*audio, "min_severity", {{"warning", AlarmFloor::kWarning}, {"high", AlarmFloor::kHigh}, {"critical", AlarmFloor::kCritical}}, s.audio.min_severity)) bad(problems, "audio.min_severity", "invalid");
   }
   if (const json::Value* voice = document.get("voice"); voice != nullptr && voice->is_object()) {
@@ -639,7 +652,10 @@ inline std::string to_json(const Settings& s, bool secrets) {
   w.key("display").begin_object().field("brightness", s.display.brightness).field("sleep_s", s.display.sleep_s).field("night_brightness", s.display.night_brightness)
       .field("night_from", s.display.night_from).field("night_to", s.display.night_to).end_object();
   w.key("audio").begin_object().field("volume", s.audio.volume).field("alarm_sound", s.audio.alarm_sound).field("min_severity", s.audio.min_severity == AlarmFloor::kCritical ? "critical" : s.audio.min_severity == AlarmFloor::kHigh ? "high" : "warning")
-      .field("critical_min_volume", s.audio.critical_min_volume).field("siren_repeat_s", s.audio.siren_repeat_s).field("siren_max_repeats", s.audio.siren_max_repeats).end_object();
+      .field("critical_min_volume", s.audio.critical_min_volume).field("siren_repeat_s", s.audio.siren_repeat_s).field("siren_max_repeats", s.audio.siren_max_repeats);
+  w.key("tone_by_source").begin_object();
+  for (int kind = 0; kind < hmi::kSourceKinds; ++kind) w.field(hmi::source_name(kind), hmi::tone_name(s.audio.tone_by_source[static_cast<std::size_t>(kind)]));
+  w.end_object().end_object();
   w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("binary_turn", s.voice.binary_turn);
   if (secrets) w.field("token", s.voice.token); else w.field("token_set", !s.voice.token.empty());
   w.end_object();

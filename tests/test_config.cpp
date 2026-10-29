@@ -106,7 +106,21 @@ static void test_document() {
   problems.clear();
   CHECK(config::load("{\"audio\":{\"min_severity\":\"critical\"}}", base, out, problems) && out.audio.min_severity == config::AlarmFloor::kCritical);
   problems.clear();
-  CHECK(config::load("{\"audio\":{\"critical_min_volume\":0,\"siren_repeat_s\":0,\"siren_max_repeats\":3}}", base, out, problems) && out.audio.critical_min_volume == 0 && out.audio.siren_repeat_s == 0 && out.audio.siren_max_repeats == 3);
+  // the tone of the alarms of each origin: by severity until chosen; one origin at a time; written and read back; a name that is not a tone, or not an object, is refused
+  CHECK(out.audio.tone_by_source[0] == hmi::ToneChoice::kAuto && out.audio.tone_by_source[5] == hmi::ToneChoice::kAuto);
+  problems.clear();
+  CHECK(config::load("{\"audio\":{\"tone_by_source\":{\"device\":\"siren\",\"network\":\"off\"}}}", base, out, problems) && out.audio.tone_by_source[0] == hmi::ToneChoice::kSiren && out.audio.tone_by_source[3] == hmi::ToneChoice::kOff && out.audio.tone_by_source[1] == hmi::ToneChoice::kAuto);
+  {
+    config::Settings tuned = out;
+    config::Settings again;
+    config::Problems again_problems;
+    CHECK(config::load(config::to_json(tuned, true), valid_settings(), again, again_problems) && again.audio.tone_by_source == tuned.audio.tone_by_source);
+  }
+  problems.clear();
+  CHECK(!config::load("{\"audio\":{\"tone_by_source\":{\"solar\":\"loud\"}}}", base, out, problems) && has(problems, "audio.tone_by_source.solar", "invalid"));
+  problems.clear();
+  CHECK(!config::load("{\"audio\":{\"tone_by_source\":\"siren\"}}", base, out, problems) && has(problems, "audio.tone_by_source", "invalid"));
+  problems.clear();  CHECK(config::load("{\"audio\":{\"critical_min_volume\":0,\"siren_repeat_s\":0,\"siren_max_repeats\":3}}", base, out, problems) && out.audio.critical_min_volume == 0 && out.audio.siren_repeat_s == 0 && out.audio.siren_max_repeats == 3);
   problems.clear();
   CHECK(config::load("{\"audio\":{\"siren_repeat_s\":600,\"siren_max_repeats\":100}}", base, out, problems) && out.audio.siren_repeat_s == 600 && out.audio.siren_max_repeats == 100);
   problems.clear();

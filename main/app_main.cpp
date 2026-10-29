@@ -188,7 +188,7 @@ extern "C" void app_main() {
       const auto audio = armor::store::settings().audio;
       if (!audio.alarm_sound || !armor::audio::ready()) return;
       const int floor = audio.min_severity == armor::config::AlarmFloor::kCritical ? 2 : audio.min_severity == armor::config::AlarmFloor::kHigh ? 1 : 0;
-      switch (armor::hmi::cue_for(fresh, floor)) {   // the sound goes with the most serious of them
+      switch (armor::hmi::cue_for(fresh, floor, audio.tone_by_source)) {   // the sound goes with the most serious of them
         case armor::hmi::Cue::kSiren: armor::audio::beep(armor::audio::Tone::kSiren); break;
         case armor::hmi::Cue::kAlarm: armor::audio::beep(armor::audio::Tone::kAlarm); break;
         case armor::hmi::Cue::kNotice: armor::audio::beep(armor::audio::Tone::kNotice); break;

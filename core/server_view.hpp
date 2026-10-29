@@ -9,13 +9,16 @@
 // and the screen says so.
 #pragma once
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include "audio_queue.hpp"
 #include "json.hpp"
 
 namespace armor::hmi {
@@ -272,6 +275,25 @@ inline Cue cue_for(const std::vector<AlarmLine>& fresh, int floor) {
   }
   if (worst < 0 || worst < floor) return Cue::kNone;
   return worst == 2 ? Cue::kSiren : worst == 1 ? Cue::kAlarm : Cue::kNotice;
+}
+
+// The same by origin: an alarm of a kind that has a tone chosen makes that tone (and sounds whatever `floor` says), one of a kind set to "none" makes nothing, and the rest go by severity and
+// `floor` as above. The sound goes with the most serious of them (a siren before an alarm tone before a notice).
+inline Cue cue_for(const std::vector<AlarmLine>& fresh, int floor, const std::array<ToneChoice, kSourceKinds>& by_source) {
+  Cue best = Cue::kNone;
+  const auto rank = [](Cue cue) { return cue == Cue::kSiren ? 3 : cue == Cue::kAlarm ? 2 : cue == Cue::kNotice ? 1 : 0; };
+  for (const AlarmLine& alarm : fresh) {
+    Cue cue = Cue::kNone;
+    switch (by_source[static_cast<std::size_t>(source_kind(alarm.source_type))]) {
+      case ToneChoice::kNotice: cue = Cue::kNotice; break;
+      case ToneChoice::kAlarm: cue = Cue::kAlarm; break;
+      case ToneChoice::kSiren: cue = Cue::kSiren; break;
+      case ToneChoice::kOff: cue = Cue::kNone; break;
+      case ToneChoice::kAuto: cue = cue_for(std::vector<AlarmLine>{alarm}, floor); break;
+    }
+    if (rank(cue) > rank(best)) best = cue;
+  }
+  return best;
 }
 
 inline Tone tone_of(const Summary& summary) {

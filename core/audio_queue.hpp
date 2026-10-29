@@ -8,6 +8,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <string>
+#include <string_view>
 
 namespace armor::hmi {
 
@@ -27,6 +29,42 @@ constexpr int priority(Sound sound) {
 
 // An alarm sound (the siren or the alarm tone) is played at least at the volume the settings give to alarms, whatever the general volume (even when it is 0).
 constexpr bool is_alarm_sound(Sound sound) { return sound == Sound::kSiren || sound == Sound::kAlarm; }
+
+// The tone an alarm makes can be chosen by where it comes from (a smoke detector is not the same as a lost network): by severity as always (kAuto), one of the three tones whatever the severity, or
+// none. An alarm of a kind with a tone chosen sounds even below the least severity of the settings; "none" keeps it silent (the screen still shows it).
+enum class ToneChoice { kAuto, kNotice, kAlarm, kSiren, kOff };
+
+// The origins an alarm can have, as the server names them (`source_type`); anything else is "other".
+constexpr int kSourceKinds = 6;
+constexpr const char* source_name(int kind) {
+  switch (kind) {
+    case 0: return "device";
+    case 1: return "solar";
+    case 2: return "electrical";
+    case 3: return "network";
+    case 4: return "alarm";
+    default: return "other";
+  }
+}
+inline int source_kind(std::string_view source_type) {
+  for (int kind = 0; kind < kSourceKinds - 1; ++kind) if (source_type == source_name(kind)) return kind;
+  return kSourceKinds - 1;
+}
+constexpr const char* tone_name(ToneChoice tone) {
+  switch (tone) {
+    case ToneChoice::kNotice: return "notice";
+    case ToneChoice::kAlarm: return "alarm";
+    case ToneChoice::kSiren: return "siren";
+    case ToneChoice::kOff: return "off";
+    default: return "auto";
+  }
+}
+inline bool tone_from_name(std::string_view name, ToneChoice& out) {
+  for (ToneChoice tone : {ToneChoice::kAuto, ToneChoice::kNotice, ToneChoice::kAlarm, ToneChoice::kSiren, ToneChoice::kOff}) {
+    if (name == tone_name(tone)) { out = tone; return true; }
+  }
+  return false;
+}
 
 constexpr int effective_volume(int volume, int alarm_minimum, Sound sound) {
   const int v = volume < 0 ? 0 : volume > 100 ? 100 : volume;
