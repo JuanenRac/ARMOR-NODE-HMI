@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93081%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-93122%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Verificação de honestidade - o que funciona hoje:** O que não depende da placa é real e está testado num computador (as definições, o que o painel sabe do servidor e quando está desatualizado, o alarme de coação que nunca é mostrado, a conversa de voz e a resposta longa do serviço de voz, os pinos da placa, os textos do ecrã em oito idiomas e os glifos das suas fontes, as verificações de versão e assinatura: 30,783 verificações em 18 programas de teste), e a página web também (executada contra um substituto num navegador real). **O firmware foi compilado uma vez (ESP-IDF 5.5.5, não verificado pela integração contínua) e nunca correu numa placa:** o ecrã, o toque, o som e a ligação ao servidor estão escritos a partir dos exemplos da Waveshare para esta família de placas e precisam do primeiro arranque. O serviço de voz (ARMOR-VOICE-AI) responde aos pedidos deste painel; não há palavra de ativação: toca-se para falar.
+**Verificação de honestidade - o que funciona hoje:** O que não depende da placa é real e está testado num computador (as definições, o que o painel sabe do servidor e quando está desatualizado, o alarme de coação que nunca é mostrado, a conversa de voz e a resposta longa do serviço de voz, os pinos da placa, os textos do ecrã em oito idiomas e os glifos das suas fontes, as verificações de versão e assinatura: 30,783 verificações em 19 programas de teste), e a página web também (executada contra um substituto num navegador real). **O firmware foi compilado uma vez (ESP-IDF 5.5.5, não verificado pela integração contínua) e nunca correu numa placa:** o ecrã, o toque, o som e a ligação ao servidor estão escritos a partir dos exemplos da Waveshare para esta família de placas e precisam do primeiro arranque. O serviço de voz (ARMOR-VOICE-AI) responde aos pedidos deste painel; não há palavra de ativação: toca-se para falar.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturidade | Funcional |
 | Função | Painel tátil de parede para o ARMOR-SERVER (família: Clients, pai: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Testes | 93081 verificações em 18 programas de anfitrião e 6 em Python (`ctest`) |
+| Testes | 93122 verificações em 19 programas de anfitrião e 6 em Python (`ctest`) |
 | Placa | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Funciona em | Uma Waveshare ESP32-S3-Touch-LCD-7C-BOX; testes de anfitrião em qualquer computador |
 | Em hardware real | Nenhum ainda: o firmware compila (ESP-IDF 5.5.5, não verificado pela CI) mas não correu na placa |
@@ -58,7 +58,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Software | 🟠 | O firmware foi compilado uma vez (ESP-IDF 5.5.5), mas a compilação não é verificada pela integração contínua e nunca funcionou numa placa. |
-| Testes | 🟢 | Passam 93.081 verificações em 18 programas de anfitrião (`ctest`): as definições, o que o painel sabe do servidor e quando isso está desatualizado, o alarme de coação que nunca se mostra, a troca de voz, os pinos, os textos do ecrã em oito idiomas e os glifos dos seus tipos de letra. |
+| Testes | 🟢 | Passam 93.122 verificações em 19 programas de anfitrião (`ctest`): as definições, o que o painel sabe do servidor e quando isso está desatualizado, o alarme de coação que nunca se mostra, a troca de voz, os pinos, os textos do ecrã em oito idiomas e os glifos dos seus tipos de letra. |
 | Protocolos e dados | 🟡 | A troca com o servidor e com o serviço de voz ARMOR-VOICE-AI é testada contra simulações; é premir para falar, sem palavra de ativação. |
 | Interface | 🟠 | A página web correu contra uma simulação num navegador real; o ecrã, o toque e o som foram escritos a partir dos exemplos da Waveshare e esperam a primeira ligação. |
 | Hardware | 🔴 | O firmware não funcionou na placa: nada funcionou ainda em equipamentos reais. |
@@ -149,7 +149,8 @@ O firmware foi compilado uma vez e nunca correu numa placa: o ecrã, o tátil, o
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | O período de consulta do resumo e o canal em direto por WebSocket |
 | `display.sleep_s` | 300 (0-3600) | Segundos até o ecrã adormecer (0 = nunca); o brilho e o brilho noturno também são definições |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | O volume mínimo de um som crítico, o período de repetição da sirene (0 ou de 10 a 600 s) e as suas repetições máximas |
-| `audio.tone_by_source` | conforme a gravidade | O som de cada origem de alarme (dispositivo, solar, elétrico, rede, central, outro): o que a sua gravidade indica, como aviso, como alarme, como sirene ou sem som; um som escolhido toca mesmo abaixo da gravidade mínima |
+| `audio.tone_by_source` | conforme a gravidade | O som de cada origem de alarme (dispositivo, solar, elétrico, rede, central, outro): o que a sua gravidade indica, como aviso, como alarme, como sirene sem som, `spoken` (o alarme dito em voz alta) ou `custom` (o som carregado para essa origem), ambos feitos pelo servidor e reproduzidos só se chegarem inteiros, senão o tom habitual; um som escolhido toca mesmo abaixo da gravidade mínima |
+| `audio.clip_max_bytes` | 200000 | O máximo de áudio, em bytes de 16 kHz, 16 bits, mono (de 3200 a 262144), obtido do servidor para um alarme dito em voz alta ou um som próprio; uma resposta mais longa não é reproduzida |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | O serviço de voz: desligado por omissão; o endereço tem no máximo 160 caracteres e é validado (senão `required` ou `invalid`); o token apaga-se quando o anfitrião muda |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | As definições que todos os nós partilham: o nome (vazio dá `armor-` e os últimos bytes do MAC), o código de configuração (vazio: aleatório), o segredo de frota (16+ caracteres, nunca no repositório), as primeiras definições do broker, o batimento (de 2 a 300 s), os minutos de configuração Bluetooth (de 1 a 120) e a reposição com BOOT (8 s nos primeiros 30 s) |
 
@@ -176,7 +177,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-18 programas de teste de anfitrião e 6 verificações Python correm com `ctest`; 93081 verificações contadas pelos programas de anfitrião, compiladas com `-Werror`.
+19 programas de teste de anfitrião e 6 verificações Python correm com `ctest`; 93122 verificações contadas pelos programas de anfitrião, compiladas com `-Werror`.
 
 Verificações Python: os textos do painel em oito línguas, as tarefas, os caminhos de gravação, a sessão Bluetooth sob o seu bloqueio e as rotas que o painel chama (e, em alguns nós, os códigos HTTP ou os glifos dos tipos de letra)
 

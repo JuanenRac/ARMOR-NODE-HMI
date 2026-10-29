@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93081%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-93122%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** What does not depend on the board is real and tested on a computer (the settings, what the panel knows of the server and when that is stale, the duress alarm that is never shown, the voice conversation and the long answer of the speech service, the board's pins, the words of the screen in eight languages and the glyphs of its fonts, the release and signature checks: 93,081 checks in 18 test programs) and so is the web page (run against a stand-in in a real browser). **The firmware has been built once (ESP-IDF 5.5.5, not checked by the continuous integration) and has never run on a board:** the screen, the touch, the sound and the link to the server are written from Waveshare's examples for this family of boards and need their first power-up. The speech service (ARMOR-VOICE-AI) answers this panel's requests, there is no wake word: it is push to talk.
+**Honesty check - what runs today:** What does not depend on the board is real and tested on a computer (the settings, what the panel knows of the server and when that is stale, the duress alarm that is never shown, the voice conversation and the long answer of the speech service, the board's pins, the words of the screen in eight languages and the glyphs of its fonts, the release and signature checks: 93,122 checks in 18 test programs) and so is the web page (run against a stand-in in a real browser). **The firmware has been built once (ESP-IDF 5.5.5, not checked by the continuous integration) and has never run on a board:** the screen, the touch, the sound and the link to the server are written from Waveshare's examples for this family of boards and need their first power-up. The speech service (ARMOR-VOICE-AI) answers this panel's requests, there is no wake word: it is push to talk.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturity | Functional |
 | Role | Wall touch panel for ARMOR-SERVER (family: Clients, parent: ARMOR-SERVER) |
 | Stack | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 93081 checks in 18 host programs and 6 Python checks (`ctest`) |
+| Tests | 93122 checks in 19 host programs and 6 Python checks (`ctest`) |
 | Board | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Runs on | A Waveshare ESP32-S3-Touch-LCD-7C-BOX; host tests on any computer |
 | On real hardware | None yet: the firmware builds (ESP-IDF 5.5.5, not checked by CI) but has not run on the board |
@@ -58,7 +58,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟠 | The firmware has been built once (ESP-IDF 5.5.5), but the build is not checked by the continuous integration and it has never run on a board. |
-| Tests | 🟢 | 93,081 checks in 18 host programs pass (`ctest`): the settings, what the panel knows of the server and when that is stale, the duress alarm that is never shown, the voice exchange, the pins, the words of the screen in eight languages and the glyphs of its fonts. |
+| Tests | 🟢 | 93,122 checks in 19 host programs pass (`ctest`): the settings, what the panel knows of the server and when that is stale, the duress alarm that is never shown, the voice exchange, the pins, the words of the screen in eight languages and the glyphs of its fonts. |
 | Protocols and data | 🟡 | The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, with no wake word. |
 | Interface | 🟠 | The web page runs against a stand-in in a real browser; the screen, the touch and the sound are written from Waveshare's examples and wait for their first power-up. |
 | Hardware | 🔴 | The firmware has not run on the board: nothing has run on real equipment yet. |
@@ -149,7 +149,8 @@ The firmware has been built once and has never run on a board: the screen, the t
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | The polling period of the summary and the live channel by WebSocket |
 | `display.sleep_s` | 300 (0-3600) | Seconds until the screen sleeps (0 = never); the brightness and the night brightness are also settings |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | The lowest volume of a critical sound, the siren repeat period (0 or 10 to 600 s) and its maximum repeats |
-| `audio.tone_by_source` | by severity | The sound of each alarm source (device, solar, electrical, network, central, other): as its severity says, as a notice, as an alarm, as a siren, or no sound; a chosen sound plays even below the minimum severity |
+| `audio.tone_by_source` | by severity | The sound of each alarm source (device, solar, electrical, network, central, other): as its severity says, as a notice, as an alarm, as a siren, no sound, `spoken` (the alarm said out loud) or `custom` (the sound uploaded for that origin), both made by the server and played only if they arrive whole, else the usual tone; a chosen sound plays even below the minimum severity |
+| `audio.clip_max_bytes` | 200000 | The most audio, in bytes of 16 kHz 16-bit mono (3200 to 262144), taken from the server for an alarm said out loud or a sound of its own; a longer answer is not played |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | The voice service: off by default; the address is at most 160 characters and is validated (`required` or `invalid` otherwise); the token is erased when the host changes |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | The settings every node shares: the name (empty gives `armor-` and the last bytes of the MAC), the set-up code (empty: random), the fleet secret (16+ characters, never in the repository), the first broker settings, the heartbeat (2 to 300 s), the minutes of Bluetooth set-up (1 to 120) and the reset with BOOT (8 s in the first 30 s) |
 
@@ -176,7 +177,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-18 host test programs and 6 Python checks run under `ctest`; 93081 checks counted by the host programs, built with `-Werror`.
+19 host test programs and 6 Python checks run under `ctest`; 93122 checks counted by the host programs, built with `-Werror`.
 
 Python checks: the panel texts in eight languages, the tasks, the save paths, the Bluetooth session under its lock and the routes the panel calls (and, in some nodes, the HTTP codes or the glyphs of the fonts)
 

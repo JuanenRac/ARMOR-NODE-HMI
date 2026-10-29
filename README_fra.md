@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Langage">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93081%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-93122%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturité">
 </p>
 
 ---
 
-**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Ce qui ne dépend pas de la carte est réel et testé sur un ordinateur (les réglages, ce que le panneau sait du serveur et quand cela est périmé, l'alarme de contrainte qui n'est jamais affichée, la conversation vocale et la longue réponse du service vocal, les broches de la carte, les textes de l'écran en huit langues et les glyphes de ses polices, les contrôles de version et de signature : 30,783 vérifications en 18 programmes de test), de même que la page web (exécutée contre un substitut dans un vrai navigateur). **Le firmware a été compilé une fois (ESP-IDF 5.5.5, non vérifié par l'intégration continue) et n'a jamais tourné sur une carte :** l'écran, le tactile, le son et la liaison avec le serveur sont écrits d'après les exemples de Waveshare pour cette famille de cartes et attendent leur première mise sous tension. Le service vocal (ARMOR-VOICE-AI) répond aux requêtes de ce panneau ; il n'y a pas de mot d'activation : c'est appuyer pour parler.
+**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Ce qui ne dépend pas de la carte est réel et testé sur un ordinateur (les réglages, ce que le panneau sait du serveur et quand cela est périmé, l'alarme de contrainte qui n'est jamais affichée, la conversation vocale et la longue réponse du service vocal, les broches de la carte, les textes de l'écran en huit langues et les glyphes de ses polices, les contrôles de version et de signature : 30,783 vérifications en 19 programmes de test), de même que la page web (exécutée contre un substitut dans un vrai navigateur). **Le firmware a été compilé une fois (ESP-IDF 5.5.5, non vérifié par l'intégration continue) et n'a jamais tourné sur une carte :** l'écran, le tactile, le son et la liaison avec le serveur sont écrits d'après les exemples de Waveshare pour cette famille de cartes et attendent leur première mise sous tension. Le service vocal (ARMOR-VOICE-AI) répond aux requêtes de ce panneau ; il n'y a pas de mot d'activation : c'est appuyer pour parler.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturité | Fonctionnel |
 | Rôle | Panneau tactile mural pour ARMOR-SERVER (famille : Clients, parent : ARMOR-SERVER) |
 | Technologie | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 93081 vérifications dans 18 programmes hôte et 6 contrôles Python (`ctest`) |
+| Tests | 93122 vérifications dans 19 programmes hôte et 6 contrôles Python (`ctest`) |
 | Carte | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Fonctionne sur | Une Waveshare ESP32-S3-Touch-LCD-7C-BOX ; tests sur hôte sur n'importe quel ordinateur |
 | Sur matériel réel | Aucun pour l'instant : le firmware se compile (ESP-IDF 5.5.5, non vérifié par la CI) mais n'a pas tourné sur la carte |
@@ -58,7 +58,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟠 | Le firmware a été compilé une fois (ESP-IDF 5.5.5), mais la compilation n'est pas contrôlée par l'intégration continue et il n'a jamais tourné sur une carte. |
-| Tests | 🟢 | 93 081 vérifications dans 18 programmes d'hôte réussissent (`ctest`) : les réglages, ce que le panneau sait du serveur et quand c'est périmé, l'alarme sous contrainte qui n'est jamais affichée, l'échange vocal, les broches, les textes de l'écran en huit langues et les glyphes de ses polices. |
+| Tests | 🟢 | 93 122 vérifications dans 19 programmes d'hôte réussissent (`ctest`) : les réglages, ce que le panneau sait du serveur et quand c'est périmé, l'alarme sous contrainte qui n'est jamais affichée, l'échange vocal, les broches, les textes de l'écran en huit langues et les glyphes de ses polices. |
 | Protocoles et données | 🟡 | L'échange avec le serveur et avec le service vocal ARMOR-VOICE-AI est testé contre des simulations ; c'est du push-to-talk, sans mot d'activation. |
 | Interface | 🟠 | La page web a tourné contre une simulation dans un vrai navigateur ; l'écran, le tactile et le son sont écrits d'après les exemples de Waveshare et attendent leur première mise sous tension. |
 | Matériel | 🔴 | Le firmware n'a pas tourné sur la carte : rien n'a encore tourné sur de vrais équipements. |
@@ -149,7 +149,8 @@ Le firmware a été compilé une fois et n'a jamais tourné sur une carte : l'é
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | La période d'interrogation du résumé et le canal en direct par WebSocket |
 | `display.sleep_s` | 300 (0-3600) | Secondes avant la mise en veille de l'écran (0 = jamais) ; la luminosité et la luminosité de nuit sont aussi des réglages |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | Le volume minimal d'un son critique, la période de répétition de la sirène (0 ou de 10 à 600 s) et ses répétitions maximales |
-| `audio.tone_by_source` | selon la gravité | Le son de chaque origine d'alarme (appareil, solaire, électrique, réseau, centrale, autre) : celui que dicte sa gravité, en avis, en alarme, en sirène ou sans son ; un son choisi retentit même sous la gravité minimale |
+| `audio.tone_by_source` | selon la gravité | Le son de chaque origine d'alarme (appareil, solaire, électrique, réseau, centrale, autre) : celui que dicte sa gravité, en avis, en alarme, en sirène sans son, `spoken` (l'alarme dite à voix haute) ou `custom` (le son téléversé pour cette origine), tous deux produits par le serveur et joués seulement s'ils arrivent entiers, sinon le son habituel ; un son choisi retentit même sous la gravité minimale |
+| `audio.clip_max_bytes` | 200000 | Le maximum d'audio, en octets de 16 kHz, 16 bits, mono (de 3200 à 262144), pris au serveur pour une alarme dite à voix haute ou un son personnalisé ; une réponse plus longue n'est pas jouée |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Le service vocal : désactivé par défaut ; l'adresse fait au plus 160 caractères et est validée (sinon `required` ou `invalid`) ; le jeton est effacé quand l'hôte change |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Les réglages que tous les nœuds partagent : le nom (vide donne `armor-` et les derniers octets de la MAC), le code de configuration (vide : aléatoire), le secret de flotte (16+ caractères, jamais dans le dépôt), les premiers réglages du broker, le battement (de 2 à 300 s), les minutes de configuration Bluetooth (de 1 à 120) et la réinitialisation avec BOOT (8 s dans les 30 premières s) |
 
@@ -176,7 +177,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-18 programmes de test sur hôte et 6 contrôles Python tournent sous `ctest` ; 93081 vérifications comptées par les programmes hôte, compilés avec `-Werror`.
+19 programmes de test sur hôte et 6 contrôles Python tournent sous `ctest` ; 93122 vérifications comptées par les programmes hôte, compilés avec `-Werror`.
 
 Contrôles Python : les textes du panneau en huit langues, les tâches, les chemins de sauvegarde, la session Bluetooth sous son verrou et les routes appelées par le panneau (et, dans certains nœuds, les codes HTTP ou les glyphes des polices)
 

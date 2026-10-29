@@ -19,6 +19,7 @@
 
 #include "board_s3.hpp"
 #include "admin_sources.hpp"
+#include "alarm_clip.hpp"
 #include "audio_queue.hpp"
 #include "json.hpp"
 #include "mqtt_tls.hpp"
@@ -116,6 +117,7 @@ struct Audio {
   int critical_min_volume = 40;   // percent: a siren or an alarm tone is never played quieter than this, even when the volume is lower or 0 (0 here: the volume decides, always)
   int siren_repeat_s = 30;        // seconds between the siren and its repeats while a critical alarm is unacknowledged (0: no repeats, 10 to 600)
   int siren_max_repeats = 10;     // how many times it repeats (1 to 100)
+  int clip_max_bytes = 200000;    // the most audio the panel takes from the server for an alarm said out loud or a sound of its own (bytes of 16 kHz 16-bit mono; 3200 to 262144): a longer one is not played
   std::array<hmi::ToneChoice, hmi::kSourceKinds> tone_by_source{};   // the tone of the alarms of each origin (device, solar, electrical, network, alarm, other): by severity (the default), a tone, or none
 };
 
@@ -408,6 +410,7 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
       if (!hmi::repeat_every_is_valid(every)) bad(problems, "audio.siren_repeat_s", "range"); else s.audio.siren_repeat_s = every;
     }
     read_int(*audio, "siren_max_repeats", s.audio.siren_max_repeats, hmi::kRepeatsMin, hmi::kRepeatsMax, "audio.siren_max_repeats", problems);
+    read_int(*audio, "clip_max_bytes", s.audio.clip_max_bytes, static_cast<int>(clip::kMinBytes), static_cast<int>(clip::kMaxBytesCeiling), "audio.clip_max_bytes", problems);
     if (const json::Value* tones = audio->get("tone_by_source"); tones != nullptr) {
       if (!tones->is_object()) bad(problems, "audio.tone_by_source", "invalid");
       else {
@@ -534,6 +537,7 @@ inline Problems validate(const Settings& s) {
   if (s.audio.critical_min_volume < 0 || s.audio.critical_min_volume > 100) bad(problems, "audio.critical_min_volume", "range");
   if (!hmi::repeat_every_is_valid(s.audio.siren_repeat_s)) bad(problems, "audio.siren_repeat_s", "range");
   if (s.audio.siren_max_repeats < hmi::kRepeatsMin || s.audio.siren_max_repeats > hmi::kRepeatsMax) bad(problems, "audio.siren_max_repeats", "range");
+  if (s.audio.clip_max_bytes < static_cast<int>(clip::kMinBytes) || s.audio.clip_max_bytes > static_cast<int>(clip::kMaxBytesCeiling)) bad(problems, "audio.clip_max_bytes", "range");
 
   // the way in: the Ethernet cable (only the s3-eth board has one), with DHCP or a fixed address, or Wi-Fi
   if (s.uplink == Uplink::kEthernet && !board::kHasEthernet) bad(problems, "uplink", "not_available");
@@ -652,7 +656,7 @@ inline std::string to_json(const Settings& s, bool secrets) {
   w.key("display").begin_object().field("brightness", s.display.brightness).field("sleep_s", s.display.sleep_s).field("night_brightness", s.display.night_brightness)
       .field("night_from", s.display.night_from).field("night_to", s.display.night_to).end_object();
   w.key("audio").begin_object().field("volume", s.audio.volume).field("alarm_sound", s.audio.alarm_sound).field("min_severity", s.audio.min_severity == AlarmFloor::kCritical ? "critical" : s.audio.min_severity == AlarmFloor::kHigh ? "high" : "warning")
-      .field("critical_min_volume", s.audio.critical_min_volume).field("siren_repeat_s", s.audio.siren_repeat_s).field("siren_max_repeats", s.audio.siren_max_repeats);
+      .field("critical_min_volume", s.audio.critical_min_volume).field("siren_repeat_s", s.audio.siren_repeat_s).field("siren_max_repeats", s.audio.siren_max_repeats).field("clip_max_bytes", s.audio.clip_max_bytes);
   w.key("tone_by_source").begin_object();
   for (int kind = 0; kind < hmi::kSourceKinds; ++kind) w.field(hmi::source_name(kind), hmi::tone_name(s.audio.tone_by_source[static_cast<std::size_t>(kind)]));
   w.end_object().end_object();

@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Sprache">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93081%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-93122%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Reifegrad">
 </p>
@@ -41,7 +41,7 @@
 | Reifegrad | Funktionsfähig |
 | Rolle | Wand-Touchpanel für ARMOR-SERVER (Familie: Clients, übergeordnet: ARMOR-SERVER) |
 | Technik | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 93081 Prüfungen in 18 Host-Programmen und 6 Python-Prüfungen (`ctest`) |
+| Tests | 93122 Prüfungen in 19 Host-Programmen und 6 Python-Prüfungen (`ctest`) |
 | Platine | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Läuft auf | Ein Waveshare ESP32-S3-Touch-LCD-7C-BOX; Host-Tests auf jedem Computer |
 | Auf echter Hardware | Noch keiner: die Firmware baut (ESP-IDF 5.5.5, von der CI nicht geprüft), lief aber nicht auf der Platine |
@@ -58,7 +58,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟠 | Die Firmware wurde einmal gebaut (ESP-IDF 5.5.5), der Build wird aber nicht von der kontinuierlichen Integration geprüft, und sie lief nie auf einer Platine. |
-| Tests | 🟢 | 93.081 Prüfungen in 18 Host-Programmen bestehen (`ctest`): die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der nie angezeigte Zwangsalarm, der Sprachaustausch, die Pins, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften. |
+| Tests | 🟢 | 93.122 Prüfungen in 19 Host-Programmen bestehen (`ctest`): die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der nie angezeigte Zwangsalarm, der Sprachaustausch, die Pins, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften. |
 | Protokolle und Daten | 🟡 | Der Austausch mit dem Server und mit dem Sprachdienst ARMOR-VOICE-AI ist gegen Nachbildungen getestet; es ist Push-to-Talk, ohne Weckwort. |
 | Oberfläche | 🟠 | Die Webseite lief gegen eine Nachbildung in einem echten Browser; Bildschirm, Touch und Ton sind nach den Beispielen von Waveshare geschrieben und warten auf das erste Einschalten. |
 | Hardware | 🔴 | Die Firmware lief nicht auf der Platine: Bisher lief nichts auf echten Geräten. |
@@ -149,7 +149,8 @@ Die Firmware wurde einmal gebaut und lief nie auf einer Platine: Bildschirm, Tou
 | `server.poll_s`, `server.live_events` | 3 (1-60), true | Die Abfrageperiode der Zusammenfassung und der Live-Kanal per WebSocket |
 | `display.sleep_s` | 300 (0-3600) | Sekunden bis der Bildschirm schläft (0 = nie); Helligkeit und Nachthelligkeit sind ebenfalls Einstellungen |
 | `audio.critical_min_volume`, `audio.siren_repeat_s`, `audio.siren_max_repeats` | 40 (0-100), 30, 10 | Die niedrigste Lautstärke eines kritischen Tons, die Wiederholperiode der Sirene (0 oder 10 bis 600 s) und ihre maximalen Wiederholungen |
-| `audio.tone_by_source` | nach Schweregrad | Der Ton jeder Alarmquelle (Gerät, Solar, Elektrik, Netz, Zentrale, andere): wie es der Schweregrad vorgibt, als Hinweis, als Alarm, als Sirene oder ohne Ton; ein gewählter Ton erklingt auch unterhalb des Mindestschweregrads |
+| `audio.tone_by_source` | nach Schweregrad | Der Ton jeder Alarmquelle (Gerät, Solar, Elektrik, Netz, Zentrale, andere): wie es der Schweregrad vorgibt, als Hinweis, als Alarm, als Sirene ohne Ton, `spoken` (der Alarm laut gesprochen) oder `custom` (der für diese Herkunft hochgeladene Ton), beides vom Server erzeugt und nur bei vollständigem Eintreffen abgespielt, sonst der übliche Ton; ein gewählter Ton erklingt auch unterhalb des Mindestschweregrads |
+| `audio.clip_max_bytes` | 200000 | Höchstmenge Audio in Bytes (16 kHz, 16 Bit, Mono; 3200 bis 262144), die der Server für einen laut gesprochenen Alarm oder einen eigenen Ton liefern darf; eine längere Antwort wird nicht abgespielt |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Der Sprachdienst: standardmäßig aus; die Adresse hat höchstens 160 Zeichen und wird geprüft (sonst `required` oder `invalid`); das Token wird beim Hostwechsel gelöscht |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Die Einstellungen, die alle Knoten teilen: der Name (leer ergibt `armor-` und die letzten Bytes der MAC), der Einrichtungscode (leer: zufällig), das Flottengeheimnis (16+ Zeichen, nie im Repository), die ersten Broker-Einstellungen, der Herzschlag (2 bis 300 s), die Minuten der Bluetooth-Einrichtung (1 bis 120) und der Reset mit BOOT (8 s in den ersten 30 s) |
 
@@ -176,7 +177,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-18 Host-Testprogramme und 6 Python-Prüfungen laufen unter `ctest`; 93081 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
+19 Host-Testprogramme und 6 Python-Prüfungen laufen unter `ctest`; 93122 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
 
 Python-Prüfungen: die Panel-Texte in acht Sprachen, die Tasks, die Speicherpfade, die Bluetooth-Sitzung unter ihrer Sperre und die vom Panel aufgerufenen Routen (und in manchen Knoten die HTTP-Codes oder die Glyphen der Schriften)
 

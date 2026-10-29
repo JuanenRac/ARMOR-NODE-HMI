@@ -32,7 +32,9 @@ constexpr bool is_alarm_sound(Sound sound) { return sound == Sound::kSiren || so
 
 // The tone an alarm makes can be chosen by where it comes from (a smoke detector is not the same as a lost network): by severity as always (kAuto), one of the three tones whatever the severity, or
 // none. An alarm of a kind with a tone chosen sounds even below the least severity of the settings; "none" keeps it silent (the screen still shows it).
-enum class ToneChoice { kAuto, kNotice, kAlarm, kSiren, kOff };
+// Two more choices play audio the server makes: kSpoken is the alarm said out loud (the sentence the voice gateway makes) and kCustom the sound an administrator uploaded for that origin; both are asked for
+// when the alarm arrives (core/alarm_clip.hpp) and, if the server does not give them, the alarm sounds as its severity says, so it is never silent.
+enum class ToneChoice { kAuto, kNotice, kAlarm, kSiren, kOff, kSpoken, kCustom };
 
 // The origins an alarm can have, as the server names them (`source_type`); anything else is "other".
 constexpr int kSourceKinds = 6;
@@ -56,11 +58,13 @@ constexpr const char* tone_name(ToneChoice tone) {
     case ToneChoice::kAlarm: return "alarm";
     case ToneChoice::kSiren: return "siren";
     case ToneChoice::kOff: return "off";
+    case ToneChoice::kSpoken: return "spoken";
+    case ToneChoice::kCustom: return "custom";
     default: return "auto";
   }
 }
 inline bool tone_from_name(std::string_view name, ToneChoice& out) {
-  for (ToneChoice tone : {ToneChoice::kAuto, ToneChoice::kNotice, ToneChoice::kAlarm, ToneChoice::kSiren, ToneChoice::kOff}) {
+  for (ToneChoice tone : {ToneChoice::kAuto, ToneChoice::kNotice, ToneChoice::kAlarm, ToneChoice::kSiren, ToneChoice::kOff, ToneChoice::kSpoken, ToneChoice::kCustom}) {
     if (name == tone_name(tone)) { out = tone; return true; }
   }
   return false;

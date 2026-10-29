@@ -45,3 +45,12 @@ taken out of the text by hand (`core/voice_answer.hpp`) because the JSON reader 
 
 The microphone is open only between the touch and the end of the recording; no audio is stored on the panel and none leaves it unless the voice is on. The address of the service is the
 installation's own (a machine of the local network); an `https://` address is checked against the usual certificate authorities.
+
+## Alarms said out loud and sounds of their own
+
+Besides its tones, the panel can play two kinds of audio that ARMOR-SERVER makes, chosen for each origin of an alarm (`audio.tone_by_source.<origin>`: `spoken` or `custom`; the Sound card of the panel). Nothing is asked for until an origin is set to one of them, and the server has its own switch for each (the options `alarm_audio.spoken` and `alarm_audio.custom_sounds` in Studio, both off by default).
+
+* `spoken`: the sentence of the alarm (how serious, where from and what it is, in the language of the panel) made by the voice gateway: `GET /api/v1/alarm-audio/spoken?language=&source=&severity=&code=`. The panel sends only the closed values and the alarm code if it is a plain one (lower-case letters, digits and `_.:-`); the server keeps the sentences it has made.
+* `custom`: the short sound an administrator uploaded in Studio for that origin: `GET /api/v1/alarm-audio/sounds/<origin>`.
+
+Both answers are raw 16 kHz 16-bit mono PCM with its SHA-256 in `X-Armor-Audio-Sha256`. Before playing, the panel checks (core/alarm_clip.hpp) that the answer is not empty, not shorter than a tenth of a second, not longer than `audio.clip_max_bytes` (default 200000 bytes, 3200 to 262144), a whole number of 16-bit samples, and that its SHA-256 is the one announced. Anything else is thrown away. It asks on a task of its own, one download at a time, and the alarm never waits for it: if the audio does not arrive whole (the option is off on the server, no sound was uploaded, the server is slow or unreachable, the checks fail), the alarm sounds as its severity says, so it is never silent for that reason. A siren for a critical alarm of another origin is never replaced by the audio of a lesser alarm. The panel remembers the last eight sentences (up to 600 KB) so that an alarm of the same kind is said at once; a sound of its own is asked for every time, so a new upload counts straight away. The download and the playing run only in the firmware and have not been tried on a board; the checks and the choice of what to play are tested on a computer.

@@ -319,6 +319,13 @@ void play(const std::int16_t* samples, std::size_t count) {
   play_locked(samples, count, hmi::Sound::kVoice);
 }
 
+bool play_clip(const std::int16_t* samples, std::size_t count) {
+  if (!g_ready || g_speaker == nullptr || samples == nullptr || count == 0) return false;
+  std::lock_guard<std::mutex> guard(g_lock);
+  play_locked(samples, count, hmi::Sound::kAlarm);
+  return true;
+}
+
 void beep(Tone tone) {
   if (g_speaker == nullptr || g_audio_task == nullptr) return;
   const hmi::Sound sound = sound_of(tone);

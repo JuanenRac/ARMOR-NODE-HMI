@@ -35,4 +35,8 @@ void play(const std::int16_t* samples, std::size_t count);
 // the most important first (a siren before an alarm tone, an alarm tone before the voice, the voice before the notices).
 void beep(Tone tone);
 
+// Plays the audio the server made for an alarm (an alarm said out loud, or a sound of its own) as an alarm sound: at least at the volume the settings give to alarms, and not given way to the voice.
+// It returns when the samples have been handed to the codec, so call it from a task of its own. False when the sound is not ready.
+bool play_clip(const std::int16_t* samples, std::size_t count);
+
 }  // namespace armor::audio

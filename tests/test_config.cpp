@@ -120,6 +120,20 @@ static void test_document() {
   CHECK(!config::load("{\"audio\":{\"tone_by_source\":{\"solar\":\"loud\"}}}", base, out, problems) && has(problems, "audio.tone_by_source.solar", "invalid"));
   problems.clear();
   CHECK(!config::load("{\"audio\":{\"tone_by_source\":\"siren\"}}", base, out, problems) && has(problems, "audio.tone_by_source", "invalid"));
+  problems.clear();
+  // the audio the server makes (the alarm said out loud, a sound of its own): chosen per origin, never on its own; the size limit is a setting with a range
+  CHECK(config::load("{\"audio\":{\"tone_by_source\":{\"electrical\":\"spoken\",\"solar\":\"custom\"},\"clip_max_bytes\":100000}}", base, out, problems) && out.audio.tone_by_source[2] == hmi::ToneChoice::kSpoken && out.audio.tone_by_source[1] == hmi::ToneChoice::kCustom && out.audio.clip_max_bytes == 100000);
+  {
+    config::Settings again;
+    config::Problems again_problems;
+    CHECK(config::load(config::to_json(out, true), valid_settings(), again, again_problems) && again.audio.tone_by_source == out.audio.tone_by_source && again.audio.clip_max_bytes == 100000);
+  }
+  problems.clear();
+  CHECK(!config::load("{\"audio\":{\"clip_max_bytes\":3199}}", base, out, problems) && has(problems, "audio.clip_max_bytes", "range"));
+  problems.clear();
+  CHECK(!config::load("{\"audio\":{\"clip_max_bytes\":262145}}", base, out, problems) && has(problems, "audio.clip_max_bytes", "range"));
+  problems.clear();
+  CHECK(config::Settings{}.audio.clip_max_bytes == 200000 && config::Settings{}.audio.tone_by_source[2] == hmi::ToneChoice::kAuto);   // nothing is fetched until an origin is set to it
   problems.clear();  CHECK(config::load("{\"audio\":{\"critical_min_volume\":0,\"siren_repeat_s\":0,\"siren_max_repeats\":3}}", base, out, problems) && out.audio.critical_min_volume == 0 && out.audio.siren_repeat_s == 0 && out.audio.siren_max_repeats == 3);
   problems.clear();
   CHECK(config::load("{\"audio\":{\"siren_repeat_s\":600,\"siren_max_repeats\":100}}", base, out, problems) && out.audio.siren_repeat_s == 600 && out.audio.siren_max_repeats == 100);

@@ -485,7 +485,7 @@ function serverPage() {
 }
 
 function screenPage() {
-  const toneSelect = { type: "select", options: [["auto", t("toneAuto")], ["notice", t("toneNotice")], ["alarm", t("toneAlarm")], ["siren", t("toneSiren")], ["off", t("toneOff")]] };   // the same five choices for every origin of an alarm
+  const toneSelect = { type: "select", options: [["auto", t("toneAuto")], ["notice", t("toneNotice")], ["alarm", t("toneAlarm")], ["siren", t("toneSiren")], ["off", t("toneOff")], ["spoken", t("toneSpoken")], ["custom", t("toneCustom")]] };   // the same seven choices for every origin of an alarm
   return el("div", { class: "grid wide" },
     card(t("screenTitle"), el("div", { class: "row" }, field("brightness", "display.brightness", { type: "number", min: 5, max: 100 }), field("sleepAfter", "display.sleep_s", { type: "number", min: 0, max: 3600 })),
       el("div", { class: "row" }, field("nightBrightness", "display.night_brightness", { type: "number", min: 1, max: 100 }), field("nightFrom", "display.night_from", { type: "number", min: 0, max: 23 }), field("nightTo", "display.night_to", { type: "number", min: 0, max: 23 })),
@@ -497,7 +497,8 @@ function screenPage() {
       field("toneElectrical", "audio.tone_by_source.electrical", toneSelect),
       field("toneNetwork", "audio.tone_by_source.network", toneSelect),
       field("toneAlarmPanel", "audio.tone_by_source.alarm", toneSelect),
-      field("toneOther", "audio.tone_by_source.other", toneSelect)));
+      field("toneOther", "audio.tone_by_source.other", toneSelect),
+      field("clipMaxBytes", "audio.clip_max_bytes", { type: "number", min: 3200, max: 262144 })));
 }
 
 function voicePage() {

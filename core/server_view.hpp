@@ -290,6 +290,8 @@ inline Cue cue_for(const std::vector<AlarmLine>& fresh, int floor, const std::ar
       case ToneChoice::kSiren: cue = Cue::kSiren; break;
       case ToneChoice::kOff: cue = Cue::kNone; break;
       case ToneChoice::kAuto: cue = cue_for(std::vector<AlarmLine>{alarm}, floor); break;
+      case ToneChoice::kSpoken:
+      case ToneChoice::kCustom: cue = cue_for(std::vector<AlarmLine>{alarm}, 0); break;   // the tone of its severity, the one that sounds if the server does not give the audio
     }
     if (rank(cue) > rank(best)) best = cue;
   }

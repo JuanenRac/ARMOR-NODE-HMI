@@ -13,6 +13,11 @@
  */
 #include <cstdio>
 #include <algorithm>
+#include <atomic>
+#include <memory>
+#include <new>
+#include <string>
+#include <vector>
 #include <cstring>
 #include <ctime>
 #include "esp_app_desc.h"
@@ -28,6 +33,7 @@
 #include "ble_provision.hpp"
 #include "clock_sync.hpp"
 #include "improv_serial.hpp"
+#include "core/alarm_clip.hpp"
 #include "core/netplan.hpp"
 #include "core/screen_text.hpp"
 #include "core/server_view.hpp"
@@ -129,6 +135,45 @@ void confirm_firmware_task(void* argument) {
 }
 }  // namespace
 
+namespace {
+void play_cue(armor::hmi::Cue cue) {
+  switch (cue) {
+    case armor::hmi::Cue::kSiren: armor::audio::beep(armor::audio::Tone::kSiren); break;
+    case armor::hmi::Cue::kAlarm: armor::audio::beep(armor::audio::Tone::kAlarm); break;
+    case armor::hmi::Cue::kNotice: armor::audio::beep(armor::audio::Tone::kNotice); break;
+    case armor::hmi::Cue::kNone: break;
+  }
+}
+
+struct ClipJob {
+  armor::clip::Request request;
+  armor::hmi::Cue fallback;
+};
+std::atomic<bool> g_clip_busy{false};
+
+void clip_task(void* argument) {
+  std::unique_ptr<ClipJob> job(static_cast<ClipJob*>(argument));
+  std::vector<std::int16_t> samples;
+  std::string error;
+  bool played = false;
+  if (armor::server_link::fetch_clip(job->request, samples, error)) played = armor::audio::play_clip(samples.data(), samples.size());
+  else ESP_LOGW(kTag, "no audio for the alarm (%s): its tone plays", error.c_str());
+  if (!played) play_cue(job->fallback);
+  g_clip_busy = false;
+  vTaskDelete(nullptr);
+}
+
+// One download at a time: an alarm that arrives while one is running sounds as its severity says. False when the task could not be started (the caller plays the tone itself).
+bool start_clip_task(const armor::clip::Request& request, armor::hmi::Cue fallback) {
+  bool expected = false;
+  if (!g_clip_busy.compare_exchange_strong(expected, true)) return false;
+  ClipJob* job = new (std::nothrow) ClipJob{request, fallback};
+  if (job == nullptr) { g_clip_busy = false; return false; }
+  if (xTaskCreate(clip_task, "alarm-clip", 8192, job, 2, nullptr) != pdPASS) { delete job; g_clip_busy = false; return false; }
+  return true;
+}
+}  // namespace
+
 extern "C" void app_main() {
   armor::logbuf::start();
   armor::memory::install_tls_allocator();   // TLS memory: the external RAM, and the internal one where a board has none
@@ -188,12 +233,11 @@ extern "C" void app_main() {
       const auto audio = armor::store::settings().audio;
       if (!audio.alarm_sound || !armor::audio::ready()) return;
       const int floor = audio.min_severity == armor::config::AlarmFloor::kCritical ? 2 : audio.min_severity == armor::config::AlarmFloor::kHigh ? 1 : 0;
-      switch (armor::hmi::cue_for(fresh, floor, audio.tone_by_source)) {   // the sound goes with the most serious of them
-        case armor::hmi::Cue::kSiren: armor::audio::beep(armor::audio::Tone::kSiren); break;
-        case armor::hmi::Cue::kAlarm: armor::audio::beep(armor::audio::Tone::kAlarm); break;
-        case armor::hmi::Cue::kNotice: armor::audio::beep(armor::audio::Tone::kNotice); break;
-        case armor::hmi::Cue::kNone: break;
-      }
+      const armor::clip::Plan plan = armor::clip::plan_sound(fresh, floor, audio.tone_by_source);
+      // An origin set to "said out loud" or to its own sound asks the server for the audio on a task of its own (the download takes seconds); the tone of the alarm plays instead whenever the audio
+      // does not come (the server has the option off, no sound was uploaded, it is slow, or what came did not pass the checks), so an alarm is never silent for that reason.
+      if (plan.clip && start_clip_task(*plan.clip, plan.cue)) return;
+      play_cue(plan.cue);   // the sound goes with the most serious of them
     });
     // While a critical alarm nobody has acknowledged is in the summary, the siren repeats as the settings say (never when the sound is off); acknowledging it, wherever that is done, ends it.
     armor::server_link::on_summary([](const armor::hmi::Summary& summary) {

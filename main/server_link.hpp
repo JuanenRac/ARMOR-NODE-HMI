@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "core/alarm_clip.hpp"
 #include "core/hmi_config.hpp"
 #include "core/server_view.hpp"
 #include "core/view_model.hpp"
@@ -41,6 +42,11 @@ void on_new_alarms(std::function<void(const std::vector<hmi::AlarmLine>&)> callb
 
 // Called, from the link's task, with every summary that arrives (asked for or by the live channel), after the alarms that are new have been told.
 void on_summary(std::function<void(const hmi::Summary&)> callback);
+
+// Downloads the audio the server makes for an alarm (said out loud, or the sound uploaded for its origin) and checks it before handing it back as 16 kHz mono samples: false, with a short code in
+// `error`, when the server is not set up, does not answer, refuses (404 while its option is off, or no sound uploaded) or sends audio that is too long or whose SHA-256 is not the one it announced.
+// It blocks for as long as the download takes (seconds at most): call it from a task of its own, never from the link's or the screen's.
+bool fetch_clip(const clip::Request& request, std::vector<std::int16_t>& out, std::string& error);
 
 // The SHA-256 fingerprint (64 lowercase hex digits) of the certificate the server at host:port presents over HTTPS, read for the person who is setting the panel up; "" and a short
 // code in `error` when no certificate arrived. It trusts nothing by itself: the person compares the number and saves it, and only then does the link require it.

@@ -19,6 +19,7 @@
 #include "mbedtls/x509_crt.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "core/alarm_clip.hpp"
 #include "core/json.hpp"
 #include "core/panel_feed.hpp"
 #include "core/pin_entry.hpp"
@@ -63,7 +64,9 @@ struct Answer {
   int status = 0;            // 0: no answer at all
   std::string body;
   std::string cookie;        // "name=value" from Set-Cookie
-  bool truncated = false;    // the answer was longer than kMaxAnswer
+  bool truncated = false;    // the answer was longer than `limit`
+  std::size_t limit = kMaxAnswer;   // how much of the body is kept (a summary is small; the audio of an alarm is not)
+  std::string audio_sha;     // X-Armor-Audio-Sha256, when the server sent it
 };
 
 esp_err_t on_http_event(esp_http_client_event_t* event) {
@@ -71,17 +74,18 @@ esp_err_t on_http_event(esp_http_client_event_t* event) {
   if (event->event_id == HTTP_EVENT_ON_HEADER && answer != nullptr && event->header_key != nullptr && event->header_value != nullptr) {
     std::string key = event->header_key;
     for (char& c : key) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    if (key == "x-armor-audio-sha256" && answer->audio_sha.empty()) answer->audio_sha = std::string(event->header_value).substr(0, 80);
     if (key == "set-cookie" && answer->cookie.empty()) {
       const std::string value = event->header_value;
       answer->cookie = value.substr(0, value.find(';'));
     }
   } else if (event->event_id == HTTP_EVENT_ON_DATA && answer != nullptr && event->data != nullptr) {
-    const std::size_t room = kMaxAnswer > answer->body.size() ? kMaxAnswer - answer->body.size() : 0;
+    const std::size_t room = answer->limit > answer->body.size() ? answer->limit - answer->body.size() : 0;
     const std::size_t take = std::min(room, static_cast<std::size_t>(event->data_len));
     answer->body.append(static_cast<const char*>(event->data), take);
     if (take < static_cast<std::size_t>(event->data_len) && !answer->truncated) {
       answer->truncated = true;
-      ESP_LOGW(kTag, "the server's answer is longer than %u bytes: it was cut", static_cast<unsigned>(kMaxAnswer));
+      ESP_LOGW(kTag, "the server's answer is longer than %u bytes: it was cut", static_cast<unsigned>(answer->limit));
     }
   }
   return ESP_OK;
@@ -135,8 +139,9 @@ std::string base_url(const config::Settings& s) {
 }
 
 // One request: no answer at all gives status 0.
-Answer request(esp_http_client_method_t method, const std::string& path, const std::string& body, bool with_cookie) {
+Answer request(esp_http_client_method_t method, const std::string& path, const std::string& body, bool with_cookie, std::size_t max_body = kMaxAnswer) {
   Answer answer;
+  answer.limit = max_body;
   config::Settings s;
   std::string cookie;
   {
@@ -529,6 +534,46 @@ void on_new_alarms(std::function<void(const std::vector<hmi::AlarmLine>&)> callb
 void on_summary(std::function<void(const hmi::Summary&)> callback) {
   std::lock_guard<std::mutex> guard(g_lock);
   g_on_summary = std::move(callback);
+}
+
+// The audio the server makes for an alarm (core/alarm_clip.hpp). The sentence of an alarm said out loud is remembered (the same language, origin, severity and code always give the same
+// one); the sound of an origin is asked for each time, so a new upload counts at once. Whatever arrives is checked (size, whole samples, SHA-256) before it is handed on.
+bool fetch_clip(const clip::Request& request_wanted, std::vector<std::int16_t>& out, std::string& error) {
+  static std::mutex cache_lock;
+  static clip::Cache cache;
+  config::Settings s;
+  std::string cookie;
+  {
+    std::lock_guard<std::mutex> guard(g_lock);
+    s = g_settings;
+    cookie = g_cookie;
+  }
+  const std::string path = clip::path_for(request_wanted, s.language);
+  const std::string key = clip::cache_key(request_wanted, s.language);
+  if (request_wanted.kind == clip::Kind::kSpoken) {
+    std::lock_guard<std::mutex> guard(cache_lock);
+    if (const std::vector<std::int16_t>* found = cache.find(key)) { out = *found; return true; }
+  }
+  if (!s.server.enabled || s.server.host.empty()) { error = "not_configured"; return false; }
+  const std::size_t max_bytes = static_cast<std::size_t>(s.audio.clip_max_bytes);
+  Answer answer;
+  for (int attempt = 0; attempt < 2; ++attempt) {
+    if (cookie.empty() && !sign_in()) { error = "sign_in"; return false; }
+    answer = request(HTTP_METHOD_GET, path, "", true, max_bytes + 1);   // one byte more than allowed, so a longer answer is seen as longer
+    if (answer.status != 401) break;
+    { std::lock_guard<std::mutex> guard(g_lock); g_cookie.clear(); }
+    cookie.clear();
+  }
+  if (answer.status == 0) { error = "no_reply"; return false; }
+  if (answer.status != 200) { error = "http_" + std::to_string(answer.status); return false; }
+  const clip::Check verdict = clip::check(answer.body, answer.audio_sha, max_bytes);
+  if (verdict != clip::Check::kOk) { error = clip::check_name(verdict); return false; }
+  out = clip::samples_of(answer.body);
+  if (request_wanted.kind == clip::Kind::kSpoken) {
+    std::lock_guard<std::mutex> guard(cache_lock);
+    cache.put(key, out);
+  }
+  return true;
 }
 
 }  // namespace armor::server_link
