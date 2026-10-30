@@ -64,7 +64,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Hardware | 🔴 | El firmware no ha funcionado en la placa: nada ha funcionado todavía con equipos reales. |
 | Seguridad | 🟡 | El código de configuración, el límite de accesos, el PIN Bluetooth, el manejo de la coacción y las actualizaciones firmadas están probados en el host; no ha habido una revisión independiente. |
 | Actualizaciones | 🟠 | Las comprobaciones de hash y de firma pasan en el host; una actualización por aire nunca se ha ejecutado en una placa. |
-| Integración | 🟡 | Los mensajes se validan contra los esquemas compartidos de ARMOR-COMMON; el enlace con el servidor y con el servicio de voz no se ha probado desde una placa. |
+| Integración | 🟠 | Los mensajes se validan contra los esquemas compartidos de ARMOR-COMMON; el enlace con el servidor y con el servicio de voz no se ha probado desde una placa. Su cliente MQTT se prueba contra un Mosquitto real en los tests. |
 | Documentación | 🟢 | Ocho idiomas, la guía del firmware, las notas de cableado y el historial de cambios están al día. |
 
 ## 🎯 Resumen

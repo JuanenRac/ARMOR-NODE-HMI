@@ -14,6 +14,7 @@
   ],
   "deployment_target": "Waveshare ESP32-S3-Touch-LCD-7C-BOX (the firmware has built once with ESP-IDF 5.5.5 and has never run on the board)",
   "maturity": "functional",
+  "evidence": "host-test",
   "family": "Clients",
   "parent": "ARMOR-SERVER",
   "build": "cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir build/host",

@@ -64,7 +64,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Matériel | 🔴 | Le firmware n'a pas tourné sur la carte : rien n'a encore tourné sur de vrais équipements. |
 | Sécurité | 🟡 | Le code de configuration, la limite de connexions, le PIN Bluetooth, la gestion de la contrainte et les mises à jour signées sont testés sur l'hôte ; il n'y a pas eu de revue indépendante. |
 | Mises à jour | 🟠 | Les contrôles de hash et de signature réussissent sur l'hôte ; une mise à jour par voie hertzienne n'a jamais été exécutée sur une carte. |
-| Intégration | 🟡 | Les messages sont validés par rapport aux schémas partagés d'ARMOR-COMMON ; la liaison avec le serveur et avec le service vocal n'a pas été essayée depuis une carte. |
+| Intégration | 🟠 | Les messages sont validés par rapport aux schémas partagés d'ARMOR-COMMON ; la liaison avec le serveur et avec le service vocal n'a pas été essayée depuis une carte. Son client MQTT est joué contre un vrai Mosquitto dans les tests. |
 | Documentation | 🟢 | Huit langues, le guide du firmware, les notes de câblage et le journal des modifications sont à jour. |
 
 ## 🎯 Présentation

@@ -64,7 +64,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Hardware | 🔴 | The firmware has not run on the board: nothing has run on real equipment yet. |
 | Security | 🟡 | The set-up code, the login limit, the Bluetooth PIN, the duress handling and the signed updates are tested on the host; there has been no independent review. |
 | Updates | 🟠 | The hash and signature checks pass on the host; an update over the air has never been run on a board. |
-| Integration | 🟡 | The messages are validated against the shared schemas of ARMOR-COMMON; the link to the server and to the speech service has not been tried from a board. |
+| Integration | 🟠 | The messages are validated against the shared schemas of ARMOR-COMMON; the link to the server and to the speech service has not been tried from a board. Its MQTT client is played against a real Mosquitto in the tests. |
 | Documentation | 🟢 | Eight languages, the firmware guide, the wiring notes and the changelog are up to date. |
 
 ## 🎯 Overview
