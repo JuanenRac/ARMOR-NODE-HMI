@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The tests play the node's MQTT client against a real Mosquitto:** `tests/check_mosquitto.py` (shared with the other nodes) checks, with the messages this node prints, the retained birth and last will, delivery to the server, the node's own order topic and that it cannot write on another node's topics; the CI installs Mosquitto and fails without it.
+
 ## [0.4.1] - Sounds by alarm source, spoken alarms and custom sounds, a siren that cuts the voice, and the universal README
 
 - **A siren cuts the spoken alarm:** when a critical alarm arrives while the clip of another alarm is playing, the siren stops the clip and sounds at once instead of waiting for it to end.
