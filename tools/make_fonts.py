@@ -16,8 +16,9 @@ os.makedirs(OUT, exist_ok=True)
 text = open(os.path.join(ROOT, "core", "screen_text.hpp"), encoding="utf-8").read()
 # the characters of the Japanese and Chinese texts that are not in the Latin font
 STRING = re.compile(r'"((?:[^"\\]|\\.)*)"')
-LANGS = re.search(r"kLanguages\{([^}]*)\}", text).group(1)
-LANGS = re.findall(r'"([a-z]{2})"', LANGS)
+_declared = re.search(r"kLanguages\{([^}]*)\}", text)
+assert _declared is not None, "kLanguages is not declared in screen_text.hpp"
+LANGS = re.findall(r'"([a-z]{2})"', _declared.group(1))
 rows = [STRING.findall(line) for line in text.splitlines() if line.startswith('    {"')]
 rows = [r for r in rows if len(r) == 1 + len(LANGS)]   # the key and one text for each language
 if not rows:
@@ -64,8 +65,8 @@ for lang, family in (("ja", "noto-sans-jp"), ("zh", "noto-sans-sc")):
         sys.exit("some characters of the " + lang + " texts are in no font: " + "".join(sorted(missing)).encode("unicode_escape").decode())
     for tag, size in sizes.items():
         args = conv + ["--font", inter, "-r", "0x20-0x7F,0x2014,0x2018-0x201F,0x2026"]
-        for slice_path, mine in plan:
-            args += ["--font", slice_path, "--symbols", mine]
+        for slice_path, slice_symbols in plan:
+            args += ["--font", slice_path, "--symbols", slice_symbols]
         args += ["--size", str(size), "--bpp", "4", "--format", "lvgl", "--lv-include", "lvgl.h", "--no-compress", "-o", os.path.join(OUT, f"hmi_font_{lang}_{tag}.c"), "--lv-font-name", f"hmi_font_{lang}_{tag}"]
         run(args)
 # The generator writes the command it was run with into each file, paths of this computer included: only the names of the files are kept.

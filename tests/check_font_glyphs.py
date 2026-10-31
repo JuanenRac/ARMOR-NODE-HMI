@@ -44,7 +44,7 @@ def main() -> int:
             needed |= {c for c in unescape(row[1 + lang_index]) if c not in "\n\r"}
         for literal in ui_literals:
             needed |= set(literal)
-        for size, have in zip("sml", fonts[family]):
+        for size, have in zip("sml", fonts[family], strict=False):
             missing = sorted(ord(c) for c in needed if ord(c) >= 0x20 and ord(c) not in have)
             if missing:
                 problems.append(f"{lang}: the font {family}_{size} has no glyph for " + " ".join(f"U+{c:04X}" for c in missing))
