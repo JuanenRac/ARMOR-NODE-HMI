@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
   <img src="https://img.shields.io/badge/Tests-93122%20checks-2ea44f.svg" alt="Test">
-  <img src="https://img.shields.io/badge/Version-0.4.1-0f6cbd.svg" alt="Versione">
+  <img src="https://img.shields.io/badge/Version-0.4.2-0f6cbd.svg" alt="Versione">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturità">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Versione | `0.4.1` |
+| Versione | `0.4.2` |
 | Maturità | Funzionale |
 | Ruolo | Pannello touch a parete per ARMOR-SERVER (famiglia: Clients, padre: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
