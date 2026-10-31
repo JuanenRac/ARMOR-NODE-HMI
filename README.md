@@ -153,6 +153,7 @@ The firmware has been built once and has never run on a board: the screen, the t
 | `audio.clip_max_bytes` | 200000 | The most audio, in bytes of 16 kHz 16-bit mono (3200 to 262144), taken from the server for an alarm said out loud or a sound of its own; a longer answer is not played |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | The voice service: off by default; the address is at most 160 characters and is validated (`required` or `invalid` otherwise); the token is erased when the host changes |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | The settings every node shares: the name (empty gives `armor-` and the last bytes of the MAC), the set-up code (empty: random), the fleet secret (16+ characters, never in the repository), the first broker settings, the heartbeat (2 to 300 s), the minutes of Bluetooth set-up (1 to 120) and the reset with BOOT (8 s in the first 30 s) |
+| `system.login_limit_per_minute` | 30 (0-120) | Wrong passwords per minute before the panel locks sign-in for everyone (0 = no global limit); read and change it from Studio (a button on every node) or with `POST /api/v1/admin/nodes/settings`, where the panel login is used once and never kept |
 
 ## 🚀 Quick start
 

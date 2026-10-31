@@ -153,6 +153,7 @@ Le firmware a été compilé une fois et n'a jamais tourné sur une carte : l'é
 | `audio.clip_max_bytes` | 200000 | Le maximum d'audio, en octets de 16 kHz, 16 bits, mono (de 3200 à 262144), pris au serveur pour une alarme dite à voix haute ou un son personnalisé ; une réponse plus longue n'est pas jouée |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Le service vocal : désactivé par défaut ; l'adresse fait au plus 160 caractères et est validée (sinon `required` ou `invalid`) ; le jeton est effacé quand l'hôte change |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Les réglages que tous les nœuds partagent : le nom (vide donne `armor-` et les derniers octets de la MAC), le code de configuration (vide : aléatoire), le secret de flotte (16+ caractères, jamais dans le dépôt), les premiers réglages du broker, le battement (de 2 à 300 s), les minutes de configuration Bluetooth (de 1 à 120) et la réinitialisation avec BOOT (8 s dans les 30 premières s) |
+| `system.login_limit_per_minute` | 30 (0-120) | Mots de passe erronés par minute avant que le panneau verrouille la connexion pour tous (0 = pas de limite globale) ; on le lit et le change depuis Studio (un bouton sur chaque nœud) ou avec `POST /api/v1/admin/nodes/settings`, l'identifiant du panneau étant utilisé une fois et jamais conservé |
 
 ## 🚀 Démarrage rapide
 

@@ -153,6 +153,7 @@ ARMOR-NODE-HMI 是壁挂面板：与 Android 应用一样是 [ARMOR-SERVER](http
 | `audio.clip_max_bytes` | 200000 | 为大声播报的告警或自定义声音从服务器获取的音频上限(16 kHz、16 位、单声道的字节数,3200 至 262144);更长的应答不会播放 |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | 语音服务：默认关闭；地址最长 160 个字符并会被校验（否则为 `required` 或 `invalid`）；更换主机时令牌会被清除 |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | 所有节点共有的设置：名称（为空则为 `armor-` 加 MAC 的最后字节）、设置码（为空则随机）、机群密钥（16 个字符以上，绝不放入仓库）、最初的代理设置、心跳（2 到 300 秒）、蓝牙设置的分钟数（1 到 120）以及用 BOOT 重置（前 30 秒内按 8 秒） |
+| `system.login_limit_per_minute` | 30 (0-120) | 面板对所有人锁定登录前每分钟允许的错误密码次数（0 = 无全局限制）；可在 Studio（每个节点上的按钮）或通过 `POST /api/v1/admin/nodes/settings` 读取和修改，面板登录信息只使用一次，绝不保存 |
 
 ## 🚀 快速开始
 

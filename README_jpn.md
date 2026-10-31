@@ -153,6 +153,7 @@ ARMOR-NODE-HMI は壁掛けパネルです。Android アプリと同じく [ARMO
 | `audio.clip_max_bytes` | 200000 | 音声で読み上げるアラームや独自の音のためにサーバーから受け取る音声の最大量(16 kHz・16 ビット・モノラルのバイト数、3200〜262144)。これより長い応答は再生されません |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | 音声サービス：初期はオフ。アドレスは 160 文字以内で検証され（満たさないと `required` か `invalid`）、ホストが変わるとトークンは消えます |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | すべてのノードに共通する設定：名前（空なら `armor-` と MAC の下位バイト）、セットアップコード（空ならランダム）、フリートシークレット（16 文字以上、リポジトリには置かない）、最初のブローカー設定、ハートビート（2〜300 秒）、Bluetooth セットアップの分数（1〜120）、BOOT によるリセット（最初の 30 秒に 8 秒） |
+| `system.login_limit_per_minute` | 30 (0-120) | パネルが全員のログインをロックするまでの 1 分あたりの誤パスワード数（0 = 全体の上限なし）。Studio（各ノードのボタン）または `POST /api/v1/admin/nodes/settings` で読み取り・変更でき、パネルのログイン情報は 1 回だけ使われ保存されません |
 
 ## 🚀 クイックスタート
 

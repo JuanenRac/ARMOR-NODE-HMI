@@ -153,6 +153,7 @@ Il firmware è stato compilato una volta e non è mai girato su una scheda: sche
 | `audio.clip_max_bytes` | 200000 | Il massimo di audio, in byte a 16 kHz, 16 bit, mono (da 3200 a 262144), preso dal server per un allarme pronunciato ad alta voce o un suono personalizzato; una risposta più lunga non viene riprodotta |
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Il servizio vocale: spento di default; l'indirizzo è lungo al massimo 160 caratteri e viene validato (altrimenti `required` o `invalid`); il token si cancella quando cambia l'host |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Le impostazioni che tutti i nodi condividono: il nome (vuoto dà `armor-` e gli ultimi byte del MAC), il codice di configurazione (vuoto: casuale), il segreto di flotta (16+ caratteri, mai nel repository), le prime impostazioni del broker, il battito (da 2 a 300 s), i minuti di configurazione Bluetooth (da 1 a 120) e il ripristino con BOOT (8 s nei primi 30 s) |
+| `system.login_limit_per_minute` | 30 (0-120) | Password errate al minuto prima che il pannello blocchi l'accesso a tutti (0 = nessun limite globale); si legge e si cambia da Studio (un pulsante su ogni nodo) o con `POST /api/v1/admin/nodes/settings`, dove l'accesso al pannello è usato una volta e mai conservato |
 
 ## 🚀 Avvio rapido
 
