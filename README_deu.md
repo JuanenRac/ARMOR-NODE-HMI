@@ -57,7 +57,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
-| Software | 🟠 | Die Firmware wurde einmal gebaut (ESP-IDF 5.5.5), der Build wird aber nicht von der kontinuierlichen Integration geprüft, und sie lief nie auf einer Platine. |
+| Software | 🟠 | Die Firmware lässt sich bauen (ESP-IDF 5.5.5), der Build wird aber nicht von der kontinuierlichen Integration geprüft, und sie lief nie auf einer Platine. |
 | Tests | 🟢 | 93.122 Prüfungen in 19 Host-Programmen bestehen (`ctest`): die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der nie angezeigte Zwangsalarm, der Sprachaustausch, die Pins, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften. |
 | Protokolle und Daten | 🟡 | Der Austausch mit dem Server und mit dem Sprachdienst ARMOR-VOICE-AI ist gegen Nachbildungen getestet; es ist Push-to-Talk, ohne Weckwort. |
 | Oberfläche | 🟠 | Die Webseite lief gegen eine Nachbildung in einem echten Browser; Bildschirm, Touch und Ton sind nach den Beispielen von Waveshare geschrieben und warten auf das erste Einschalten. |

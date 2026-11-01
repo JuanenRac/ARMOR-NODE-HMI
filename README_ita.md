@@ -57,7 +57,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 
 | Area | Stato | Cosa significa qui |
 |---|---|---|
-| Software | 🟠 | Il firmware è stato compilato una volta (ESP-IDF 5.5.5), ma la compilazione non è controllata dall'integrazione continua e non ha mai girato su una scheda. |
+| Software | 🟠 | Il firmware compila (ESP-IDF 5.5.5), ma la compilazione non è controllata dall'integrazione continua e non ha mai girato su una scheda. |
 | Test | 🟢 | Superano 93.122 controlli in 19 programmi host (`ctest`): le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme sotto minaccia che non viene mai mostrato, lo scambio vocale, i pin, i testi dello schermo in otto lingue e i glifi dei suoi caratteri. |
 | Protocolli e dati | 🟡 | Lo scambio con il server e con il servizio vocale ARMOR-VOICE-AI è provato contro simulazioni; è push to talk, senza parola di attivazione. |
 | Interfaccia | 🟠 | La pagina web è stata eseguita contro una simulazione in un browser reale; lo schermo, il tocco e l'audio sono scritti dagli esempi di Waveshare e attendono la prima accensione. |

@@ -57,7 +57,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
-| Logiciel | 🟠 | Le firmware a été compilé une fois (ESP-IDF 5.5.5), mais la compilation n'est pas contrôlée par l'intégration continue et il n'a jamais tourné sur une carte. |
+| Logiciel | 🟠 | Le firmware compile (ESP-IDF 5.5.5), mais la compilation n'est pas contrôlée par l'intégration continue et il n'a jamais tourné sur une carte. |
 | Tests | 🟢 | 93 122 vérifications dans 19 programmes d'hôte réussissent (`ctest`) : les réglages, ce que le panneau sait du serveur et quand c'est périmé, l'alarme sous contrainte qui n'est jamais affichée, l'échange vocal, les broches, les textes de l'écran en huit langues et les glyphes de ses polices. |
 | Protocoles et données | 🟡 | L'échange avec le serveur et avec le service vocal ARMOR-VOICE-AI est testé contre des simulations ; c'est du push-to-talk, sans mot d'activation. |
 | Interface | 🟠 | La page web a tourné contre une simulation dans un vrai navigateur ; l'écran, le tactile et le son sont écrits d'après les exemples de Waveshare et attendent leur première mise sous tension. |

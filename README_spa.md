@@ -57,7 +57,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 
 | Área | Estado | Qué significa aquí |
 |---|---|---|
-| Software | 🟠 | El firmware se ha compilado una vez (ESP-IDF 5.5.5), pero la compilación no la comprueba la integración continua y nunca ha funcionado en una placa. |
+| Software | 🟠 | El firmware compila (ESP-IDF 5.5.5), pero la compilación no la comprueba la integración continua y nunca ha funcionado en una placa. |
 | Pruebas | 🟢 | Pasan 93.122 comprobaciones en 19 programas de host (`ctest`): los ajustes, lo que el panel sabe del servidor y cuándo está obsoleto, la alarma de coacción que nunca se muestra, el intercambio de voz, los pines, los textos de la pantalla en ocho idiomas y los glifos de sus fuentes. |
 | Protocolos y datos | 🟡 | El intercambio con el servidor y con el servicio de voz ARMOR-VOICE-AI se prueba contra simulaciones; es pulsar para hablar, sin palabra de activación. |
 | Interfaz | 🟠 | La página web se ha ejecutado contra una simulación en un navegador real; la pantalla, el táctil y el sonido están escritos a partir de los ejemplos de Waveshare y esperan su primer encendido. |

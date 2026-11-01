@@ -57,7 +57,7 @@ Each line is one part of this repository and the light says how far it is today.
 
 | Area | State | What it means here |
 |---|---|---|
-| Software | 🟠 | The firmware has been built once (ESP-IDF 5.5.5), but the build is not checked by the continuous integration and it has never run on a board. |
+| Software | 🟠 | The firmware builds (ESP-IDF 5.5.5), but the build is not checked by the continuous integration and it has never run on a board. |
 | Tests | 🟢 | 93,142 checks in 19 host programs pass (`ctest`): the settings, what the panel knows of the server and when that is stale, the duress alarm that is never shown, the voice exchange, the pins, the words of the screen in eight languages and the glyphs of its fonts. |
 | Protocols and data | 🟡 | The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, with no wake word. |
 | Interface | 🟠 | The web page runs against a stand-in in a real browser; the screen, the touch and the sound are written from Waveshare's examples and wait for their first power-up. |
