@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  *
  * The hardware-independent core under core/ (the settings, what the panel knows of the server, the voice conversation, the board's pins, the words of the screen) is built and
- * tested on a computer (tests/); the files beside this one are built with ESP-IDF 5.4 (tools/build_node.sh does it in a container). None of it has run on a board yet.
+ * tested on a computer (tests/); the files beside this one are built with ESP-IDF 5.5.5 (tools/build_node.sh does it in a container). None of it has run on a board yet.
  *
  * What the panel is, in one paragraph: a node like the others of the family (the same settings store, Wi-Fi, web page, Bluetooth set-up and firmware update; see
  * ARMOR-COMMON/firmware_base) and, beside that, a CLIENT of ARMOR-SERVER like the Android app: it signs in with the login an administrator made for it and asks the server what
