@@ -6,7 +6,8 @@ The software of these checks is done and tested on a computer; what is left need
 
 | Check | Connect | Run | Expected |
 |---|---|---|---|
-| Acknowledging with a PIN | the real screen | acknowledge an alarm and watch the footer | it says "sending" while the order is on its way and "confirmed" after it is done |
+| Acknowledging with a PIN | the real screen and a server with a panel account that has a PIN | touch "Acknowledge all": the keypad opens; type a wrong PIN, then the right one, then the duress PIN; then set `controls.ack` to `confirm` and to `off` and touch again | a wrong PIN says so in the footer and acknowledges nothing; the right one says "sending" and then "confirmed" and a critical alarm stops being escalated; the duress PIN acknowledges but the server keeps escalating; `confirm` asks a yes or a no and the server takes the order as unverified; `off` sends at once; the keypad closes by itself after 30 seconds and when the screen sleeps |
+| End of speech | the audio board and the speech service | turn `voice.end_of_speech` on; ask a short question and then stay quiet; ask a question with pauses of a second; stay quiet from the start; do it again with a fan or music on | the recording ends about the quiet time after the last word, not in the pauses between words; with nobody speaking nothing is sent and the screen says so; with noise the level of the room is measured at the start, and a room louder than the voice needs `voice.level_percent` and `voice.min_level` adjusted (the numbers of the room and the verdict come from `core/speech_end.hpp`) |
 | Cancelled voice answer | the audio board | cancel a voice answer half way and speak again | no leftover audio and no blocking |
 | Siren and voice together | the audio board | sound the siren while the assistant speaks | the audio does not block the screen loop |
 | Log-in on the screen | the screen | sign in | the interface does not freeze during the password derivation |

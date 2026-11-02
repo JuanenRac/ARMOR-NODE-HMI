@@ -261,6 +261,7 @@ extern "C" void app_main() {
         context.language = s.language;
         context.voice_enabled = s.voice.enabled && armor::audio::ready();
         context.wake_name = s.voice.wake_name;
+        context.ack = armor::hmi::ack_mode_text(s.controls.ack);
         context.ip = armor::network::status().ip;
         context.version = esp_app_get_description()->version;
         context.setup = armor::store::users_empty();

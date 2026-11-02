@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Sprache">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93142%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-93476%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.3-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Reifegrad">
 </p>
 
 ---
 
-**Ehrlichkeitsprüfung - was heute läuft:** Was nicht von der Platine abhängt, ist real und auf einem Computer getestet (die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der Zwangsalarm, der nie angezeigt wird, das Sprachgespräch und die lange Antwort des Sprachdienstes, die Pins der Platine, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften, die Release- und Signaturprüfungen: 93,142 Prüfungen in 19 Testprogrammen), ebenso die Webseite (gegen einen Ersatz in einem echten Browser ausgeführt). **Die Firmware wurde einmal gebaut (ESP-IDF 5.5.5, von der kontinuierlichen Integration nicht geprüft) und lief nie auf einer Platine:** Bildschirm, Touch, Ton und die Verbindung zum Server sind nach Waveshares Beispielen für diese Platinenfamilie geschrieben und brauchen ihr erstes Einschalten. Der Sprachdienst (ARMOR-VOICE-AI) beantwortet die Anfragen dieses Panels; es gibt kein Aktivierungswort: Man tippt zum Sprechen.
+**Ehrlichkeitsprüfung - was heute läuft:** Was nicht von der Platine abhängt, ist real und auf einem Computer getestet (die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der Zwangsalarm, der nie angezeigt wird, das Sprachgespräch und die lange Antwort des Sprachdienstes, die Pins der Platine, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften, die Release- und Signaturprüfungen: 93,476 Prüfungen in 21 Testprogrammen), ebenso die Webseite (gegen einen Ersatz in einem echten Browser ausgeführt). **Die Firmware wurde einmal gebaut (ESP-IDF 5.5.5, von der kontinuierlichen Integration nicht geprüft) und lief nie auf einer Platine:** Bildschirm, Touch, Ton und die Verbindung zum Server sind nach Waveshares Beispielen für diese Platinenfamilie geschrieben und brauchen ihr erstes Einschalten. Der Sprachdienst (ARMOR-VOICE-AI) beantwortet die Anfragen dieses Panels; es gibt kein Aktivierungswort: Man tippt zum Sprechen.
 
 ---
 
@@ -41,7 +41,7 @@
 | Reifegrad | Funktionsfähig |
 | Rolle | Wand-Touchpanel für ARMOR-SERVER (Familie: Clients, übergeordnet: ARMOR-SERVER) |
 | Technik | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 93142 Prüfungen in 19 Host-Programmen und 6 Python-Prüfungen (`ctest`) |
+| Tests | 93476 Prüfungen in 21 Host-Programmen und 6 Python-Prüfungen (`ctest`) |
 | Platine | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Läuft auf | Ein Waveshare ESP32-S3-Touch-LCD-7C-BOX; Host-Tests auf jedem Computer |
 | Auf echter Hardware | Noch keiner: die Firmware baut (ESP-IDF 5.5.5, von der CI nicht geprüft), lief aber nicht auf der Platine |
@@ -58,7 +58,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟠 | Die Firmware lässt sich bauen (ESP-IDF 5.5.5), der Build wird aber nicht von der kontinuierlichen Integration geprüft, und sie lief nie auf einer Platine. |
-| Tests | 🟢 | 93.122 Prüfungen in 19 Host-Programmen bestehen (`ctest`): die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der nie angezeigte Zwangsalarm, der Sprachaustausch, die Pins, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften. |
+| Tests | 🟢 | 93.122 Prüfungen in 21 Host-Programmen bestehen (`ctest`): die Einstellungen, was das Panel vom Server weiß und wann das veraltet ist, der nie angezeigte Zwangsalarm, der Sprachaustausch, die Pins, die Texte des Bildschirms in acht Sprachen und die Glyphen seiner Schriften. |
 | Protokolle und Daten | 🟡 | Der Austausch mit dem Server und mit dem Sprachdienst ARMOR-VOICE-AI ist gegen Nachbildungen getestet; es ist Push-to-Talk, ohne Weckwort. |
 | Oberfläche | 🟠 | Die Webseite lief gegen eine Nachbildung in einem echten Browser; Bildschirm, Touch und Ton sind nach den Beispielen von Waveshare geschrieben und warten auf das erste Einschalten. |
 | Hardware | 🔴 | Die Firmware lief nicht auf der Platine: Bisher lief nichts auf echten Geräten. |
@@ -154,6 +154,9 @@ Die Firmware wurde einmal gebaut und lief nie auf einer Platine: Bildschirm, Tou
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Der Sprachdienst: standardmäßig aus; die Adresse hat höchstens 160 Zeichen und wird geprüft (sonst `required` oder `invalid`); das Token wird beim Hostwechsel gelöscht |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Die Einstellungen, die alle Knoten teilen: der Name (leer ergibt `armor-` und die letzten Bytes der MAC), der Einrichtungscode (leer: zufällig), das Flottengeheimnis (16+ Zeichen, nie im Repository), die ersten Broker-Einstellungen, der Herzschlag (2 bis 300 s), die Minuten der Bluetooth-Einrichtung (1 bis 120) und der Reset mit BOOT (8 s in den ersten 30 s) |
 | `system.login_limit_per_minute` | 30 (0-120) | Falsche Passwörter pro Minute, bevor das Panel die Anmeldung für alle sperrt (0 = kein globales Limit); in Studio (eine Schaltfläche an jedem Knoten) oder mit `POST /api/v1/admin/nodes/settings` lesen und ändern, wobei die Panel-Anmeldung einmal benutzt und nie gespeichert wird |
+| `controls.ack` | pin | Was ein Tipp auf „Alle quittieren“ zuerst verlangt: `pin` (die Tastatur; die PIN geht mit dem Befehl an den Server und wird dort geprüft), `confirm` (Ja oder Nein) oder `off` (ein Tipp) |
+| `voice.end_of_speech` | off | Die Aufnahme beenden, wenn die Person aufhört zu sprechen (die ersten Momente sind der Raum; die Anfrage endet nach der Stille nach dem letzten Wort oder wird nicht gesendet, wenn niemand spricht) |
+| `voice.silence_ms`, `min_speech_ms`, `level_percent`, `min_level`, `lead_ms`, `calibrate_ms` | 900, 250, 300, 200, 4000, 300 | Die Stille, die eine Anfrage beendet, die Sprache, die zu hören sein muss, damit sie zählt, wie viel lauter als der Raum eine Stimme ist (Prozent), der Mindestpegel einer Stimme, das Warten auf das erste Wort und die Zeit zum Messen des Raums |
 
 ## 🚀 Schnellstart
 
@@ -178,7 +181,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-19 Host-Testprogramme und 6 Python-Prüfungen laufen unter `ctest`; 93142 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
+21 Host-Testprogramme und 6 Python-Prüfungen laufen unter `ctest`; 93476 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
 
 Python-Prüfungen: die Panel-Texte in acht Sprachen, die Tasks, die Speicherpfade, die Bluetooth-Sitzung unter ihrer Sperre und die vom Panel aufgerufenen Routen (und in manchen Knoten die HTTP-Codes oder die Glyphen der Schriften)
 

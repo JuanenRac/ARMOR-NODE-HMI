@@ -22,7 +22,7 @@ struct Row {
 };
 
 // clang-format off
-constexpr std::array<Row, 98> kRows{{
+constexpr std::array<Row, 99> kRows{{
     {"armed", {"ARMED", "ARMADO", "SCHARF", "ARMÉ", "ATTIVO", "警戒中", "已布防", "ARMADO"}},
     {"disarmed", {"DISARMED", "DESARMADO", "UNSCHARF", "DÉSARMÉ", "DISATTIVO", "解除中", "已撤防", "DESARMADO"}},
     {"arm", {"Arm", "Armar", "Scharf schalten", "Armer", "Attiva", "警戒する", "布防", "Armar"}},
@@ -46,6 +46,7 @@ constexpr std::array<Row, 98> kRows{{
     {"no_alarms", {"All quiet", "Todo en calma", "Alles ruhig", "Tout est calme", "Tutto tranquillo", "異常なし", "一切正常", "Tudo calmo"}},
     {"acknowledge", {"Acknowledge", "Reconocer", "Quittieren", "Acquitter", "Riconosci", "確認", "确认", "Reconhecer"}},
     {"acknowledge_all", {"Acknowledge all", "Reconocer todas", "Alle quittieren", "Tout acquitter", "Riconosci tutti", "すべて確認", "全部确认", "Reconhecer todos"}},
+    {"confirm_ack", {"Acknowledge all the alarms?", "¿Reconocer todas las alarmas?", "Alle Alarme quittieren?", "Acquitter toutes les alarmes ?", "Riconoscere tutti gli allarmi?", "すべて確認しますか？", "全部确认吗？", "Reconhecer todos os alarmes?"}},
     {"link_not_configured", {"Not set up yet", "Sin configurar", "Noch nicht eingerichtet", "Pas encore configuré", "Non ancora configurato", "未設定", "尚未设置", "Ainda sem configurar"}},
     {"link_no_network", {"No network", "Sin red", "Kein Netzwerk", "Pas de réseau", "Nessuna rete", "ネットワークなし", "无网络", "Sem rede"}},
     {"link_connecting", {"Connecting to the server…", "Conectando con el servidor…", "Verbindung zum Server…", "Connexion au serveur…", "Connessione al server…", "サーバーに接続中…", "正在连接服务器…", "A ligar ao servidor…"}},

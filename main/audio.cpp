@@ -298,7 +298,7 @@ void set_critical_unacknowledged(int count) {
   if (g_audio_task != nullptr) xTaskNotifyGive(g_audio_task);   // so that the end of a cycle is noticed at once
 }
 
-std::size_t record(std::int16_t* out, std::size_t max_samples, const std::function<bool()>& keep_going) {
+std::size_t record(std::int16_t* out, std::size_t max_samples, const std::function<bool()>& keep_going, const std::function<bool(const std::int16_t*, std::size_t)>& on_frame) {
   if (g_microphone == nullptr || out == nullptr) return 0;
   std::lock_guard<std::mutex> guard(g_lock);
   if (!open_microphone()) return 0;
@@ -309,6 +309,7 @@ std::size_t record(std::int16_t* out, std::size_t max_samples, const std::functi
     if (esp_codec_dev_read(g_microphone, frame, sizeof frame) != ESP_CODEC_DEV_OK) break;
     for (std::size_t i = 0; i < kFrames; ++i) out[taken + i] = frame[i * 2];   // the first channel is the first microphone
     taken += kFrames;
+    if (on_frame && !on_frame(out + taken - kFrames, kFrames)) break;
   }
   return taken;
 }

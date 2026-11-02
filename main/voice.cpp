@@ -19,6 +19,7 @@
 #include "mbedtls/base64.h"
 #include "audio.hpp"
 #include "core/json.hpp"
+#include "core/speech_end.hpp"
 #include "core/voice_answer.hpp"
 #include "core/voice_multipart.hpp"
 #include "core/board_s3.hpp"
@@ -209,9 +210,17 @@ void run_turn() {
   std::int16_t* buffer = static_cast<std::int16_t*>(heap_caps_malloc(capacity * sizeof(std::int16_t), MALLOC_CAP_SPIRAM));
   if (buffer == nullptr) { std::lock_guard<std::mutex> guard(g_lock); g_session.on_event(voice::Event::kFailure, now_ms(), "memory"); return; }
   g_stop_recording = false;
+  // The end of the request is found from the level of the sound (core/speech_end.hpp) when the settings ask for it (voice.end_of_speech); else the recording runs to the time or to a second touch.
+  armor::hmi::SpeechEnd speech_end(s.voice.end_of_speech, board::kAudioSampleRate);
+  bool no_speech_heard = false;
   const std::size_t heard_samples = audio::record(buffer, capacity, [] {
     std::lock_guard<std::mutex> guard(g_lock);
     return g_session.state() == voice::State::kListening && !g_stop_recording;
+  }, [&](const std::int16_t* frame, std::size_t count) {
+    if (!s.voice.end_of_speech.enabled) return true;
+    const armor::hmi::SpeechVerdict verdict = speech_end.feed(frame, count);
+    if (verdict == armor::hmi::SpeechVerdict::kNoSpeech) no_speech_heard = true;
+    return verdict == armor::hmi::SpeechVerdict::kContinue;
   });
   {
     std::lock_guard<std::mutex> guard(g_lock);
@@ -220,8 +229,9 @@ void run_turn() {
   }
   std::string heard, reply_text, failure;
   std::vector<std::int16_t> reply_audio;
-  const bool ok = heard_samples > static_cast<std::size_t>(board::kAudioSampleRate / 4) && ask_service(buffer, heard_samples, s, heard, reply_text, reply_audio, failure);
-  if (heard_samples <= static_cast<std::size_t>(board::kAudioSampleRate / 4)) failure = "no_speech";
+  const bool nothing_to_send = no_speech_heard || heard_samples <= static_cast<std::size_t>(board::kAudioSampleRate / 4);   // nobody spoke: nothing goes to the service
+  const bool ok = !nothing_to_send && ask_service(buffer, heard_samples, s, heard, reply_text, reply_audio, failure);
+  if (nothing_to_send) failure = "no_speech";
   heap_caps_free(buffer);
   {
     std::lock_guard<std::mutex> guard(g_lock);

@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93142%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-93476%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.3-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分：** 不依赖板子的部分是真实的，并已在计算机上测试（设置、面板对服务器的了解及其何时过期、永不显示的胁迫告警、语音对话和语音服务的长回复、板子的引脚、八种语言的屏幕文字及其字体字形、发布与签名检查：19 个测试程序共 93,142 项检查），网页也是如此（在真实浏览器中对替身运行）。**固件已构建过一次（ESP-IDF 5.5.5，持续集成不检查），但从未在板上运行：**屏幕、触摸、声音和与服务器的连接是根据 Waveshare 对这一系列板子的示例编写的，等待首次上电。语音服务（ARMOR-VOICE-AI）会应答此面板的请求；没有唤醒词，需点按说话。
+**诚实性检查 - 今天真正能运行的部分：** 不依赖板子的部分是真实的，并已在计算机上测试（设置、面板对服务器的了解及其何时过期、永不显示的胁迫告警、语音对话和语音服务的长回复、板子的引脚、八种语言的屏幕文字及其字体字形、发布与签名检查：21 个测试程序共 93,476 项检查），网页也是如此（在真实浏览器中对替身运行）。**固件已构建过一次（ESP-IDF 5.5.5，持续集成不检查），但从未在板上运行：**屏幕、触摸、声音和与服务器的连接是根据 Waveshare 对这一系列板子的示例编写的，等待首次上电。语音服务（ARMOR-VOICE-AI）会应答此面板的请求；没有唤醒词，需点按说话。
 
 ---
 
@@ -41,7 +41,7 @@
 | 成熟度 | 可用 |
 | 角色 | ARMOR-SERVER 的壁挂触摸面板（家族：Clients，上级：ARMOR-SERVER） |
 | 技术栈 | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| 测试 | 93142 项检查（19 个主机程序和 6 项 Python 检查，`ctest`） |
+| 测试 | 93476 项检查（21 个主机程序和 6 项 Python 检查，`ctest`） |
 | 电路板 | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | 运行位置 | Waveshare ESP32-S3-Touch-LCD-7C-BOX；主机测试可在任何计算机上运行 |
 | 真实硬件 | 暂无：固件可以构建（ESP-IDF 5.5.5，CI 未检查），但还没有在板上运行 |
@@ -58,7 +58,7 @@
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
 | 软件 | 🟠 | 固件可以构建（ESP-IDF 5.5.5），但该构建不在持续集成的检查范围内，也从未在板子上运行过。 |
-| 测试 | 🟢 | 19 个主机程序中的 93,142 项检查通过（`ctest`）：设置、面板对服务器的了解及其何时过期、从不显示的胁迫报警、语音交换、引脚、屏幕上八种语言的文字及其字体的字形。 |
+| 测试 | 🟢 | 21 个主机程序中的 93,476 项检查通过（`ctest`）：设置、面板对服务器的了解及其何时过期、从不显示的胁迫报警、语音交换、引脚、屏幕上八种语言的文字及其字体的字形。 |
 | 协议与数据 | 🟡 | 与服务器和语音服务 ARMOR-VOICE-AI 的交互已对照模拟测试；采用按键说话，没有唤醒词。 |
 | 界面 | 🟠 | 网页已在真实浏览器中对模拟运行过；屏幕、触摸和声音依据 Waveshare 的示例编写，等待首次上电。 |
 | 硬件 | 🔴 | 固件尚未在板子上运行过：还没有在真实设备上运行过。 |
@@ -154,6 +154,9 @@ ARMOR-NODE-HMI 是壁挂面板：与 Android 应用一样是 [ARMOR-SERVER](http
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | 语音服务：默认关闭；地址最长 160 个字符并会被校验（否则为 `required` 或 `invalid`）；更换主机时令牌会被清除 |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | 所有节点共有的设置：名称（为空则为 `armor-` 加 MAC 的最后字节）、设置码（为空则随机）、机群密钥（16 个字符以上，绝不放入仓库）、最初的代理设置、心跳（2 到 300 秒）、蓝牙设置的分钟数（1 到 120）以及用 BOOT 重置（前 30 秒内按 8 秒） |
 | `system.login_limit_per_minute` | 30 (0-120) | 面板对所有人锁定登录前每分钟允许的错误密码次数（0 = 无全局限制）；可在 Studio（每个节点上的按钮）或通过 `POST /api/v1/admin/nodes/settings` 读取和修改，面板登录信息只使用一次，绝不保存 |
+| `controls.ack` | pin | 触摸“全部确认”时首先要求的内容：`pin`（小键盘；PIN 随操作发往服务器并在那里校验）、`confirm`（是/否）或 `off`（一次触摸） |
+| `voice.end_of_speech` | off | 说话者停止说话时结束录音（最初一小段是环境声；最后一个词之后的静音结束请求，无人说话则不发送） |
+| `voice.silence_ms`, `min_speech_ms`, `level_percent`, `min_level`, `lead_ms`, `calibrate_ms` | 900, 250, 300, 200, 4000, 300 | 结束请求的静音时长、计入所需听到的语音时长、语音比环境声大多少（百分比）、视为语音的最低电平、等待第一个词的时间以及测量环境声的时间 |
 
 ## 🚀 快速开始
 
@@ -178,7 +181,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-`ctest` 运行 19 个主机测试程序和 6 个 Python 检查；主机程序统计的检查共 93142 项，使用 `-Werror` 构建。
+`ctest` 运行 21 个主机测试程序和 6 个 Python 检查；主机程序统计的检查共 93476 项，使用 `-Werror` 构建。
 
 Python 检查：八种语言的面板文字、任务、保存路径、受锁保护的蓝牙会话以及面板调用的路由（部分节点还包括 HTTP 状态码或字体字形）
 

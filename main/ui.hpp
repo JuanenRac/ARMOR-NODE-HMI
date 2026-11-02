@@ -11,6 +11,7 @@ struct Context {
   std::string language = "en";
   bool voice_enabled = false;
   std::string wake_name = "armor";
+  std::string ack = "pin";   // what a touch on "Acknowledge all" asks first: "pin", "confirm" or "off" (core/ack_flow.hpp)
   std::string ip;            // the panel's own address ("" until it has one)
   std::string version;
   bool setup = false;        // no user yet: the screen only says how to set the panel up

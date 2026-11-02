@@ -19,6 +19,7 @@
 
 #include "board_s3.hpp"
 #include "admin_sources.hpp"
+#include "ack_flow.hpp"
 #include "alarm_clip.hpp"
 #include "audio_queue.hpp"
 #include "json.hpp"
@@ -26,6 +27,7 @@
 #include "net_text.hpp"
 #include "node_id.hpp"
 #include "server_pin.hpp"
+#include "speech_end.hpp"
 #include "stored_load.hpp"
 
 namespace armor::config {
@@ -129,6 +131,14 @@ struct Voice {
   int listen_s = 8;                  // the longest it listens for one request
   std::string token;         // the service's token (X-Armor-Voice-Token): the service answers nobody without it
   bool binary_turn = true;   // send the recording as raw bytes in a multipart request and ask for the spoken answer as raw bytes; off: the older request only (base64 in the answer)
+  // Stop recording when the person stops talking (core/speech_end.hpp) instead of running to listen_s or a second touch. Off by default: nothing of it has run on a board.
+  hmi::SpeechEndSettings end_of_speech;
+};
+
+// What the person at the panel is asked before an order that matters. `ack`: what a touch on "Acknowledge all" asks first (core/ack_flow.hpp): "pin" (the keypad; the default), "confirm"
+// (a yes or a no) or "off" (one touch, as before). Acknowledging a critical alarm stops the server from going on warning people, so the safe way is the default.
+struct Controls {
+  hmi::AckMode ack = hmi::AckMode::kPin;
 };
 
 // What time the node believes it is: a time server on the Internet (or the browser's clock when that is off) and the zone the local time is
@@ -154,6 +164,7 @@ struct Settings {
   Display display;
   Audio audio;
   Voice voice;
+  Controls controls;
   WebMode web = WebMode::kBoth;
   std::string admin_sources;   // the networks that may use the panel; empty = the private ranges of a house (see admin_sources.hpp)
   BleMode ble = BleMode::kSetup;   // "setup": only while the node has no user; "always"; "off": the Bluetooth stack is not even started
@@ -425,6 +436,9 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
     }
     if (audio->get("min_severity") != nullptr && !read_choice<AlarmFloor>(*audio, "min_severity", {{"warning", AlarmFloor::kWarning}, {"high", AlarmFloor::kHigh}, {"critical", AlarmFloor::kCritical}}, s.audio.min_severity)) bad(problems, "audio.min_severity", "invalid");
   }
+  if (const json::Value* controls = document.get("controls"); controls != nullptr && controls->is_object()) {
+    if (const json::Value* ack = controls->get("ack"); ack != nullptr && (!ack->is_string() || !hmi::parse_ack_mode(ack->text, s.controls.ack))) bad(problems, "controls.ack", "invalid");
+  }
   if (const json::Value* voice = document.get("voice"); voice != nullptr && voice->is_object()) {
     read_bool(*voice, "enabled", s.voice.enabled, "voice.enabled", problems);
     const std::string stored_voice_host = broker_host(s.voice.url);
@@ -435,6 +449,14 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
     read_text(*voice, "wake_name", s.voice.wake_name, 24, "voice.wake_name", problems);
     read_bool(*voice, "binary_turn", s.voice.binary_turn, "voice.binary_turn", problems);
     read_int(*voice, "listen_s", s.voice.listen_s, 2, 15, "voice.listen_s", problems);   // the service takes 15 seconds of audio at most (480 KB)
+    hmi::SpeechEndSettings& eos = s.voice.end_of_speech;
+    read_bool(*voice, "end_of_speech", eos.enabled, "voice.end_of_speech", problems);
+    read_int(*voice, "silence_ms", eos.silence_ms, 300, 3000, "voice.silence_ms", problems);
+    read_int(*voice, "min_speech_ms", eos.min_speech_ms, 80, 1500, "voice.min_speech_ms", problems);
+    read_int(*voice, "level_percent", eos.level_percent, 150, 1000, "voice.level_percent", problems);
+    read_int(*voice, "min_level", eos.min_level, 50, 4000, "voice.min_level", problems);
+    read_int(*voice, "lead_ms", eos.lead_ms, 1000, 15000, "voice.lead_ms", problems);
+    read_int(*voice, "calibrate_ms", eos.calibrate_ms, 100, 1000, "voice.calibrate_ms", problems);
   }
   if (const json::Value* web = document.get("web"); web != nullptr && web->is_object()) {
     if (!read_choice<WebMode>(*web, "mode", {{"http", WebMode::kHttp}, {"both", WebMode::kBoth}, {"https", WebMode::kHttps}}, s.web)) bad(problems, "web.mode", "invalid");
@@ -603,6 +625,7 @@ inline Problems validate(const Settings& s) {
   if (s.display.night_from == s.display.night_to && s.display.night_brightness != s.display.brightness) bad(problems, "display.night_to", "conflict");
 
   // the voice assistant: where its speech service is, and the name it answers to
+  if (const char* member = hmi::check(s.voice.end_of_speech); member[0] != 0) bad(problems, std::string("voice.") + member, "range");
   if (s.voice.enabled) {
     if (s.voice.url.empty()) bad(problems, "voice.url", "required");
     else if (!service_url_is_valid(s.voice.url)) bad(problems, "voice.url", "invalid");
@@ -660,7 +683,10 @@ inline std::string to_json(const Settings& s, bool secrets) {
   w.key("tone_by_source").begin_object();
   for (int kind = 0; kind < hmi::kSourceKinds; ++kind) w.field(hmi::source_name(kind), hmi::tone_name(s.audio.tone_by_source[static_cast<std::size_t>(kind)]));
   w.end_object().end_object();
-  w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("binary_turn", s.voice.binary_turn);
+  w.key("controls").begin_object().field("ack", hmi::ack_mode_text(s.controls.ack)).end_object();
+  w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("binary_turn", s.voice.binary_turn)
+      .field("end_of_speech", s.voice.end_of_speech.enabled).field("silence_ms", s.voice.end_of_speech.silence_ms).field("min_speech_ms", s.voice.end_of_speech.min_speech_ms).field("level_percent", s.voice.end_of_speech.level_percent)
+      .field("min_level", s.voice.end_of_speech.min_level).field("lead_ms", s.voice.end_of_speech.lead_ms).field("calibrate_ms", s.voice.end_of_speech.calibrate_ms);
   if (secrets) w.field("token", s.voice.token); else w.field("token_set", !s.voice.token.empty());
   w.end_object();
   w.key("web").begin_object().field("mode", to_text(s.web)).field("admin_sources", s.admin_sources).end_object();

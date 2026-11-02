@@ -24,6 +24,7 @@
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "lvgl.h"
+#include "core/ack_flow.hpp"
 #include "core/pin_entry.hpp"
 #include "core/screen_text.hpp"
 #include "core/server_view.hpp"
@@ -71,6 +72,9 @@ struct Screen {
   lv_obj_t* alarm_text[kAlarmRows] = {};
   lv_obj_t *confirm = nullptr, *confirm_text = nullptr, *confirm_yes = nullptr, *confirm_no = nullptr, *confirm_yes_label = nullptr, *confirm_no_label = nullptr;
   hmi::Mode confirm_for = hmi::Mode::kUnknown;
+  bool confirm_ack = false;      // the question is "acknowledge all the alarms?" and not arm or disarm
+  bool ack_pin_asked = false;    // ... and it asks for the PIN
+  hmi::AckMode ack_mode = hmi::AckMode::kPin;   // what a touch on "Acknowledge all" asks first (controls.ack)
   hmi::PinEntry pin;
   lv_obj_t *pin_prompt = nullptr, *pin_dots = nullptr;
   std::vector<lv_obj_t*> keys;   // the keypad of the PIN, shown only to disarm
@@ -141,13 +145,13 @@ void show_pin() {
 
 std::int64_t g_confirm_opened_ms = 0;   // when the confirmation was shown (hmi::confirm_expired closes it when it has been left)
 
-void show_confirm(hmi::Mode target) {
+// The question that covers the screen: `text_key` is the words, `with_pin` shows the keypad (disarming and, by default, acknowledging the alarms ask for the PIN).
+void open_confirm(const char* text_key, bool with_pin) {
   g_confirm_opened_ms = esp_timer_get_time() / 1000;
-  g_screen.confirm_for = target;
   g_screen.pin.clear();
-  const bool disarming = target == hmi::Mode::kDisarmed;
-  lv_label_set_text(g_screen.confirm_text, text_of(target == hmi::Mode::kArmed ? "confirm_arm" : "confirm_disarm").c_str());
-  // disarming asks for the PIN: the question goes to the top, the keypad under it and the two buttons at the bottom
+  const bool disarming = with_pin;
+  lv_label_set_text(g_screen.confirm_text, text_of(text_key).c_str());
+  // the PIN is asked: the question goes to the top, the keypad under it and the two buttons at the bottom
   lv_obj_align(g_screen.confirm_text, disarming ? LV_ALIGN_TOP_MID : LV_ALIGN_CENTER, 0, disarming ? 14 : -60);
   lv_obj_set_pos(g_screen.confirm_yes, 140, disarming ? 384 : 300);
   lv_obj_set_pos(g_screen.confirm_no, 440, disarming ? 384 : 300);
@@ -159,6 +163,18 @@ void show_confirm(hmi::Mode target) {
   show_pin();
   lv_obj_clear_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN);
 }
+void show_confirm(hmi::Mode target) {
+  g_screen.confirm_ack = false;
+  g_screen.confirm_for = target;
+  open_confirm(target == hmi::Mode::kArmed ? "confirm_arm" : "confirm_disarm", target == hmi::Mode::kDisarmed);
+}
+// Acknowledging every alarm: with the keypad (the PIN goes to the server with the order) or as a plain question.
+void show_confirm_ack(bool with_pin) {
+  g_screen.confirm_ack = true;
+  g_screen.ack_pin_asked = with_pin;
+  g_screen.confirm_for = hmi::Mode::kUnknown;
+  open_confirm("confirm_ack", with_pin);
+}
 void hide_confirm() { g_screen.pin.clear(); show_pin(); lv_obj_add_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN); }
 
 void on_arm(lv_event_t*) {
@@ -167,7 +183,9 @@ void on_arm(lv_event_t*) {
   show_confirm(snap.summary.mode == hmi::Mode::kArmed ? hmi::Mode::kDisarmed : hmi::Mode::kArmed);
 }
 void on_yes(lv_event_t*) {
-  server_link::request_mode(g_screen.confirm_for, g_screen.confirm_for == hmi::Mode::kDisarmed ? g_screen.pin.digits() : std::string());
+  if (g_screen.confirm_ack) server_link::request_acknowledge_all(g_screen.ack_pin_asked ? g_screen.pin.digits() : std::string());
+  else server_link::request_mode(g_screen.confirm_for, g_screen.confirm_for == hmi::Mode::kDisarmed ? g_screen.pin.digits() : std::string());
+  g_screen.confirm_ack = false;
   hide_confirm();
 }
 // the keys of the keypad: a digit, 'C' to clear everything, '<' to erase the last one
@@ -179,7 +197,15 @@ void on_key(lv_event_t* event) {
   show_pin();
 }
 void on_no(lv_event_t*) { hide_confirm(); }
-void on_ack(lv_event_t*) { server_link::request_acknowledge_all(); }
+// Anyone who can touch the panel can acknowledge, and acknowledging a critical alarm stops the server from warning people: the panel asks first (core/ack_flow.hpp; the setting controls.ack).
+void on_ack(lv_event_t*) {
+  if (server_link::snapshot().action_pending) return;   // an order is already on its way
+  switch (hmi::ack_step(g_screen.ack_mode)) {
+    case hmi::AckStep::kSendNow: server_link::request_acknowledge_all(); break;
+    case hmi::AckStep::kAskToConfirm: show_confirm_ack(false); break;
+    case hmi::AckStep::kAskForPin: show_confirm_ack(true); break;
+  }
+}
 void on_mic(lv_event_t*) { voice_task::press(); }
 
 // ---- the content ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -229,6 +255,7 @@ void set_text(lv_obj_t* label, const std::string& text) {
 void refresh(lv_timer_t*) {
   if (!lv_obj_has_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN) && hmi::confirm_expired(g_confirm_opened_ms, esp_timer_get_time() / 1000, display::asleep())) hide_confirm();   // the PIN does not wait on a screen nobody is using
   const Context context = g_screen.context ? g_screen.context() : Context{};
+  if (!hmi::parse_ack_mode(context.ack, g_screen.ack_mode)) g_screen.ack_mode = hmi::AckMode::kPin;   // a word nobody knows asks for the PIN, the safe way
   const bool words_changed = apply_language(std::string(screen::effective_language(context.language, true)));
   const bool news = server_link::view_changed(g_screen.view_seen, g_screen.view);
   const bool redraw = news || words_changed || !g_screen.drawn;

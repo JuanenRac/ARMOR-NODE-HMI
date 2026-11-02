@@ -25,7 +25,8 @@ void set_alarm_options(int alarm_min_volume, const hmi::RepeatPolicy& repeat);
 void set_critical_unacknowledged(int count);
 
 // Records one mono channel (the first microphone) into `out`, until `max_samples` or until `keep_going` says to stop; the number of samples recorded.
-std::size_t record(std::int16_t* out, std::size_t max_samples, const std::function<bool()>& keep_going);
+// `on_frame`, when given, sees every frame of 20 ms as it is recorded (the samples are already in `out`) and says whether to go on: the end of the speech is found with it (core/speech_end.hpp).
+std::size_t record(std::int16_t* out, std::size_t max_samples, const std::function<bool()>& keep_going, const std::function<bool(const std::int16_t*, std::size_t)>& on_frame = nullptr);
 
 // Plays mono 16-bit samples at 16 kHz (a spoken answer) and returns when they have been handed to the codec, or sooner when an alarm sound is waiting: the voice gives way to a siren. The
 // amplifier is on only while this runs.

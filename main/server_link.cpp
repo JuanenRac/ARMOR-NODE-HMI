@@ -22,6 +22,7 @@
 #include "core/alarm_clip.hpp"
 #include "core/json.hpp"
 #include "core/panel_feed.hpp"
+#include "core/ack_flow.hpp"
 #include "core/pin_entry.hpp"
 #include "core/server_pin.hpp"
 #include "network.hpp"
@@ -41,6 +42,7 @@ std::string g_cookie;                                  // "name=value" of the se
 std::string g_action_error;
 std::atomic<bool> g_action_pending{false};
 std::string g_pending_pin;                            // under g_lock: the PIN that goes with the pending order
+std::string g_pending_ack_pin;                        // under g_lock: the PIN that goes with the pending acknowledgement of the alarms (empty when the panel was set not to ask)
 std::atomic<int> g_pending_mode{-1};                   // -1 none, otherwise a hmi::Mode
 std::atomic<bool> g_pending_acknowledge{false};
 std::atomic<std::int64_t> g_pending_since_ms{0};       // when the person gave the pending order
@@ -410,19 +412,24 @@ void do_pending_actions() {
     }
     std::fill(body.begin(), body.end(), static_cast<char>(0));
     std::fill(pin.begin(), pin.end(), '\0');
-    const std::string pin_error = hmi::pin_error_of(answer.status, answer.body);
     std::lock_guard<std::mutex> guard(g_lock);
-    g_action_error = answer.status == 200 ? "" : !pin_error.empty() ? pin_error : answer.status == 0 ? "no_answer" : answer.status == 401 ? "unauthorized" : answer.status == 403 ? "forbidden" : "failed";
+    g_action_error = hmi::order_error(answer.status, answer.body);
     if (answer.status == 401) g_cookie.clear();
   }
   if (g_pending_acknowledge.exchange(false)) {
-    Answer answer = request(HTTP_METHOD_POST, "/api/v1/alarms/acknowledge", "{}", true);
+    std::string pin;
+    { std::lock_guard<std::mutex> guard(g_lock); pin.swap(g_pending_ack_pin); }
+    std::string body = hmi::ack_body(pin);   // carries the PIN, when the panel asked for it: overwritten below, with the PIN itself
+    Answer answer = request(HTTP_METHOD_POST, "/api/v1/alarms/acknowledge", body, true);
     if (answer.status == 401) {
       { std::lock_guard<std::mutex> guard(g_lock); g_cookie.clear(); }
-      if (sign_in()) answer = request(HTTP_METHOD_POST, "/api/v1/alarms/acknowledge", "{}", true);
+      if (sign_in()) answer = request(HTTP_METHOD_POST, "/api/v1/alarms/acknowledge", body, true);
     }
+    std::fill(body.begin(), body.end(), static_cast<char>(0));
+    std::fill(pin.begin(), pin.end(), '\0');
     std::lock_guard<std::mutex> guard(g_lock);
-    g_action_error = answer.status == 200 ? "" : answer.status == 0 ? "no_answer" : answer.status == 401 ? "unauthorized" : answer.status == 403 ? "forbidden" : "failed";
+    g_action_error = hmi::order_error(answer.status, answer.body);
+    if (answer.status == 401) g_cookie.clear();
   }
   g_action_pending = false;
 }
@@ -438,6 +445,8 @@ void expire_pending_orders(std::int64_t now) {
     std::lock_guard<std::mutex> guard(g_lock);
     std::fill(g_pending_pin.begin(), g_pending_pin.end(), '\0');
     g_pending_pin.clear();
+    std::fill(g_pending_ack_pin.begin(), g_pending_ack_pin.end(), '\0');
+    g_pending_ack_pin.clear();
     g_action_error = "no_answer";
   }
   g_action_pending = false;
@@ -519,7 +528,8 @@ void request_mode(hmi::Mode mode, const std::string& pin) {
   if (g_task != nullptr) xTaskNotifyGive(g_task);
 }
 
-void request_acknowledge_all() {
+void request_acknowledge_all(const std::string& pin) {
+  { std::lock_guard<std::mutex> guard(g_lock); g_pending_ack_pin = pin; }
   g_pending_since_ms = now_ms();
   g_action_pending = true;
   g_pending_acknowledge = true;

@@ -5,7 +5,7 @@ to the people in the house through it. This version has the panel's half of that
 
 ## What there is
 
-* **Push to talk.** A touch on the microphone button opens the microphone; a second touch (or the time limit, 8 seconds by default) closes it. The audio goes to the speech service
+* **Push to talk.** A touch on the microphone button opens the microphone; a second touch (or the time limit, 8 seconds by default) closes it. With `voice.end_of_speech` on (off by default) it also closes by itself when the person stops talking: the first 300 ms are taken as the room, a voice is a sound 3 times louder (and never below a least level), and the quiet of 900 ms after the last word ends the request; if nobody speaks within 4 seconds nothing is sent. All of it is in `core/speech_end.hpp` and its settings (`silence_ms`, `min_speech_ms`, `level_percent`, `min_level`, `lead_ms`, `calibrate_ms`); it has been tried on a simulated microphone only. The audio goes to the speech service
   whose address is in the settings, the reply is shown and spoken. Nothing is sent anywhere unless the voice is turned on in the settings and given an address.
 * **A conversation as a state machine** (`core/voice_session.hpp`, tested in `tests/test_voice.cpp`): idle, listening, thinking, speaking, failed. Every step has a time limit
   (a reply that never ends does not lock the screen), a touch always stops it, a failure is shown for a few seconds and dismissed by a touch, and a sound right after a conversation

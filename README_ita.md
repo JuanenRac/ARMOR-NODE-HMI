@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Linguaggio">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-93142%20checks-2ea44f.svg" alt="Test">
+  <img src="https://img.shields.io/badge/Tests-93476%20checks-2ea44f.svg" alt="Test">
   <img src="https://img.shields.io/badge/Version-0.4.3-0f6cbd.svg" alt="Versione">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturità">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Ciò che non dipende dalla scheda è reale e provato su un computer (le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme di coercizione che non viene mai mostrato, la conversazione vocale e la lunga risposta del servizio vocale, i pin della scheda, i testi dello schermo in otto lingue e i glifi dei suoi caratteri, i controlli di versione e firma: 93,142 verifiche in 19 programmi di test) e lo è anche la pagina web (eseguita contro un sostituto in un browser reale). **Il firmware è stato compilato una volta (ESP-IDF 5.5.5, non verificato dall'integrazione continua) e non è mai girato su una scheda:** lo schermo, il touch, l'audio e il collegamento al server sono scritti dagli esempi di Waveshare per questa famiglia di schede e attendono la prima accensione. Il servizio vocale (ARMOR-VOICE-AI) risponde alle richieste di questo pannello; non c'è una parola di attivazione: si tocca per parlare.
+**Controllo di onestà - cosa funziona oggi:** Ciò che non dipende dalla scheda è reale e provato su un computer (le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme di coercizione che non viene mai mostrato, la conversazione vocale e la lunga risposta del servizio vocale, i pin della scheda, i testi dello schermo in otto lingue e i glifi dei suoi caratteri, i controlli di versione e firma: 93,476 verifiche in 21 programmi di test) e lo è anche la pagina web (eseguita contro un sostituto in un browser reale). **Il firmware è stato compilato una volta (ESP-IDF 5.5.5, non verificato dall'integrazione continua) e non è mai girato su una scheda:** lo schermo, il touch, l'audio e il collegamento al server sono scritti dagli esempi di Waveshare per questa famiglia di schede e attendono la prima accensione. Il servizio vocale (ARMOR-VOICE-AI) risponde alle richieste di questo pannello; non c'è una parola di attivazione: si tocca per parlare.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturità | Funzionale |
 | Ruolo | Pannello touch a parete per ARMOR-SERVER (famiglia: Clients, padre: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Test | 93142 verifiche in 19 programmi host e 6 verifiche Python (`ctest`) |
+| Test | 93476 verifiche in 21 programmi host e 6 verifiche Python (`ctest`) |
 | Scheda | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Gira su | Una Waveshare ESP32-S3-Touch-LCD-7C-BOX; test su host su qualsiasi computer |
 | Su hardware reale | Ancora nessuno: il firmware si compila (ESP-IDF 5.5.5, non verificato dalla CI) ma non è girato sulla scheda |
@@ -58,7 +58,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟠 | Il firmware compila (ESP-IDF 5.5.5), ma la compilazione non è controllata dall'integrazione continua e non ha mai girato su una scheda. |
-| Test | 🟢 | Superano 93.122 controlli in 19 programmi host (`ctest`): le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme sotto minaccia che non viene mai mostrato, lo scambio vocale, i pin, i testi dello schermo in otto lingue e i glifi dei suoi caratteri. |
+| Test | 🟢 | Superano 93.122 controlli in 21 programmi host (`ctest`): le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme sotto minaccia che non viene mai mostrato, lo scambio vocale, i pin, i testi dello schermo in otto lingue e i glifi dei suoi caratteri. |
 | Protocolli e dati | 🟡 | Lo scambio con il server e con il servizio vocale ARMOR-VOICE-AI è provato contro simulazioni; è push to talk, senza parola di attivazione. |
 | Interfaccia | 🟠 | La pagina web è stata eseguita contro una simulazione in un browser reale; lo schermo, il tocco e l'audio sono scritti dagli esempi di Waveshare e attendono la prima accensione. |
 | Hardware | 🔴 | Il firmware non ha mai girato sulla scheda: nulla ha ancora funzionato su apparecchiature reali. |
@@ -154,6 +154,9 @@ Il firmware è stato compilato una volta e non è mai girato su una scheda: sche
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | Il servizio vocale: spento di default; l'indirizzo è lungo al massimo 160 caratteri e viene validato (altrimenti `required` o `invalid`); il token si cancella quando cambia l'host |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | Le impostazioni che tutti i nodi condividono: il nome (vuoto dà `armor-` e gli ultimi byte del MAC), il codice di configurazione (vuoto: casuale), il segreto di flotta (16+ caratteri, mai nel repository), le prime impostazioni del broker, il battito (da 2 a 300 s), i minuti di configurazione Bluetooth (da 1 a 120) e il ripristino con BOOT (8 s nei primi 30 s) |
 | `system.login_limit_per_minute` | 30 (0-120) | Password errate al minuto prima che il pannello blocchi l'accesso a tutti (0 = nessun limite globale); si legge e si cambia da Studio (un pulsante su ogni nodo) o con `POST /api/v1/admin/nodes/settings`, dove l'accesso al pannello è usato una volta e mai conservato |
+| `controls.ack` | pin | Cosa chiede per prima una pressione su «Riconosci tutti»: `pin` (la tastiera; il PIN va al server con il comando e lì si verifica), `confirm` (un sì o un no) o `off` (un tocco) |
+| `voice.end_of_speech` | off | Fermare la registrazione quando la persona smette di parlare (i primi istanti sono la stanza; la richiesta termina dopo il silenzio che segue l'ultima parola, o non viene inviata se nessuno parla) |
+| `voice.silence_ms`, `min_speech_ms`, `level_percent`, `min_level`, `lead_ms`, `calibrate_ms` | 900, 250, 300, 200, 4000, 300 | Il silenzio che chiude una richiesta, la voce che deve essere sentita perché conti, quanto più forte della stanza è una voce (per cento), il livello minimo che è voce, l'attesa della prima parola e il tempo per misurare la stanza |
 
 ## 🚀 Avvio rapido
 
@@ -178,7 +181,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-19 programmi di test su host e 6 verifiche Python girano con `ctest`; 93142 verifiche contate dai programmi host, compilati con `-Werror`.
+21 programmi di test su host e 6 verifiche Python girano con `ctest`; 93476 verifiche contate dai programmi host, compilati con `-Werror`.
 
 Verifiche Python: i testi del pannello in otto lingue, i task, i percorsi di salvataggio, la sessione Bluetooth sotto il suo lock e i percorsi chiamati dal pannello (e, in alcuni nodi, i codici HTTP o i glifi dei caratteri)
 

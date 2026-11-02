@@ -481,7 +481,9 @@ function serverPage() {
         field("serverPoll", "server.poll_s", { type: "number", min: 1, max: 60 }),
         field("serverLive", "server.live_events", { type: "checkbox" })] : null,
       S.screen ? linkPill(S.screen.link.state) : null,
-      note(t("serverNote"), "info")));
+      note(t("serverNote"), "info")),
+    card(t("controlsTitle"), field("controlsAck", "controls.ack", { type: "select", options: [["pin", t("controlsAckPin")], ["confirm", t("controlsAckConfirm")], ["off", t("controlsAckOff")]] }),
+      note(t("controlsNote"), "info")));
 }
 
 function screenPage() {
@@ -508,7 +510,12 @@ function voicePage() {
       v.enabled ? [field("voiceUrl", "voice.url", { max: 160, placeholder: "http://192.168.0.180:18090" }),
         field("voiceToken", "voice.token", { type: "password", hint: t("passwordHostBound") }),
         el("div", { class: "row" }, field("voiceWake", "voice.wake_name", { max: 24 }), field("voiceListen", "voice.listen_s", { type: "number", min: 2, max: 15 })),
-        field("voiceBinary", "voice.binary_turn", { type: "checkbox" })] : null,
+        field("voiceBinary", "voice.binary_turn", { type: "checkbox" }),
+        field("voiceEnd", "voice.end_of_speech", { type: "checkbox", rerender: true }),
+        v.end_of_speech ? [el("div", { class: "row" }, field("voiceEndSilence", "voice.silence_ms", { type: "number", min: 300, max: 3000 }), field("voiceEndMinSpeech", "voice.min_speech_ms", { type: "number", min: 80, max: 1500 })),
+          el("div", { class: "row" }, field("voiceEndLevel", "voice.level_percent", { type: "number", min: 150, max: 1000 }), field("voiceEndMinLevel", "voice.min_level", { type: "number", min: 50, max: 4000 })),
+          el("div", { class: "row" }, field("voiceEndLead", "voice.lead_ms", { type: "number", min: 1000, max: 15000 }), field("voiceEndCalibrate", "voice.calibrate_ms", { type: "number", min: 100, max: 1000 })),
+          note(t("voiceEndNote"), "info")] : null] : null,
       S.screen ? el("p", { class: "muted" }, t("vs_" + S.screen.voice.state)) : null,
       note(t("voiceNote"), "info")));
 }

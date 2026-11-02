@@ -35,7 +35,7 @@ bool view_changed(std::uint32_t& seen, hmi::ViewModel& out);
 // What the person asked for at the screen. The server decides: its answer (the new mode) shows at the next summary.
 // Disarming carries the PIN typed at the screen (the server checks it); arming never does.
 void request_mode(hmi::Mode mode, const std::string& pin = "");
-void request_acknowledge_all();
+void request_acknowledge_all(const std::string& pin = std::string());
 
 // Called, from the link's task, with the alarms that are new and nobody has acknowledged (never for the ones that existed when the panel started).
 void on_new_alarms(std::function<void(const std::vector<hmi::AlarmLine>&)> callback);
