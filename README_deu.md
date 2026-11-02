@@ -107,12 +107,31 @@ ARMOR-NODE-HMI ist das Wandpanel: ein Client von [ARMOR-SERVER](https://github.c
 
 ## 🖼️ Screenshots
 
-Aufgenommen mit 1920×1080 auf einem Prüfstand, mit Beispieldaten und ohne eine echte Anlage dahinter.
+Aufgenommen auf einem Prüfstand mit erfundenen Beispieldaten und ohne eine echte Anlage dahinter.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Übersicht: der Zustand des Knotens auf einen Blick - Netzwerk, Broker, Firmware und was er meldet." width="100%"><br><sub>Übersicht: der Zustand des Knotens auf einen Blick - Netzwerk, Broker, Firmware und was er meldet.</sub></td><td width="50%" valign="top"><img src="images/screenshots/screen.png" alt="Bildschirm und Ton: Helligkeit, Nachtstunden, Lautstärke und welche Alarme angesagt werden." width="100%"><br><sub>Bildschirm und Ton: Helligkeit, Nachtstunden, Lautstärke und welche Alarme angesagt werden.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="Sprachassistent: Drücken zum Sprechen, standardmäßig aus, und der Dienst, an den sein Audio geht." width="100%"><br><sub>Sprachassistent: Drücken zum Sprechen, standardmäßig aus, und der Dienst, an den sein Audio geht.</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="Server: die Adresse des A.R.M.O.R.-Servers, der Benutzer des Panels und wie oft es nachfragt." width="100%"><br><sub>Server: die Adresse des A.R.M.O.R.-Servers, der Benutzer des Panels und wie oft es nachfragt.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Übersicht" width="100%">
+</p>
+
+<p align="center"><em>Übersicht: der Zustand des Knotens auf einen Blick - Netzwerk, Broker, Firmware und was er meldet.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/screen.png" alt="Bildschirm und Ton" width="100%">
+</p>
+
+<p align="center"><em>Bildschirm und Ton: Helligkeit, Nachtstunden, Lautstärke und welche Alarme angesagt werden.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/voice.png" alt="Sprachassistent" width="100%">
+</p>
+
+<p align="center"><em>Sprachassistent: Drücken zum Sprechen, standardmäßig aus, und der Dienst, an den sein Audio geht.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/server.png" alt="Server" width="100%">
+</p>
+
+<p align="center"><em>Server: die Adresse des A.R.M.O.R.-Servers, der Benutzer des Panels und wie oft es nachfragt.</em></p>
 
 ## 🔒 Sicherheit und Schutz
 

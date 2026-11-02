@@ -107,12 +107,31 @@ ARMOR-NODE-HMI 是壁挂面板：与 Android 应用一样是 [ARMOR-SERVER](http
 
 ## 🖼️ 屏幕截图
 
-在测试台上以 1920×1080 截取，使用示例数据，背后没有真实的安装。
+在测试台上使用虚构的示例数据截取，背后没有真实的安装。
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="概览：节点状态一目了然——网络、代理、固件及其上报内容。" width="100%"><br><sub>概览：节点状态一目了然——网络、代理、固件及其上报内容。</sub></td><td width="50%" valign="top"><img src="images/screenshots/screen.png" alt="屏幕和声音：亮度、夜间时段、音量以及播报哪些警报。" width="100%"><br><sub>屏幕和声音：亮度、夜间时段、音量以及播报哪些警报。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="语音助手：按键说话，默认关闭，以及其音频发送到的服务。" width="100%"><br><sub>语音助手：按键说话，默认关闭，以及其音频发送到的服务。</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="服务器：A.R.M.O.R. 服务器的地址、面板所用的用户以及查询间隔。" width="100%"><br><sub>服务器：A.R.M.O.R. 服务器的地址、面板所用的用户以及查询间隔。</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="概览" width="100%">
+</p>
+
+<p align="center"><em>概览：节点状态一目了然——网络、代理、固件及其上报内容。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/screen.png" alt="屏幕和声音" width="100%">
+</p>
+
+<p align="center"><em>屏幕和声音：亮度、夜间时段、音量以及播报哪些警报。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/voice.png" alt="语音助手" width="100%">
+</p>
+
+<p align="center"><em>语音助手：按键说话，默认关闭，以及其音频发送到的服务。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/server.png" alt="服务器" width="100%">
+</p>
+
+<p align="center"><em>服务器：A.R.M.O.R. 服务器的地址、面板所用的用户以及查询间隔。</em></p>
 
 ## 🔒 安全与防护
 

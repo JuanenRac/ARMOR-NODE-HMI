@@ -107,12 +107,31 @@ ARMOR-NODE-HMI è il pannello a muro: un client di [ARMOR-SERVER](https://github
 
 ## 🖼️ Schermate
 
-Catturate a 1920×1080 su un banco di prova, con dati di esempio e senza alcuna installazione reale dietro.
+Catturate su un banco di prova con dati di esempio inventati e senza alcuna installazione reale dietro.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Riepilogo: lo stato del nodo in breve - rete, broker, firmware e ciò che riporta." width="100%"><br><sub>Riepilogo: lo stato del nodo in breve - rete, broker, firmware e ciò che riporta.</sub></td><td width="50%" valign="top"><img src="images/screenshots/screen.png" alt="Schermo e suono: luminosità, ore notturne, volume e quali allarmi vengono annunciati." width="100%"><br><sub>Schermo e suono: luminosità, ore notturne, volume e quali allarmi vengono annunciati.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="Assistente vocale: premi per parlare, disattivato per impostazione predefinita, e il servizio a cui va il suo audio." width="100%"><br><sub>Assistente vocale: premi per parlare, disattivato per impostazione predefinita, e il servizio a cui va il suo audio.</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="Server: l'indirizzo del server A.R.M.O.R., l'utente del pannello e ogni quanto interroga." width="100%"><br><sub>Server: l'indirizzo del server A.R.M.O.R., l'utente del pannello e ogni quanto interroga.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Riepilogo" width="100%">
+</p>
+
+<p align="center"><em>Riepilogo: lo stato del nodo in breve - rete, broker, firmware e ciò che riporta.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/screen.png" alt="Schermo e suono" width="100%">
+</p>
+
+<p align="center"><em>Schermo e suono: luminosità, ore notturne, volume e quali allarmi vengono annunciati.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/voice.png" alt="Assistente vocale" width="100%">
+</p>
+
+<p align="center"><em>Assistente vocale: premi per parlare, disattivato per impostazione predefinita, e il servizio a cui va il suo audio.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/server.png" alt="Server" width="100%">
+</p>
+
+<p align="center"><em>Server: l'indirizzo del server A.R.M.O.R., l'utente del pannello e ogni quanto interroga.</em></p>
 
 ## 🔒 Sicurezza e protezione
 

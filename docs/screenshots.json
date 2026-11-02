@@ -1,0 +1,96 @@
+{
+  "screens": [
+    {
+      "file": "overview.png",
+      "alt": {
+        "en": "Overview",
+        "es": "Resumen",
+        "fr": "Résumé",
+        "it": "Riepilogo",
+        "de": "Übersicht",
+        "zh": "概览",
+        "ja": "概要",
+        "pt": "Resumo"
+      },
+      "caption": {
+        "en": "Overview: the state of the node at a glance - network, broker, firmware and what it reports.",
+        "es": "Resumen: el estado del nodo de un vistazo - red, broker, firmware y lo que reporta.",
+        "fr": "Résumé : l'état du nœud en un coup d'œil - réseau, broker, firmware et ce qu'il remonte.",
+        "it": "Riepilogo: lo stato del nodo in breve - rete, broker, firmware e ciò che riporta.",
+        "de": "Übersicht: der Zustand des Knotens auf einen Blick - Netzwerk, Broker, Firmware und was er meldet.",
+        "zh": "概览：节点状态一目了然——网络、代理、固件及其上报内容。",
+        "ja": "概要：ネットワーク、ブローカー、ファームウェア、報告内容など、ノードの状態をひと目で確認できます。",
+        "pt": "Resumo: o estado do nó num relance - rede, broker, firmware e o que reporta."
+      }
+    },
+    {
+      "file": "screen.png",
+      "alt": {
+        "en": "Screen and sound",
+        "es": "Pantalla y sonido",
+        "fr": "Écran et son",
+        "it": "Schermo e suono",
+        "de": "Bildschirm und Ton",
+        "zh": "屏幕和声音",
+        "ja": "画面と音",
+        "pt": "Ecrã e som"
+      },
+      "caption": {
+        "en": "Screen and sound: brightness, night hours, volume and which alarms are announced.",
+        "es": "Pantalla y sonido: brillo, horas nocturnas, volumen y qué alarmas se anuncian.",
+        "fr": "Écran et son : luminosité, heures de nuit, volume et quelles alarmes sont annoncées.",
+        "it": "Schermo e suono: luminosità, ore notturne, volume e quali allarmi vengono annunciati.",
+        "de": "Bildschirm und Ton: Helligkeit, Nachtstunden, Lautstärke und welche Alarme angesagt werden.",
+        "zh": "屏幕和声音：亮度、夜间时段、音量以及播报哪些警报。",
+        "ja": "画面と音：明るさ、夜間の時間帯、音量、通知する警報の種類。",
+        "pt": "Ecrã e som: brilho, horas noturnas, volume e que alarmes são anunciados."
+      }
+    },
+    {
+      "file": "voice.png",
+      "alt": {
+        "en": "Voice assistant",
+        "es": "Asistente de voz",
+        "fr": "Assistant vocal",
+        "it": "Assistente vocale",
+        "de": "Sprachassistent",
+        "zh": "语音助手",
+        "ja": "音声アシスタント",
+        "pt": "Assistente de voz"
+      },
+      "caption": {
+        "en": "Voice assistant: push to talk, off by default, and the service its audio goes to.",
+        "es": "Asistente de voz: pulsar para hablar, desactivado por defecto, y el servicio al que va su audio.",
+        "fr": "Assistant vocal : appuyer pour parler, désactivé par défaut, et le service vers lequel va son audio.",
+        "it": "Assistente vocale: premi per parlare, disattivato per impostazione predefinita, e il servizio a cui va il suo audio.",
+        "de": "Sprachassistent: Drücken zum Sprechen, standardmäßig aus, und der Dienst, an den sein Audio geht.",
+        "zh": "语音助手：按键说话，默认关闭，以及其音频发送到的服务。",
+        "ja": "音声アシスタント：プッシュトゥトーク（既定ではオフ）と、音声の送信先サービス。",
+        "pt": "Assistente de voz: premir para falar, desativado por predefinição, e o serviço para onde vai o seu áudio."
+      }
+    },
+    {
+      "file": "server.png",
+      "alt": {
+        "en": "Server",
+        "es": "Servidor",
+        "fr": "Serveur",
+        "it": "Server",
+        "de": "Server",
+        "zh": "服务器",
+        "ja": "サーバー",
+        "pt": "Servidor"
+      },
+      "caption": {
+        "en": "Server: the address of the A.R.M.O.R. server, the user of the panel and how often it asks.",
+        "es": "Servidor: la dirección del servidor A.R.M.O.R., el usuario del panel y cada cuánto pregunta.",
+        "fr": "Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation.",
+        "it": "Server: l'indirizzo del server A.R.M.O.R., l'utente del pannello e ogni quanto interroga.",
+        "de": "Server: die Adresse des A.R.M.O.R.-Servers, der Benutzer des Panels und wie oft es nachfragt.",
+        "zh": "服务器：A.R.M.O.R. 服务器的地址、面板所用的用户以及查询间隔。",
+        "ja": "サーバー：A.R.M.O.R. サーバーのアドレス、パネルのユーザー、問い合わせの間隔。",
+        "pt": "Servidor: o endereço do servidor A.R.M.O.R., o utilizador do painel e de quanto em quanto tempo pergunta."
+      }
+    }
+  ]
+}

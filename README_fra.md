@@ -107,12 +107,31 @@ ARMOR-NODE-HMI est le panneau mural : un client d'[ARMOR-SERVER](https://github.
 
 ## 🖼️ Captures d'écran
 
-Capturées en 1920×1080 sur un banc d'essai, avec des données d'exemple et sans installation réelle derrière.
+Capturées sur un banc d'essai avec des données d'exemple fictives et sans installation réelle derrière.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Résumé : l'état du nœud en un coup d'œil - réseau, broker, firmware et ce qu'il remonte." width="100%"><br><sub>Résumé : l'état du nœud en un coup d'œil - réseau, broker, firmware et ce qu'il remonte.</sub></td><td width="50%" valign="top"><img src="images/screenshots/screen.png" alt="Écran et son : luminosité, heures de nuit, volume et quelles alarmes sont annoncées." width="100%"><br><sub>Écran et son : luminosité, heures de nuit, volume et quelles alarmes sont annoncées.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="Assistant vocal : appuyer pour parler, désactivé par défaut, et le service vers lequel va son audio." width="100%"><br><sub>Assistant vocal : appuyer pour parler, désactivé par défaut, et le service vers lequel va son audio.</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation." width="100%"><br><sub>Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Résumé" width="100%">
+</p>
+
+<p align="center"><em>Résumé : l'état du nœud en un coup d'œil - réseau, broker, firmware et ce qu'il remonte.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/screen.png" alt="Écran et son" width="100%">
+</p>
+
+<p align="center"><em>Écran et son : luminosité, heures de nuit, volume et quelles alarmes sont annoncées.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/voice.png" alt="Assistant vocal" width="100%">
+</p>
+
+<p align="center"><em>Assistant vocal : appuyer pour parler, désactivé par défaut, et le service vers lequel va son audio.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/server.png" alt="Serveur" width="100%">
+</p>
+
+<p align="center"><em>Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation.</em></p>
 
 ## 🔒 Sécurité et protection
 

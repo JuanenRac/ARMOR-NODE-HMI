@@ -107,12 +107,31 @@ ARMOR-NODE-HMI is the wall panel: a client of [ARMOR-SERVER](https://github.com/
 
 ## 🖼️ Screenshots
 
-Captured at 1920×1080 on a test bench, with sample data and no real installation behind them.
+Captured on a test bench with made-up sample data and no real installation behind them.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Overview: the state of the node at a glance - network, broker, firmware and what it reports." width="100%"><br><sub>Overview: the state of the node at a glance - network, broker, firmware and what it reports.</sub></td><td width="50%" valign="top"><img src="images/screenshots/screen.png" alt="Screen and sound: brightness, night hours, volume and which alarms are announced." width="100%"><br><sub>Screen and sound: brightness, night hours, volume and which alarms are announced.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="Voice assistant: push to talk, off by default, and the service its audio goes to." width="100%"><br><sub>Voice assistant: push to talk, off by default, and the service its audio goes to.</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="Server: the address of the A.R.M.O.R. server, the user of the panel and how often it asks." width="100%"><br><sub>Server: the address of the A.R.M.O.R. server, the user of the panel and how often it asks.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Overview" width="100%">
+</p>
+
+<p align="center"><em>Overview: the state of the node at a glance - network, broker, firmware and what it reports.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/screen.png" alt="Screen and sound" width="100%">
+</p>
+
+<p align="center"><em>Screen and sound: brightness, night hours, volume and which alarms are announced.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/voice.png" alt="Voice assistant" width="100%">
+</p>
+
+<p align="center"><em>Voice assistant: push to talk, off by default, and the service its audio goes to.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/server.png" alt="Server" width="100%">
+</p>
+
+<p align="center"><em>Server: the address of the A.R.M.O.R. server, the user of the panel and how often it asks.</em></p>
 
 ## 🔒 Security & Safety
 

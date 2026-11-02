@@ -107,12 +107,31 @@ O ARMOR-NODE-HMI é o painel de parede: um cliente do [ARMOR-SERVER](https://git
 
 ## 🖼️ Capturas de ecrã
 
-Capturadas a 1920×1080 numa bancada de testes, com dados de exemplo e sem qualquer instalação real por trás.
+Capturadas numa bancada de testes com dados de exemplo inventados e sem qualquer instalação real por trás.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Resumo: o estado do nó num relance - rede, broker, firmware e o que reporta." width="100%"><br><sub>Resumo: o estado do nó num relance - rede, broker, firmware e o que reporta.</sub></td><td width="50%" valign="top"><img src="images/screenshots/screen.png" alt="Ecrã e som: brilho, horas noturnas, volume e que alarmes são anunciados." width="100%"><br><sub>Ecrã e som: brilho, horas noturnas, volume e que alarmes são anunciados.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/voice.png" alt="Assistente de voz: premir para falar, desativado por predefinição, e o serviço para onde vai o seu áudio." width="100%"><br><sub>Assistente de voz: premir para falar, desativado por predefinição, e o serviço para onde vai o seu áudio.</sub></td><td width="50%" valign="top"><img src="images/screenshots/server.png" alt="Servidor: o endereço do servidor A.R.M.O.R., o utilizador do painel e de quanto em quanto tempo pergunta." width="100%"><br><sub>Servidor: o endereço do servidor A.R.M.O.R., o utilizador do painel e de quanto em quanto tempo pergunta.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Resumo" width="100%">
+</p>
+
+<p align="center"><em>Resumo: o estado do nó num relance - rede, broker, firmware e o que reporta.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/screen.png" alt="Ecrã e som" width="100%">
+</p>
+
+<p align="center"><em>Ecrã e som: brilho, horas noturnas, volume e que alarmes são anunciados.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/voice.png" alt="Assistente de voz" width="100%">
+</p>
+
+<p align="center"><em>Assistente de voz: premir para falar, desativado por predefinição, e o serviço para onde vai o seu áudio.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/server.png" alt="Servidor" width="100%">
+</p>
+
+<p align="center"><em>Servidor: o endereço do servidor A.R.M.O.R., o utilizador do painel e de quanto em quanto tempo pergunta.</em></p>
 
 ## 🔒 Segurança e proteção
 
