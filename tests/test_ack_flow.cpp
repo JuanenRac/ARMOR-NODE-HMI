@@ -97,6 +97,17 @@ static void test_the_contract(const std::string& common, const std::string& serv
   const std::size_t next = openapi.find("\n  /api/v1/", at + 10);
   const std::string route = openapi.substr(at, next == std::string::npos ? std::string::npos : next - at);
   CHECK(route.find("PostAlarmsAcknowledgeRequest") != std::string::npos && route.find("'403'") != std::string::npos && route.find("'429'") != std::string::npos && route.find("'200'") != std::string::npos);
+  // the codes of a refusal about the PIN are the ones of the contract (PinErrorCode), in the same order, and no other
+  const std::size_t pins = openapi.find("    PinErrorCode:");
+  CHECK(pins != std::string::npos);
+  if (pins != std::string::npos) {
+    const std::size_t line = openapi.find("enum: [", pins);
+    const std::size_t close = openapi.find(']', line);
+    std::string listed = line == std::string::npos || close == std::string::npos ? std::string() : openapi.substr(line + 7, close - line - 7);
+    std::string mine;
+    for (const char* code : hmi::kPinErrorCodes) mine += (mine.empty() ? "" : ", ") + std::string(code);
+    CHECK(listed == mine);
+  }
   const std::size_t schema = openapi.find("    PostAlarmsAcknowledgeRequest:");
   CHECK(schema != std::string::npos);
   if (schema != std::string::npos) {

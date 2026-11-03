@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <string>
 
+#include "json.hpp"
+
 namespace armor::hmi {
 
 // Up to 10 digits; anything else is ignored. The screen shows only as many dots as digits typed, never the digits.
@@ -31,13 +33,19 @@ class PinEntry {
   std::string digits_;
 };
 
-// The short code of a refusal that is about the PIN ("wrong_pin", "pin_locked", "pin_not_set"), or "" for any other answer. The server answers 403 or 429 with {"code": ...}.
+// The codes of a refusal that is about the PIN, as the contract lists them (PinErrorCode in ARMOR-COMMON openapi/armor-server.yaml, generated/armor_error_codes.hpp: tests/test_ack_flow.cpp compares them).
+inline constexpr const char* kPinErrorCodes[] = {"wrong_pin", "pin_locked", "pin_not_set"};
+
+// The short code of a refusal that is about the PIN, or "" for any other answer. The server answers 403 or 429 with a JSON body whose "code" is one of kPinErrorCodes; the body is read as JSON
+// (the spacing of the text does not matter) and only the "code" is looked at, never the words of "error".
 inline std::string pin_error_of(int status, const std::string& body) {
   if (status != 403 && status != 429) return "";
-  for (const char* code : {"wrong_pin", "pin_locked", "pin_not_set"}) {
-    const std::string wanted = std::string("\"code\":\"") + code + "\"";
-    if (body.find(wanted) != std::string::npos) return code;
-  }
+  json::Value doc;
+  if (!json::parse(body, doc) || !doc.is_object()) return "";
+  const json::Value* code = doc.get("code");
+  if (code == nullptr || !code->is_string()) return "";
+  for (const char* known : kPinErrorCodes)
+    if (code->text == known) return known;
   return "";
 }
 

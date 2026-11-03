@@ -50,7 +50,8 @@ static void test_pin_entry() {
   CHECK(hmi::pin_error_of(403, "{\"code\":\"wrong_pin\"}") == "wrong_pin" && hmi::pin_error_of(429, "{\"code\":\"pin_locked\",\"retry\":30}") == "pin_locked" &&
         hmi::pin_error_of(403, "{\"error\":\"x\",\"code\":\"pin_not_set\"}") == "pin_not_set");
   for (const int status : {0, 200, 204, 400, 401, 404, 500, 503}) CHECK(hmi::pin_error_of(status, "{\"code\":\"wrong_pin\"}").empty());
-  CHECK(hmi::pin_error_of(403, "").empty() && hmi::pin_error_of(403, "{\"code\":\"forbidden\"}").empty() && hmi::pin_error_of(403, "{\"code\": \"wrong_pin\"}").empty() && hmi::pin_error_of(403, "wrong_pin").empty());
+  CHECK(hmi::pin_error_of(403, "").empty() && hmi::pin_error_of(403, "{\"code\":\"forbidden\"}").empty() && hmi::pin_error_of(403, "{\"code\": \"wrong_pin\"}") == "wrong_pin" && hmi::pin_error_of(403, "wrong_pin").empty() &&
+        hmi::pin_error_of(403, "{\"error\":\"wrong_pin\"}").empty() && hmi::pin_error_of(403, "{\"code\":\"wrong_pin\"").empty() && hmi::pin_error_of(403, "{\"code\":3}").empty() && hmi::pin_error_of(403, "{\"code\":\"wrong_pin_x\"}").empty());
 }
 
 // ---- the words of the screen ---------------------------------------------------------------------------------------------------------------------
