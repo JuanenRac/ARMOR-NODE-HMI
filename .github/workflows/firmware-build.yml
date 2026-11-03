@@ -61,7 +61,7 @@ jobs:
           [[ "$IDF_IMAGE" =~ ^espressif/idf:v[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo "::error::the container must be espressif/idf:vX.Y[.Z]"; exit 1; }
 
       - name: Check out the node repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: JuanenRac/${{ inputs.project }}
           ref: ${{ inputs.ref }}
@@ -128,7 +128,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the image
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.project }}-generic-image
           path: |
