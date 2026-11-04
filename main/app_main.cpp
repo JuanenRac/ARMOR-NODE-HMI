@@ -32,6 +32,7 @@
 #include "audio.hpp"
 #include "ble_provision.hpp"
 #include "clock_sync.hpp"
+#include "contract_version.hpp"
 #include "improv_serial.hpp"
 #include "core/alarm_clip.hpp"
 #include "core/netplan.hpp"
@@ -79,7 +80,7 @@ void presence_task(void*) {
       if (counter++ % 6 == 0) {
         armor::json::Writer info;
         info.begin_object().field("node_id", s.node_id).key("timestamp_ms").integer(now_ms).field("name", s.node_name).field("firmware", esp_app_get_description()->version)
-            .field("ip", n.ip).field("port", 80).end_object();
+            .field("ip", n.ip).field("port", 80).field("contract", armor::kContractVersion).end_object();
         armor::mqtt_link::publish("armor/node/" + s.node_id + "/info", info.str());
       }
     }
