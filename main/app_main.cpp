@@ -79,7 +79,7 @@ void presence_task(void*) {
       static int counter = 0;
       if (counter++ % 6 == 0) {
         armor::json::Writer info;
-        info.begin_object().field("node_id", s.node_id).key("timestamp_ms").integer(now_ms).field("name", s.node_name).field("firmware", esp_app_get_description()->version)
+        info.begin_object().field("kind", "info").field("node_id", s.node_id).key("timestamp_ms").integer(now_ms).field("name", s.node_name).field("firmware", esp_app_get_description()->version)
             .field("ip", n.ip).field("port", 80).field("contract", armor::kContractVersion).end_object();
         armor::mqtt_link::publish("armor/node/" + s.node_id + "/info", info.str());
       }
