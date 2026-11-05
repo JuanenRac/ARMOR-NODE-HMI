@@ -9,8 +9,13 @@
 #include <string_view>
 
 #include "json.hpp"
+#include "node_id.hpp"
 
 namespace armor::voice {
+
+// The value of the header X-Armor-Panel: the node id of this panel, so that the speech service can hand it back to the server and what the panel asked is written down as that panel.
+// An id that is not a plain node id is not sent (the header is left out), never a cut or altered one.
+inline std::string panel_header_value(std::string_view node_id) { return armor::node_id_is_valid(node_id) ? std::string(node_id) : std::string(); }
 
 // The words and the audio of an answer.
 struct Answer {

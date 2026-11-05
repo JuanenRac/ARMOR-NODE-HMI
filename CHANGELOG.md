@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The voice turn says which panel spoke:** both forms of the request to the speech service (binary and older) carry `X-Armor-Panel` with the node id of the panel, which the service hands back to the server so that what the panel asked is written down as that panel. An id that is not a plain node id is left out, never altered. A test; `docs/VOICE.md` lists the header.
 ## [0.4.4] - The health report says the contracts too: besides the information message, the health report carries contract (the number of main/contractversion.hpp), as the shared firmware now writes it. The shared firmware files are copied... (and 7 more changes)
 
 - **The health report says the contracts too:** besides the information message, the health report carries `contract` (the number of `main/contract_version.hpp`), as the shared firmware now writes it. The shared firmware files are copied again from the shared repository.

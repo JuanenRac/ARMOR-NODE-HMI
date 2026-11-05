@@ -79,6 +79,7 @@ void send_raw(const std::int16_t* samples, std::size_t count, const config::Sett
   if (client == nullptr) return;
   esp_http_client_set_header(client, "Content-Type", "audio/L16;rate=16000");
   esp_http_client_set_header(client, "X-Armor-Language", s.language.c_str());
+  { const std::string panel = armor::voice::panel_header_value(s.node_id); if (!panel.empty()) esp_http_client_set_header(client, "X-Armor-Panel", panel.c_str()); }   // which panel spoke; the client keeps its own copy
   if (!s.voice.token.empty()) esp_http_client_set_header(client, "X-Armor-Voice-Token", s.voice.token.c_str());   // the service answers nobody without it
   esp_http_client_set_post_field(client, reinterpret_cast<const char*>(samples), static_cast<int>(count * sizeof(std::int16_t)));
   const esp_err_t result = esp_http_client_perform(client);
@@ -117,6 +118,7 @@ void send_binary(const std::int16_t* samples, std::size_t count, const config::S
   if (client == nullptr) return;
   esp_http_client_set_header(client, "Content-Type", framing.content_type.c_str());
   esp_http_client_set_header(client, "X-Armor-Language", s.language.c_str());   // a server that does not read the meta part still knows the language
+  { const std::string panel = armor::voice::panel_header_value(s.node_id); if (!panel.empty()) esp_http_client_set_header(client, "X-Armor-Panel", panel.c_str()); }   // which panel spoke; the client keeps its own copy
   if (!s.voice.token.empty()) esp_http_client_set_header(client, "X-Armor-Voice-Token", s.voice.token.c_str());
   const int total = static_cast<int>(framing.head.size() + audio_bytes + framing.tail.size());
   bool sent = esp_http_client_open(client, total) == ESP_OK;

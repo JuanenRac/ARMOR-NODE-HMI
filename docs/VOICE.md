@@ -26,6 +26,7 @@ to the people in the house through it. This version has the panel's half of that
 POST <voice.url>/v1/turn
 Content-Type: audio/L16;rate=16000      16 kHz, mono, 16-bit signed little-endian PCM, at most listen_s seconds
 X-Armor-Language: en|es|de|fr|it|ja|zh|pt the language of the panel
+X-Armor-Panel: <node id>                the node id of this panel (left out when it is not a plain id), handed back to the server by the service
 X-Armor-Voice-Token: <token>            the token of the service (the setting *Token*, never shown again once saved)
 
 200 {"heard":"arm the system", "reply":"Arm the system? Say yes to confirm.", "audio":"<base64 of 16 kHz mono 16-bit PCM>"}

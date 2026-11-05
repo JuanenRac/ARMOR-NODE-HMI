@@ -90,7 +90,16 @@ static void test_answer_with_long_audio() {
   CHECK(!parse_answer("", a) && !parse_answer("[]", a) && !parse_answer(R"({"audio":5})", a) && !parse_answer(R"({"audio":"unfinished)", a) && !parse_answer(R"({"reply":"x",})", a));
 }
 
+static void test_panel_header() {
+  CHECK(panel_header_value("hmi-a1b2c3") == "hmi-a1b2c3");
+  CHECK(panel_header_value("hall_2") == "hall_2");
+  CHECK(panel_header_value("").empty() && panel_header_value("Hall").empty() && panel_header_value("a b").empty() && panel_header_value("a
+X-Evil: 1").empty());
+  CHECK(panel_header_value(std::string(65, 'a')).empty() && panel_header_value(std::string(64, 'a')).size() == 64);
+}
+
 int main() {
+  test_panel_header();
   test_answer_with_long_audio();
   test_happy_path();
   test_order_is_enforced();
