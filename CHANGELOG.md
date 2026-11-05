@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The health report says the contracts too:** besides the information message, the health report carries `contract` (the number of `main/contract_version.hpp`), as the shared firmware now writes it. The shared firmware files are copied again from the shared repository.
 - **The panel says which contracts its firmware was checked against:** the information message it sends to the server carries an optional `contract` (the version of the shared contracts, kept in `main/contract_version.hpp` and compared with the pin of the reverse-dependency run by a test of the shared repository), so Studio can warn about a node built against other contracts than the server.
 
 - **The panel reads the PIN refusals as JSON and from the contract's list:** `pin_error_of` parses the body and looks only at its `code` (spacing no longer matters, and the words of `error` are never searched), and the codes it knows are compared by a test with `PinErrorCode` of the shared contract. A command id of a control order is sixteen lowercase hexadecimal digits, as in every command of the family.
