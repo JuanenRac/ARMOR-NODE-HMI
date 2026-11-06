@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Simulation bench:** `tests/sim_bench.cpp` is built from the same core files as the firmware and is fed by ARMOR-SIMULATOR (`python -m armor_simulator.node_bench --bus hmi-feed`) with the frames of the live channel of the server (other types, broken or oversize JSON, unknown modes, missing blocks, heartbeat limits), and the answers are compared with what the documented rules require. The workflow `Simulation bench` runs it on every push, with no board and no ESP-IDF.
 - **The messages are tested against a seeded oracle:** the shared firmware now carries the readers and writers that ARMOR-COMMON generates from its schemas (`core/armor_wire.hpp`) and a host test (`tests/test_wire.cpp`) that reads the seeded cases of the contracts (each with the verdict of the Python validator) and checks, with the compiler and the flags of this project, that the generated validator, reader and writer agree on every one. The shared control order is checked the same way.
 
 ## [0.4.5] - The information message says its kind: it carries kind (info), as the shared contract now allows, so a reader no longer has to take it from the topic. (and 1 more changes)
