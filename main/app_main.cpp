@@ -91,7 +91,8 @@ void presence_task(void*) {
 // The screen's brightness follows the clock (a dimmer night) and its sleep follows the touches.
 void screen_task(void*) {
   for (;;) {
-    const armor::config::Display display = armor::store::display_settings();   // only the display part: the whole settings are never copied once a second
+    armor::config::Display display;   // only the display part is copied: the whole settings are never copied once a second
+    armor::store::with_settings([&display](const armor::config::Settings& s) { display = s.display; });
     int brightness = display.brightness;
     const std::time_t now = std::time(nullptr);
     if (now > 1700000000) {
@@ -231,7 +232,8 @@ extern "C" void app_main() {
   if (!setup) {
     armor::server_link::on_new_alarms([settings](const std::vector<armor::hmi::AlarmLine>& fresh) {
       armor::display::wake();                                            // an alarm wakes the screen
-      const auto audio = armor::store::audio_settings();
+      armor::config::Audio audio;
+      armor::store::with_settings([&audio](const armor::config::Settings& s) { audio = s.audio; });
       if (!audio.alarm_sound || !armor::audio::ready()) return;
       const int floor = audio.min_severity == armor::config::AlarmFloor::kCritical ? 2 : audio.min_severity == armor::config::AlarmFloor::kHigh ? 1 : 0;
       const armor::clip::Plan plan = armor::clip::plan_sound(fresh, floor, audio.tone_by_source);
@@ -244,7 +246,9 @@ extern "C" void app_main() {
     armor::server_link::on_summary([](const armor::hmi::Summary& summary) {
       int critical = 0;
       for (const armor::hmi::AlarmLine& line : summary.alarms) if (line.severity == armor::hmi::Severity::kCritical && !line.acknowledged) ++critical;
-      armor::audio::set_critical_unacknowledged(armor::store::audio_settings().alarm_sound ? critical : 0);
+      bool alarm_sound = false;
+      armor::store::with_settings([&alarm_sound](const armor::config::Settings& s) { alarm_sound = s.audio.alarm_sound; });
+      armor::audio::set_critical_unacknowledged(alarm_sound ? critical : 0);
     });
     armor::server_link::start(settings);
     armor::voice_task::start(settings);

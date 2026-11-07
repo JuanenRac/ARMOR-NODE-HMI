@@ -29,7 +29,7 @@
 
 ---
 
-**Comprobación de honestidad - qué funciona hoy:** Lo que no depende de la placa es real y está probado en un ordenador (los ajustes, lo que el panel sabe del servidor y cuándo está desfasado, la alarma de coacción que nunca se muestra, la conversación de voz y la respuesta larga del servicio de voz, los pines de la placa, los textos de la pantalla en ocho idiomas y los glifos de sus fuentes, las comprobaciones de versión y firma: 99,511 comprobaciones en 23 programas de test) y también lo está la página web (ejecutada contra un sustituto en un navegador real). **El firmware se ha compilado una vez (ESP-IDF 5.5.5, que la integración continua no comprueba) y nunca ha corrido en una placa:** la pantalla, el táctil, el sonido y el enlace con el servidor están escritos a partir de los ejemplos de Waveshare para esta familia de placas y necesitan su primer encendido. El servicio de voz (ARMOR-VOICE-AI) atiende las peticiones de este panel; no hay palabra de activación: es pulsar para hablar.
+**Comprobación de honestidad - qué funciona hoy:** Lo que no depende de la placa es real y está probado en un ordenador (los ajustes, lo que el panel sabe del servidor y cuándo está desfasado, la alarma de coacción que nunca se muestra, la conversación de voz y la respuesta larga del servicio de voz, los pines de la placa, los textos de la pantalla en ocho idiomas y los glifos de sus fuentes, las comprobaciones de versión y firma: 99,511 comprobaciones en 24 programas de test) y también lo está la página web (ejecutada contra un sustituto en un navegador real). **El firmware se ha compilado una vez (ESP-IDF 5.5.5, que la integración continua no comprueba) y nunca ha corrido en una placa:** la pantalla, el táctil, el sonido y el enlace con el servidor están escritos a partir de los ejemplos de Waveshare para esta familia de placas y necesitan su primer encendido. El servicio de voz (ARMOR-VOICE-AI) atiende las peticiones de este panel; no hay palabra de activación: es pulsar para hablar.
 
 ---
 
@@ -41,7 +41,7 @@
 | Madurez | Funcional |
 | Función | Panel táctil de pared para ARMOR-SERVER (familia: Clients, padre: ARMOR-SERVER) |
 | Tecnología | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Pruebas | 99511 comprobaciones en 23 programas de host y 6 de Python (`ctest`) |
+| Pruebas | 99511 comprobaciones en 24 programas de host y 6 de Python (`ctest`) |
 | Placa | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Funciona en | Una Waveshare ESP32-S3-Touch-LCD-7C-BOX; pruebas de host en cualquier ordenador |
 | En hardware real | Ninguno todavía: el firmware compila (ESP-IDF 5.5.5, sin comprobar en CI) pero no ha corrido en la placa |
@@ -58,7 +58,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟠 | El firmware compila (ESP-IDF 5.5.5), pero la compilación no la comprueba la integración continua y nunca ha funcionado en una placa. |
-| Pruebas | 🟢 | Pasan 93.122 comprobaciones en 23 programas de host (`ctest`): los ajustes, lo que el panel sabe del servidor y cuándo está obsoleto, la alarma de coacción que nunca se muestra, el intercambio de voz, los pines, los textos de la pantalla en ocho idiomas y los glifos de sus fuentes. |
+| Pruebas | 🟢 | Pasan 93.122 comprobaciones en 24 programas de host (`ctest`): los ajustes, lo que el panel sabe del servidor y cuándo está obsoleto, la alarma de coacción que nunca se muestra, el intercambio de voz, los pines, los textos de la pantalla en ocho idiomas y los glifos de sus fuentes. |
 | Protocolos y datos | 🟡 | El intercambio con el servidor y con el servicio de voz ARMOR-VOICE-AI se prueba contra simulaciones; es pulsar para hablar, sin palabra de activación. |
 | Interfaz | 🟠 | La página web se ha ejecutado contra una simulación en un navegador real; la pantalla, el táctil y el sonido están escritos a partir de los ejemplos de Waveshare y esperan su primer encendido. |
 | Hardware | 🔴 | El firmware no ha funcionado en la placa: nada ha funcionado todavía con equipos reales. |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-23 programas de prueba de host y 6 comprobaciones en Python se ejecutan con `ctest`; 99511 comprobaciones contadas por los programas de host, compilados con `-Werror`.
+24 programas de prueba de host y 6 comprobaciones en Python se ejecutan con `ctest`; 99511 comprobaciones contadas por los programas de host, compilados con `-Werror`.
 
 Comprobaciones Python: los textos del panel en ocho idiomas, las tareas, las rutas de guardado, la sesión Bluetooth bajo su bloqueo y las rutas que llama el panel (y, en algunos nodos, los códigos HTTP o los glifos de las fuentes)
 

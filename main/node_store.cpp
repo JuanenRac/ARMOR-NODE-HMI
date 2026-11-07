@@ -257,13 +257,9 @@ config::Settings settings() {
   std::lock_guard<std::mutex> guard(g_lock);
   return g_settings;
 }
-config::Display display_settings() {
+void with_settings(const std::function<void(const config::Settings&)>& read) {
   std::lock_guard<std::mutex> guard(g_lock);
-  return g_settings.display;
-}
-config::Audio audio_settings() {
-  std::lock_guard<std::mutex> guard(g_lock);
-  return g_settings.audio;
+  read(g_settings);
 }
 bool settings_are_stored() {
   std::lock_guard<std::mutex> guard(g_lock);
@@ -336,8 +332,8 @@ auth::Result user_add(std::string_view name, std::string_view password, auth::Ro
 }
 
 bool user_verify(std::string_view name, std::string_view password, auth::Role& role) {
-  // The password hash (10 000 rounds, about a third of a second) is computed on a copy of the users, with the lock of the store let go: the screen reads the settings through the same lock
-  // every half second, so a sign-in that held it froze the picture and the touch for as long as it lasted (and a loop of sign-ins froze them for good).
+  // The hash of the password (10 000 rounds, about a third of a second) is computed on a copy of the users with the lock of the store let go: a node with a screen reads the settings through that
+  // lock every half second, so a sign-in that held it froze the picture and the touch for as long as it lasted (and a loop of sign-ins froze them for good).
   auth::UserStore users;
   {
     std::lock_guard<std::mutex> guard(g_lock);
