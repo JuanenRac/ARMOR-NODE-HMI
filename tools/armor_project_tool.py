@@ -157,7 +157,7 @@ def test_common(project: Path) -> None:
 def host_tests(project: Path, build: Path) -> None:
     """Run every test program the project's CMake registers (a list written by hand here left some of them out, among them the ones that check the signature of a firmware)."""
     ctest = check_tool("ctest", "CTest (it comes with CMake) is required to run the host tests")
-    command(project, [ctest, "--test-dir", str(build), "--output-on-failure"])
+    command(project, [ctest, "--test-dir", str(build), "-V"])
 
 
 def unit_tests(project: Path, folder: str = "tests") -> None:
