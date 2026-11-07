@@ -68,12 +68,13 @@ esp_lcd_panel_handle_t make_panel() {
   return panel;
 }
 
-esp_lcd_touch_handle_t make_touch() {
-  boardio::reset_touch();
+// One try of the GT911 at one of its two addresses (the level of the interrupt line at reset chooses it). nullptr when it does not answer there.
+esp_lcd_touch_handle_t try_touch(bool alternative_address) {
+  boardio::reset_touch(alternative_address);
   esp_lcd_panel_io_handle_t io = nullptr;
   // The component's ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG() lists its fields in an order C++ rejects, so the same values are set by name.
   esp_lcd_panel_io_i2c_config_t io_config{};
-  io_config.dev_addr = ESP_LCD_TOUCH_IO_I2C_GT911_ADDRESS;
+  io_config.dev_addr = alternative_address ? board::kTouchAddressAlternative : board::kTouchAddress;
   io_config.scl_speed_hz = board::kI2cHz;
   io_config.control_phase_bytes = 1;
   io_config.lcd_cmd_bits = 16;
@@ -87,7 +88,19 @@ esp_lcd_touch_handle_t make_touch() {
   touch_config.levels.reset = 0;
   touch_config.levels.interrupt = 0;
   esp_lcd_touch_handle_t touch = nullptr;
-  if (esp_lcd_touch_new_i2c_gt911(io, &touch_config, &touch) != ESP_OK) { ESP_LOGE(kTag, "the GT911 touch controller does not answer"); return nullptr; }
+  if (esp_lcd_touch_new_i2c_gt911(io, &touch_config, &touch) != ESP_OK) {
+    ESP_LOGW(kTag, "the GT911 touch controller does not answer at 0x%02X", static_cast<unsigned>(io_config.dev_addr));
+    esp_lcd_panel_io_del(io);
+    return nullptr;
+  }
+  ESP_LOGI(kTag, "the GT911 touch controller answers at 0x%02X", static_cast<unsigned>(io_config.dev_addr));
+  return touch;
+}
+
+esp_lcd_touch_handle_t make_touch() {
+  esp_lcd_touch_handle_t touch = try_touch(false);
+  if (touch == nullptr) touch = try_touch(true);   // some boards leave the interrupt line high at reset: the controller is then at its other address
+  if (touch == nullptr) ESP_LOGE(kTag, "the GT911 touch controller does not answer at either address");
   return touch;
 }
 }  // namespace

@@ -347,8 +347,8 @@ void refresh(lv_timer_t*) {
   }
 
   // an order that was on its way has been answered: two short notes when it went through, one note when it did not (the footer says why); the volume of the sound settings applies
-  if (g_screen.was_pending && !view.action_pending && audio::ready()) audio::beep(view.action_error[0] == ' ' ? audio::Tone::kConfirm : audio::Tone::kNotice);
-  if (g_screen.was_pending && !view.action_pending && view.action_error[0] == ' ') { g_screen.done_shown = true; g_screen.done_since_ms = lv_tick_get(); }
+  if (g_screen.was_pending && !view.action_pending && audio::ready()) audio::beep(view.action_error[0] == '\0' ? audio::Tone::kConfirm : audio::Tone::kNotice);
+  if (g_screen.was_pending && !view.action_pending && view.action_error[0] == '\0') { g_screen.done_shown = true; g_screen.done_since_ms = lv_tick_get(); }
   g_screen.was_pending = view.action_pending;
 
   // the footer: how to set the panel up, or what is wrong

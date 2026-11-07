@@ -71,13 +71,13 @@ void set_backlight(int percent) {
   set_line(board::kExpanderBacklight, true);
 }
 
-void reset_touch() {
+void reset_touch(bool alternative_address) {
   const gpio_num_t interrupt = static_cast<gpio_num_t>(board::kTouchInterrupt);
   gpio_config_t out{};
   out.pin_bit_mask = 1ULL << interrupt;
   out.mode = GPIO_MODE_OUTPUT;
   gpio_config(&out);
-  gpio_set_level(interrupt, 0);          // low while the controller wakes: it then answers at 0x5D
+  gpio_set_level(interrupt, alternative_address ? 1 : 0);   // the level of the interrupt line while the controller wakes chooses its address: low 0x5D, high 0x14
   set_line(board::kExpanderTouchReset, false);
   vTaskDelay(pdMS_TO_TICKS(10));
   set_line(board::kExpanderTouchReset, true);

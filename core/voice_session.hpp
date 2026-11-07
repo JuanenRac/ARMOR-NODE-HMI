@@ -69,6 +69,13 @@ class Session {
     return Action::kNone;
   }
 
+  // True while the conversation is still in `wanted` after the time limits of that moment have been applied. A step that blocks the voice task (the microphone, the speaker) asks this
+  // between its chunks, so that a touch, a limit of time or a switch-off ends it at once instead of when the step finishes by itself.
+  bool still(State wanted, std::uint32_t now_ms) {
+    tick(now_ms);
+    return state_ == wanted;
+  }
+
   // Call every few hundred milliseconds: the time limits of each step.
   Action tick(std::uint32_t now_ms) {
     const std::uint32_t spent = now_ms - since_ms_;
