@@ -20,7 +20,9 @@ void init();
 std::string mac_tail();
 unsigned mac_sum();
 
-config::Settings settings();                     // a copy
+config::Settings settings();                     // a copy of everything (about forty texts, some of them kilobytes long): not for the tasks that ask every second
+config::Display display_settings();              // a copy of the display part only, which is a handful of numbers
+config::Audio audio_settings();                  // a copy of the audio part only
 std::string settings_json_full();                // the settings as they are kept in flash, secrets included, without copying them (for the diagnostic package, which washes them: core/diag_package.hpp)
 bool settings_are_stored();                      // false until the panel (or a build) has saved them once
 bool save_settings(const config::Settings& s);   // false when flash writing failed

@@ -30,7 +30,8 @@ std::size_t record(std::int16_t* out, std::size_t max_samples, const std::functi
 
 // Plays mono 16-bit samples at 16 kHz (a spoken answer) and returns when they have been handed to the codec, or sooner when an alarm sound is waiting: the voice gives way to a siren. The
 // amplifier is on only while this runs.
-void play(const std::int16_t* samples, std::size_t count);
+// `keep_going`, when given, is asked between two chunks of 32 ms and the playing stops when it says no (a touch, the time limit of a spoken answer).
+void play(const std::int16_t* samples, std::size_t count, const std::function<bool()>& keep_going = nullptr);
 
 // A short tone made on the spot (no file): a notice, the rising pattern of an alarm, a two-note confirmation, a siren. It returns at once: the sound goes into a queue that one task plays,
 // the most important first (a siren before an alarm tone, an alarm tone before the voice, the voice before the notices).

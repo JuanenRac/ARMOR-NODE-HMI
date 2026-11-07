@@ -217,7 +217,7 @@ void run_turn() {
   bool no_speech_heard = false;
   const std::size_t heard_samples = audio::record(buffer, capacity, [] {
     std::lock_guard<std::mutex> guard(g_lock);
-    return g_session.state() == voice::State::kListening && !g_stop_recording;
+    return g_session.still(voice::State::kListening, now_ms()) && !g_stop_recording;   // the time limit of listening is applied here too: this task cannot call tick() while it records
   }, [&](const std::int16_t* frame, std::size_t count) {
     if (!s.voice.end_of_speech.enabled) return true;
     const armor::hmi::SpeechVerdict verdict = speech_end.feed(frame, count);
@@ -243,7 +243,11 @@ void run_turn() {
     g_failure.clear();
     g_session.on_event(voice::Event::kReply, now_ms());
   }
-  if (!reply_audio.empty()) audio::play(reply_audio.data(), reply_audio.size());
+  // A touch ends the answer at once, and so does the time limit of speaking: the state machine is asked between two chunks of the sound (this task cannot call tick() while it plays).
+  if (!reply_audio.empty()) audio::play(reply_audio.data(), reply_audio.size(), [] {
+    std::lock_guard<std::mutex> guard(g_lock);
+    return g_session.still(voice::State::kSpeaking, now_ms());
+  });
   std::lock_guard<std::mutex> guard(g_lock);
   g_session.on_event(voice::Event::kSpeechDone, now_ms());
 }

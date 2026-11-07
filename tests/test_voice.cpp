@@ -97,7 +97,30 @@ static void test_panel_header() {
   CHECK(panel_header_value(std::string(65, 'a')).empty() && panel_header_value(std::string(64, 'a')).size() == 64);
 }
 
+// What blocks the voice task (the microphone, the speaker) asks still() between its chunks: a touch, the time limit and a switch-off end it at once.
+static void test_still_while_blocked() {
+  Limits l;
+  l.listen_ms = 8000; l.think_ms = 15000; l.speak_ms = 30000;
+  Session s(l);
+  s.set_enabled(true, 0);
+  s.on_event(Event::kWake, 10000);
+  CHECK(s.still(State::kListening, 10100) && s.still(State::kListening, 17999));
+  CHECK(!s.still(State::kListening, 18000) && s.state() == State::kThinking);   // the time of listening ran out while the task was recording
+  s.on_event(Event::kReply, 19000);
+  CHECK(s.still(State::kSpeaking, 19100) && s.still(State::kSpeaking, 48999));
+  CHECK(!s.still(State::kSpeaking, 49000) && s.state() == State::kIdle);        // a reply that never ends lets go of the speaker
+  s.on_event(Event::kWake, 60000);
+  s.on_event(Event::kSpeechEnded, 61000);
+  s.on_event(Event::kReply, 62000);
+  CHECK(s.still(State::kSpeaking, 62500));
+  s.on_event(Event::kTouch, 63000);
+  CHECK(!s.still(State::kSpeaking, 63100));                                      // a touch stops the sound that is playing
+  s.set_enabled(false, 64000);
+  CHECK(!s.still(State::kListening, 64100) && !s.still(State::kSpeaking, 64100));
+}
+
 int main() {
+  test_still_while_blocked();
   test_panel_header();
   test_answer_with_long_audio();
   test_happy_path();

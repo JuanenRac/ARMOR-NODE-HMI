@@ -17,7 +17,7 @@ i2c_master_bus_handle_t bus();
 void set_backlight(int percent);
 
 // Resets the touch controller with the interrupt line held low, so that it answers at its usual address (0x5D).
-void reset_touch();
+void reset_touch(bool alternative_address = false);   // true: the interrupt line is held high while the controller wakes, so it answers at 0x14 instead of 0x5D
 
 // The speaker's power amplifier: on only while there is something to play (it hisses when left on).
 void set_amplifier(bool on);
