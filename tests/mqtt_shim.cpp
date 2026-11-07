@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
   const std::string node = argc > 1 ? argv[1] : "";
   const std::string topic = nh::topic(node);
   if (topic.empty()) return 0;
-  std::cout << topic << '\t' << armor::mqtt::birth_payload(node) << '\n';
   std::string line;
   while (std::getline(std::cin, line)) {
     if (!line.empty() && line.back() == '\r') line.pop_back();
