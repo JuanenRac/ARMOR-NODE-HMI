@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-102794%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-103139%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
@@ -41,7 +41,7 @@
 | Maturity | Functional |
 | Role | Wall touch panel for ARMOR-SERVER (family: Clients, parent: ARMOR-SERVER) |
 | Stack | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 102794 checks in 32 host programs and 6 Python checks (`ctest`) |
+| Tests | 103139 checks in 32 host programs and 7 Python checks (`ctest`) |
 | Board | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Runs on | A Waveshare ESP32-S3-Touch-LCD-7C-BOX; host tests on any computer |
 | On real hardware | None yet: the firmware builds (ESP-IDF 5.5.5, not checked by CI) but has not run on the board |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-32 host test programs and 6 Python checks run under `ctest`; 102794 checks counted by the host programs, built with `-Werror`.
+32 host test programs and 7 Python checks run under `ctest`; 103139 checks counted by the host programs, built with `-Werror`.
 
 Python checks: the panel texts in eight languages, the tasks, the save paths, the Bluetooth session under its lock and the routes the panel calls (and, in some nodes, the HTTP codes or the glyphs of the fonts)
 

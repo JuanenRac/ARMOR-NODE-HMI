@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Langage">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-102794%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-103139%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturité">
 </p>
@@ -41,7 +41,7 @@
 | Maturité | Fonctionnel |
 | Rôle | Panneau tactile mural pour ARMOR-SERVER (famille : Clients, parent : ARMOR-SERVER) |
 | Technologie | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 102794 vérifications dans 32 programmes hôte et 6 contrôles Python (`ctest`) |
+| Tests | 103139 vérifications dans 32 programmes hôte et 7 contrôles Python (`ctest`) |
 | Carte | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Fonctionne sur | Une Waveshare ESP32-S3-Touch-LCD-7C-BOX ; tests sur hôte sur n'importe quel ordinateur |
 | Sur matériel réel | Aucun pour l'instant : le firmware se compile (ESP-IDF 5.5.5, non vérifié par la CI) mais n'a pas tourné sur la carte |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-32 programmes de test sur hôte et 6 contrôles Python tournent sous `ctest` ; 102794 vérifications comptées par les programmes hôte, compilés avec `-Werror`.
+32 programmes de test sur hôte et 7 contrôles Python tournent sous `ctest` ; 103139 vérifications comptées par les programmes hôte, compilés avec `-Werror`.
 
 Contrôles Python : les textes du panneau en huit langues, les tâches, les chemins de sauvegarde, la session Bluetooth sous son verrou et les routes appelées par le panneau (et, dans certains nœuds, les codes HTTP ou les glyphes des polices)
 
