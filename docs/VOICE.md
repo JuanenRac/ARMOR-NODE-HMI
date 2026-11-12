@@ -16,6 +16,7 @@ to the people in the house through it. This version has the panel's half of that
 
 ## What there is not
 
+* **A wake word heard on the board itself.** The setting `voice.wake_local` (off by default) is the way for a panel that must send no sound at all: a small model on the board would listen in frames of 80 ms and only a wake would leave it. What exists is the interface (`core/wake_local.hpp`: the detector, the rule that turns scores into a wake and the choice between the board and the service) and a detector for the computer that plays a script, tested on a computer. The detector for the board (TFLite Micro) and the model are not in the firmware, so with the setting on the panel keeps asking the service; the models are trained by the owner (ARMOR-VOICE-AI `docs/WAKE_TRAINING.md`). Nothing of it has run on a board.
 * **A wake word that has run on the board.** The setting `voice.wake_word` (off by default; a checkbox on the Voice page) makes the panel listen for a second at a time and send that piece of sound to
   `POST /v1/wake` of ARMOR-VOICE-AI, which runs the detector (openWakeWord, on the machine of the service, never the cloud) and answers whether the word was said; nothing is kept on the panel. It needs the service
   started with `ARMOR_WAKE_WORD=on` and a model for the word; it pauses while the panel speaks or records, and a service that does not answer is asked less and less often. It has been tested on a computer

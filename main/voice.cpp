@@ -23,6 +23,7 @@
 #include "core/voice_answer.hpp"
 #include "core/voice_multipart.hpp"
 #include "core/wake_stream.hpp"
+#include "core/wake_local.hpp"
 #include "core/voice_challenge.hpp"
 #include "core/board_s3.hpp"
 
@@ -39,6 +40,10 @@ std::string g_reply, g_failure;
 voice::ChallengeShown g_challenge;   // under g_lock: the number of the spoken challenge while it is to be shown (core/voice_challenge.hpp)
 std::atomic<bool> g_stop_recording{false};
 armor::wake::Gate g_gate;   // under g_lock: when the next piece of sound may go to the wake word detector (core/wake_stream.hpp)
+// The detector of the wake word on the panel (core/wake_local.hpp). None is linked yet: the model trained by the owner and the TFLite Micro runtime are not in this firmware, so with voice.wake_local on
+// the panel keeps asking the service. When one exists it is set here once, before start(), and the local listening takes over without any other change.
+armor::wake_local::Detector* g_local_detector = nullptr;
+armor::wake_local::Listener* g_local_listener = nullptr;   // made on first use, in the heap; no sound is kept in it beyond one frame of 80 ms
 std::int16_t* g_wake_buffer = nullptr;   // one piece of the microphone in external RAM, only while the wake word is on
 TaskHandle_t g_task = nullptr;
 
@@ -255,6 +260,24 @@ void wake_round() {
   if (ok && woke && g_session.state() == voice::State::kIdle) g_session.on_event(voice::Event::kWake, now_ms());
 }
 
+// One round of the wake word heard on the panel: listen for 320 ms, give the sound to the local detector and, if it completes a wake, start a turn as a touch would. Nothing is sent anywhere.
+void local_wake_round() {
+  constexpr std::size_t kSamples = armor::wake_local::kFrameSamples * 4;
+  if (g_local_detector == nullptr) return;
+  if (g_local_listener == nullptr) g_local_listener = new armor::wake_local::Listener(g_local_detector, armor::wake_local::Trigger());
+  if (g_wake_buffer == nullptr) g_wake_buffer = static_cast<std::int16_t*>(heap_caps_malloc(armor::wake::kRate * armor::wake::kDefaultMs / 1000 * sizeof(std::int16_t), MALLOC_CAP_SPIRAM));
+  if (g_wake_buffer == nullptr) return;
+  const std::size_t heard = audio::record(g_wake_buffer, kSamples, [] {
+    std::lock_guard<std::mutex> guard(g_lock);
+    return g_session.state() == voice::State::kIdle;
+  });
+  if (heard < kSamples) return;
+  const bool woke = g_local_listener->feed(g_wake_buffer, kSamples, now_ms());
+  std::lock_guard<std::mutex> guard(g_lock);
+  if (woke) g_gate.result(true, true, now_ms());   // the panel is left alone for a while after a wake
+  if (woke && g_session.state() == voice::State::kIdle) g_session.on_event(voice::Event::kWake, now_ms());
+}
+
 // One whole turn, run by the task: record, send, speak. The session decides the order; a touch (cancel) ends it at any step.
 void run_turn() {
   config::Settings s;
@@ -309,7 +332,7 @@ void run_turn() {
 
 void voice_task(void*) {
   for (;;) {
-    bool start_turn = false, listen_for_wake = false;
+    bool start_turn = false, listen_for_wake = false, listen_local = false;
     {
       std::lock_guard<std::mutex> guard(g_lock);
       g_session.tick(now_ms());
@@ -317,10 +340,12 @@ void voice_task(void*) {
       start_turn = state == voice::State::kListening;
       g_gate.set_speaking(state == voice::State::kSpeaking);
       g_gate.set_recording(state == voice::State::kListening || state == voice::State::kThinking);
-      listen_for_wake = state == voice::State::kIdle && g_settings.voice.wake_word && g_gate.may_send(now_ms());
+      const armor::wake_local::Source source = armor::wake_local::choose_source(g_settings.voice.wake_local, g_local_detector, g_settings.voice.wake_word);
+      listen_local = source == armor::wake_local::Source::kLocal;
+      listen_for_wake = state == voice::State::kIdle && source != armor::wake_local::Source::kNone && g_gate.may_send(now_ms());
     }
     if (start_turn) run_turn();
-    else if (listen_for_wake) wake_round();
+    else if (listen_for_wake) { if (listen_local) local_wake_round(); else wake_round(); }
     vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
@@ -335,7 +360,7 @@ void start(const config::Settings& settings) {
     limits.listen_ms = static_cast<std::uint32_t>(settings.voice.listen_s) * 1000;
     g_session = voice::Session(limits);
     g_session.set_enabled(settings.voice.enabled && audio::ready(), now_ms());
-    g_gate.set_enabled(settings.voice.enabled && settings.voice.wake_word && audio::ready());   // off unless both the assistant and the wake word are on
+    g_gate.set_enabled(settings.voice.enabled && (settings.voice.wake_word || settings.voice.wake_local) && audio::ready());   // off unless the assistant and one way of hearing the wake word are on
   }
   if (g_task == nullptr && settings.voice.enabled) xTaskCreate(voice_task, "voice", 8192, nullptr, 3, &g_task);
 }

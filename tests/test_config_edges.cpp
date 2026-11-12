@@ -58,7 +58,7 @@ static void test_each_member_refuses_a_wrong_value() {
       {"display", "night_from", Kind::kInt, 0, 23}, {"display", "night_to", Kind::kInt, 0, 23},
       {"audio", "volume", Kind::kInt, 0, 100}, {"audio", "alarm_sound", Kind::kBool}, {"audio", "critical_min_volume", Kind::kInt, 0, 100}, {"audio", "siren_repeat_s", Kind::kInt},
       {"audio", "siren_max_repeats", Kind::kInt}, {"audio", "clip_max_bytes", Kind::kInt},
-      {"voice", "enabled", Kind::kBool}, {"voice", "url", Kind::kText}, {"voice", "token", Kind::kSecret}, {"voice", "wake_name", Kind::kText}, {"voice", "wake_word", Kind::kBool},
+      {"voice", "enabled", Kind::kBool}, {"voice", "url", Kind::kText}, {"voice", "token", Kind::kSecret}, {"voice", "wake_name", Kind::kText}, {"voice", "wake_word", Kind::kBool}, {"voice", "wake_local", Kind::kBool},
       {"voice", "binary_turn", Kind::kBool}, {"voice", "listen_s", Kind::kInt, 2, 15}, {"voice", "end_of_speech", Kind::kBool}, {"voice", "silence_ms", Kind::kInt, 300, 3000},
       {"voice", "min_speech_ms", Kind::kInt, 80, 1500}, {"voice", "level_percent", Kind::kInt, 150, 1000}, {"voice", "min_level", Kind::kInt, 50, 4000},
       {"voice", "lead_ms", Kind::kInt, 1000, 15000}, {"voice", "calibrate_ms", Kind::kInt, 100, 1000},

@@ -131,6 +131,7 @@ struct Voice {
   int listen_s = 8;                  // the longest it listens for one request
   std::string token;         // the service's token (X-Armor-Voice-Token): the service answers nobody without it
   bool wake_word = false;    // listen for the wake word (ARMOR-VOICE-AI /v1/wake) instead of waiting for a touch; off by default, and the service has its own switch (ARMOR_WAKE_WORD)
+  bool wake_local = false;   // hear the wake word on the panel itself with a model on the board (core/wake_local.hpp) instead of sending sound to the service; off by default, and it does nothing until the firmware has a ready detector (none yet: the service is used)
   bool binary_turn = true;   // send the recording as raw bytes in a multipart request and ask for the spoken answer as raw bytes; off: the older request only (base64 in the answer)
   // Stop recording when the person stops talking (core/speech_end.hpp) instead of running to listen_s or a second touch. Off by default: nothing of it has run on a board.
   hmi::SpeechEndSettings end_of_speech;
@@ -449,6 +450,7 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
     read_secret(*voice, "token", s.voice.token, "voice.token", problems);
     read_text(*voice, "wake_name", s.voice.wake_name, 24, "voice.wake_name", problems);
     read_bool(*voice, "wake_word", s.voice.wake_word, "voice.wake_word", problems);
+    read_bool(*voice, "wake_local", s.voice.wake_local, "voice.wake_local", problems);
     read_bool(*voice, "binary_turn", s.voice.binary_turn, "voice.binary_turn", problems);
     read_int(*voice, "listen_s", s.voice.listen_s, 2, 15, "voice.listen_s", problems);   // the service takes 15 seconds of audio at most (480 KB)
     hmi::SpeechEndSettings& eos = s.voice.end_of_speech;
@@ -686,7 +688,7 @@ inline std::string to_json(const Settings& s, bool secrets) {
   for (int kind = 0; kind < hmi::kSourceKinds; ++kind) w.field(hmi::source_name(kind), hmi::tone_name(s.audio.tone_by_source[static_cast<std::size_t>(kind)]));
   w.end_object().end_object();
   w.key("controls").begin_object().field("ack", hmi::ack_mode_text(s.controls.ack)).end_object();
-  w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("wake_word", s.voice.wake_word).field("binary_turn", s.voice.binary_turn)
+  w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("wake_word", s.voice.wake_word).field("wake_local", s.voice.wake_local).field("binary_turn", s.voice.binary_turn)
       .field("end_of_speech", s.voice.end_of_speech.enabled).field("silence_ms", s.voice.end_of_speech.silence_ms).field("min_speech_ms", s.voice.end_of_speech.min_speech_ms).field("level_percent", s.voice.end_of_speech.level_percent)
       .field("min_level", s.voice.end_of_speech.min_level).field("lead_ms", s.voice.end_of_speech.lead_ms).field("calibrate_ms", s.voice.end_of_speech.calibrate_ms);
   if (secrets) w.field("token", s.voice.token); else w.field("token_set", !s.voice.token.empty());
