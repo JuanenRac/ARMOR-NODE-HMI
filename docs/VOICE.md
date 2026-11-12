@@ -15,8 +15,10 @@ to the people in the house through it. This version has the panel's half of that
 
 ## What there is not
 
-* **A wake word.** "Armor" cannot be said yet: a wake word needs a model for the chip (Espressif's ESP-SR) trained for the name, and the board's four microphones can feed it, but it is
-  not part of this version. The setting "name it answers to" is what the screen will show once it exists.
+* **A wake word that has run on the board.** The setting `voice.wake_word` (off by default; a checkbox on the Voice page) makes the panel listen for a second at a time and send that piece of sound to
+  `POST /v1/wake` of ARMOR-VOICE-AI, which runs the detector (openWakeWord, on the machine of the service, never the cloud) and answers whether the word was said; nothing is kept on the panel. It needs the service
+  started with `ARMOR_WAKE_WORD=on` and a model for the word; it pauses while the panel speaks or records, and a service that does not answer is asked less and less often. It has been tested on a computer
+  against stand-ins, not on the board. The setting "name it answers to" is what the screen shows.
 * **A speech service that listens everywhere.** ARMOR-VOICE-AI answers `POST /v1/turn` (speech to text and text to speech by commands the installation chooses), but by default it listens only on the machine
   it runs on (port 18090): to reach it from the panel it must be started to accept other machines, or sit behind a proxy, and the panel must carry its token.
 

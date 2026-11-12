@@ -22,6 +22,7 @@
 #include "core/speech_end.hpp"
 #include "core/voice_answer.hpp"
 #include "core/voice_multipart.hpp"
+#include "core/wake_stream.hpp"
 #include "core/board_s3.hpp"
 
 namespace armor::voice_task {
@@ -35,6 +36,8 @@ voice::BinaryTurnPolicy g_binary;   // under g_lock: whether the binary request 
 config::Settings g_settings;
 std::string g_reply, g_failure;
 std::atomic<bool> g_stop_recording{false};
+armor::wake::Gate g_gate;   // under g_lock: when the next piece of sound may go to the wake word detector (core/wake_stream.hpp)
+std::int16_t* g_wake_buffer = nullptr;   // one piece of the microphone in external RAM, only while the wake word is on
 TaskHandle_t g_task = nullptr;
 
 std::uint32_t now_ms() { return static_cast<std::uint32_t>(esp_timer_get_time() / 1000); }
@@ -201,6 +204,41 @@ bool ask_service(const std::int16_t* samples, std::size_t count, const config::S
   return true;
 }
 
+std::string wake_url(const config::Settings& s) { return s.voice.url + (s.voice.url.back() == '/' ? "v1/wake" : "/v1/wake"); }
+
+// One round of the wake word: listen for one piece of sound (a second), ask the voice service whether the word ended in it and, if it did, start a turn as a touch on the microphone would.
+// Nothing is kept on the panel; a service that is off, away or slow is asked less and less often (core/wake_stream.hpp). The service has its own switch (ARMOR_WAKE_WORD) and answers 403 while it is off.
+void wake_round(const config::Settings& s) {
+  constexpr std::size_t kSamples = armor::wake::kRate * armor::wake::kDefaultMs / 1000;
+  if (g_wake_buffer == nullptr) g_wake_buffer = static_cast<std::int16_t*>(heap_caps_malloc(kSamples * sizeof(std::int16_t), MALLOC_CAP_SPIRAM));
+  if (g_wake_buffer == nullptr) return;
+  const std::size_t heard = audio::record(g_wake_buffer, kSamples, [] {
+    std::lock_guard<std::mutex> guard(g_lock);
+    return g_session.state() == voice::State::kIdle;   // a touch, an alarm or a turn started some other way ends the listening at once
+  });
+  if (heard < kSamples) return;
+  Reply reply;
+  const std::string url = wake_url(s);
+  esp_http_client_config_t config{};
+  fill_common(config, url, &reply, s);
+  config.timeout_ms = 4000;
+  esp_http_client_handle_t client = esp_http_client_init(&config);
+  bool ok = false, woke = false;
+  if (client != nullptr) {
+    esp_http_client_set_header(client, "Content-Type", "audio/L16;rate=16000");
+    esp_http_client_set_header(client, "X-Armor-Language", s.language.c_str());
+    { const std::string panel = armor::voice::panel_header_value(s.node_id); if (!panel.empty()) esp_http_client_set_header(client, "X-Armor-Panel", panel.c_str()); }
+    if (!s.voice.token.empty()) esp_http_client_set_header(client, "X-Armor-Voice-Token", s.voice.token.c_str());
+    esp_http_client_set_post_field(client, reinterpret_cast<const char*>(g_wake_buffer), static_cast<int>(kSamples * sizeof(std::int16_t)));
+    const esp_err_t result = esp_http_client_perform(client);
+    ok = result == ESP_OK && esp_http_client_get_status_code(client) == 200 && !reply.overflow && armor::wake::parse_answer(reply.body, woke);
+    esp_http_client_cleanup(client);
+  }
+  std::lock_guard<std::mutex> guard(g_lock);
+  g_gate.result(ok, ok && woke, now_ms());
+  if (ok && woke && g_session.state() == voice::State::kIdle) g_session.on_event(voice::Event::kWake, now_ms());
+}
+
 // One whole turn, run by the task: record, send, speak. The session decides the order; a touch (cancel) ends it at any step.
 void run_turn() {
   config::Settings s;
@@ -254,13 +292,20 @@ void run_turn() {
 
 void voice_task(void*) {
   for (;;) {
-    bool start_turn = false;
+    bool start_turn = false, listen_for_wake = false;
+    config::Settings wake_settings;
     {
       std::lock_guard<std::mutex> guard(g_lock);
       g_session.tick(now_ms());
-      start_turn = g_session.state() == voice::State::kListening;
+      const voice::State state = g_session.state();
+      start_turn = state == voice::State::kListening;
+      g_gate.set_speaking(state == voice::State::kSpeaking);
+      g_gate.set_recording(state == voice::State::kListening || state == voice::State::kThinking);
+      listen_for_wake = state == voice::State::kIdle && g_settings.voice.wake_word && g_gate.may_send(now_ms());
+      if (listen_for_wake) wake_settings = g_settings;
     }
     if (start_turn) run_turn();
+    else if (listen_for_wake) wake_round(wake_settings);
     vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
@@ -275,6 +320,7 @@ void start(const config::Settings& settings) {
     limits.listen_ms = static_cast<std::uint32_t>(settings.voice.listen_s) * 1000;
     g_session = voice::Session(limits);
     g_session.set_enabled(settings.voice.enabled && audio::ready(), now_ms());
+    g_gate.set_enabled(settings.voice.enabled && settings.voice.wake_word && audio::ready());   // off unless both the assistant and the wake word are on
   }
   if (g_task == nullptr && settings.voice.enabled) xTaskCreate(voice_task, "voice", 8192, nullptr, 3, &g_task);
 }

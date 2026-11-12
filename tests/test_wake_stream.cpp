@@ -89,6 +89,19 @@ static void test_after_a_wake_the_panel_is_left_alone_for_a_while_and_a_late_clo
   CHECK(wrapping.may_send(3000u));
 }
 
+static void test_the_answer_of_the_service_is_read_strictly() {
+  bool woke = true;
+  CHECK(parse_answer("{\"wake\":false}", woke) && !woke);
+  CHECK(parse_answer(" {\"wake\": true, \"score\": 0.9} ", woke) && woke);
+  woke = true;
+  CHECK(!parse_answer("", woke) && woke);                       // a refusal leaves the value alone
+  CHECK(!parse_answer("{\"wake\":\"yes\"}", woke));            // not a boolean
+  CHECK(!parse_answer("{\"wake\":1}", woke));
+  CHECK(!parse_answer("{\"error\":\"wake_disabled\"}", woke));  // the service answers 403 with this
+  CHECK(!parse_answer("[true]", woke) && !parse_answer("true", woke) && !parse_answer("{\"wake\":tr", woke));
+  CHECK(!parse_answer(std::string(300, ' ') + "{\"wake\":true}", woke));   // longer than any answer of the service
+}
+
 int main() {
   test_a_chunk_is_cut_to_the_length_asked_and_never_beyond_what_the_server_takes();
   test_samples_fill_a_chunk_and_the_rest_is_offered_again();
@@ -97,5 +110,6 @@ int main() {
   test_nothing_is_sent_while_the_panel_speaks_or_records();
   test_a_server_that_does_not_answer_is_asked_less_and_less_often();
   test_after_a_wake_the_panel_is_left_alone_for_a_while_and_a_late_clock_wrap_is_safe();
+  test_the_answer_of_the_service_is_read_strictly();
   FINISH("test_wake_stream");
 }

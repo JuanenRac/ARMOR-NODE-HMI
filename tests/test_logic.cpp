@@ -344,6 +344,11 @@ static void test_reading_the_screen_and_the_link() {
   p = read(s, "{\"server\":{\"live_events\":false},\"voice\":{\"binary_turn\":false}}"); CHECK(p.empty() && !s.server.live_events && !s.voice.binary_turn);
   { const std::string shown_off = config::to_json(s, false); CHECK(shown_off.find("\"live_events\":false") != std::string::npos && shown_off.find("\"binary_turn\":false") != std::string::npos); }
   p = read(s, "{\"server\":{\"live_events\":\"no\"},\"voice\":{\"binary_turn\":1}}"); CHECK(has(p, "server.live_events", "invalid") && has(p, "voice.binary_turn", "invalid") && !s.server.live_events && !s.voice.binary_turn);
+  { config::Settings fresh = good(); CHECK(!fresh.voice.wake_word); }   // the wake word is off until someone turns it on
+  p = read(s, "{\"voice\":{\"wake_word\":true}}"); CHECK(p.empty() && s.voice.wake_word);
+  { const std::string shown = config::to_json(s, false); CHECK(shown.find("\"wake_word\":true") != std::string::npos); }
+  p = read(s, "{\"voice\":{\"wake_word\":\"on\"}}"); CHECK(has(p, "voice.wake_word", "invalid") && s.voice.wake_word);
+  p = read(s, "{\"voice\":{\"wake_word\":false}}"); CHECK(p.empty() && !s.voice.wake_word);
   p = read(s, "{\"server\":{\"live_events\":true},\"voice\":{\"binary_turn\":true}}"); CHECK(p.empty() && s.server.live_events && s.voice.binary_turn);
   // the passwords: kept when not sent, never shown
   s = good();

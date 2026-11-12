@@ -8,6 +8,9 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <string_view>
+
+#include "json.hpp"
 
 namespace armor::wake {
 
@@ -43,6 +46,16 @@ class Chunker {
   std::size_t want_;
   std::size_t fill_ = 0;
 };
+
+// The answer of /v1/wake: an object with a boolean `wake`. Anything else (a page of an error, a number, a missing member) is not an answer and the panel treats it as a refusal.
+inline bool parse_answer(std::string_view body, bool& woke) {
+  json::Value document;
+  if (body.size() > 256 || !json::parse(body, document) || !document.is_object()) return false;
+  const json::Value* member = document.get("wake");
+  if (member == nullptr || !member->is_bool()) return false;
+  woke = member->boolean;
+  return true;
+}
 
 // When the panel may send a chunk. Times are milliseconds of a monotonic clock.
 class Gate {
