@@ -511,6 +511,7 @@ function voicePage() {
         field("voiceToken", "voice.token", { type: "password", hint: t("passwordHostBound") }),
         el("div", { class: "row" }, field("voiceWake", "voice.wake_name", { max: 24 }), field("voiceListen", "voice.listen_s", { type: "number", min: 2, max: 15 })),
         field("voiceWakeWord", "voice.wake_word", { type: "checkbox" }),
+        field("voiceWakeLocal", "voice.wake_local", { type: "checkbox" }),
         field("voiceBinary", "voice.binary_turn", { type: "checkbox" }),
         field("voiceEnd", "voice.end_of_speech", { type: "checkbox", rerender: true }),
         v.end_of_speech ? [el("div", { class: "row" }, field("voiceEndSilence", "voice.silence_ms", { type: "number", min: 300, max: 3000 }), field("voiceEndMinSpeech", "voice.min_speech_ms", { type: "number", min: 80, max: 1500 })),
