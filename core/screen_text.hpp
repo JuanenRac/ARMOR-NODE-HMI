@@ -22,7 +22,7 @@ struct Row {
 };
 
 // clang-format off
-constexpr std::array<Row, 99> kRows{{
+constexpr std::array<Row, 100> kRows{{
     {"armed", {"ARMED", "ARMADO", "SCHARF", "ARMÉ", "ATTIVO", "警戒中", "已布防", "ARMADO"}},
     {"disarmed", {"DISARMED", "DESARMADO", "UNSCHARF", "DÉSARMÉ", "DISATTIVO", "解除中", "已撤防", "DESARMADO"}},
     {"arm", {"Arm", "Armar", "Scharf schalten", "Armer", "Attiva", "警戒する", "布防", "Armar"}},
@@ -59,6 +59,7 @@ constexpr std::array<Row, 99> kRows{{
     {"voice_speaking", {"Speaking…", "Hablando…", "Ich spreche…", "Je parle…", "Sto parlando…", "話しています…", "正在回答…", "A falar…"}},
     {"voice_failed", {"I could not do that", "No he podido hacerlo", "Das konnte ich nicht", "Je n'ai pas pu le faire", "Non ci sono riuscito", "実行できませんでした", "我没能完成", "Não consegui fazê-lo"}},
     {"voice_off", {"Voice assistant is off", "El asistente de voz está apagado", "Sprachassistent ist aus", "L'assistant vocal est désactivé", "L'assistente vocale è spento", "音声アシスタントはオフです", "语音助手已关闭", "O assistente de voz está desligado"}},
+    {"voice_challenge", {"Say this number:", "Di este número:", "Sag diese Zahl:", "Dites ce nombre :", "Di' questo numero:", "表示を話してください：", "请说出显示：", "Diga este número:"}},
     {"alarm_intrusion", {"Intrusion detected by the radars", "Intrusión detectada por los radares", "Einbruch von den Radaren erkannt", "Intrusion détectée par les radars", "Intrusione rilevata dai radar", "レーダーが侵入を検知", "雷达检测到入侵", "Intrusão detetada pelos radares"}},
     {"alarm_node_down", {"A field node is not answering", "Un nodo de campo no responde", "Ein Feldknoten antwortet nicht", "Un nœud de terrain ne répond pas", "Un nodo di campo non risponde", "フィールドノードが応答しません", "现场节点无响应", "Um nó de campo não responde"}},
     {"alarm_camera_down", {"A camera is not answering", "Una cámara no responde", "Eine Kamera antwortet nicht", "Une caméra ne répond pas", "Una telecamera non risponde", "カメラが応答しません", "摄像头无响应", "Uma câmara não responde"}},

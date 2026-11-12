@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "json.hpp"
+#include "voice_challenge.hpp"
 
 namespace armor::voice {
 
@@ -332,6 +333,7 @@ inline bool build_request_framing(const std::string& boundary, std::string_view 
 
 struct BinaryAnswer {
   std::string heard, reply;
+  std::string challenge;            // the number of the spoken challenge, to be shown on the screen and not said aloud (empty when the service asked for none)
   bool audio_omitted = false;       // the server left the spoken answer out because it was too long: the words are still there
   std::string_view audio;           // raw 16-bit PCM, empty when the answer is text only
 };
@@ -346,13 +348,17 @@ inline bool parse_reply(std::string_view content_type, std::string_view body, st
   if (result == nullptr) return detail::refuse(why, 422, "bad_meta");
   json::Value document;
   if (!json::parse(result->data, document) || !document.is_object() || document.get("audio") != nullptr) return detail::refuse(why, 422, "bad_meta");
-  for (const std::string& name : document.names) if (name != "heard" && name != "reply" && name != "audio_omitted") return detail::refuse(why, 422, "bad_meta");
+  for (const std::string& name : document.names) if (name != "heard" && name != "reply" && name != "audio_omitted" && name != "challenge") return detail::refuse(why, 422, "bad_meta");
   const json::Value* heard = document.get("heard");
   const json::Value* reply = document.get("reply");
   if (heard == nullptr || !heard->is_string() || reply == nullptr || !reply->is_string()) return detail::refuse(why, 422, "bad_meta");
   BinaryAnswer answer;
   answer.heard = heard->text;
   answer.reply = reply->text;
+  if (const json::Value* challenge = document.get("challenge"); challenge != nullptr) {
+    if (!challenge->is_string() || !valid_challenge(challenge->text)) return detail::refuse(why, 422, "bad_meta");
+    answer.challenge = challenge->text;
+  }
   if (const json::Value* omitted = document.get("audio_omitted"); omitted != nullptr) {
     if (!omitted->is_string() || omitted->text != "too_large") return detail::refuse(why, 422, "bad_meta");
     answer.audio_omitted = true;

@@ -25,6 +25,7 @@ struct View {
   voice::State state = voice::State::kOff;
   std::string reply;     // the text of the last reply, shown on the screen
   std::string failure;   // a short code when it failed
+  std::string challenge; // the number of the spoken challenge while it is to be shown (never said aloud); empty otherwise
 };
 View view();
 

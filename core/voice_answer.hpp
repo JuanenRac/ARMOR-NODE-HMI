@@ -10,6 +10,7 @@
 
 #include "json.hpp"
 #include "node_id.hpp"
+#include "voice_challenge.hpp"
 
 namespace armor::voice {
 
@@ -17,12 +18,12 @@ namespace armor::voice {
 // An id that is not a plain node id is not sent (the header is left out), never a cut or altered one.
 inline std::string panel_header_value(std::string_view node_id) { return armor::node_id_is_valid(node_id) ? std::string(node_id) : std::string(); }
 
-// The words and the audio of an answer.
+// The words and the audio of an answer, and the number of the spoken challenge when the service asks for one (the mode `challenge`; empty otherwise).
 struct Answer {
-  std::string heard, reply, audio_base64;
+  std::string heard, reply, audio_base64, challenge;
 };
 
-// False when it is not an object whose words are well formed and whose audio, if there is one, is a string (or null).
+// False when it is not an object whose words are well formed and whose audio, if there is one, is a string (or null), or whose challenge, if there is one, is not two to six digits.
 inline bool parse_answer(std::string_view body, Answer& out) {
   Answer answer;
   std::string rest(body);
@@ -65,6 +66,10 @@ inline bool parse_answer(std::string_view body, Answer& out) {
   if (!json::parse(rest, document) || !document.is_object()) return false;
   answer.heard = document.string_or("heard", "");
   answer.reply = document.string_or("reply", "");
+  if (const json::Value* challenge = document.get("challenge"); challenge != nullptr) {
+    if (!challenge->is_string() || !valid_challenge(challenge->text)) return false;   // a number the panel could not show properly is no answer: silencing stays closed
+    answer.challenge = challenge->text;
+  }
   out = std::move(answer);
   return true;
 }

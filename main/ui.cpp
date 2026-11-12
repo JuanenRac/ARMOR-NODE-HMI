@@ -342,6 +342,8 @@ void refresh(lv_timer_t*) {
       case voice::State::kOff: say = text_of("voice_off"); break;
       case voice::State::kIdle: say = text_of("voice_idle"); break;
     }
+    // The number of the spoken challenge (voice.silence_confirmation = challenge) is shown with its words for as long as the service waits for it, whatever the assistant is doing
+    if (!voice.challenge.empty() && voice.state != voice::State::kOff && voice.state != voice::State::kFailed) say = text_of("voice_challenge") + " " + voice.challenge;
     set_text(g_screen.voice_label, say);
     lv_obj_set_style_bg_color(g_screen.mic_button, lv_color_hex(voice.state == voice::State::kListening ? kRed : voice.state == voice::State::kIdle ? kCyan : kAmber), 0);
   }

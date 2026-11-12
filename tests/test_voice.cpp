@@ -1,8 +1,10 @@
 // ARMOR-NODE-HMI - host tests of the voice conversation: the order of the steps, the time limits and what a touch does.
 // Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+#include <cstdint>
 #include <string>
 
 #include "../core/voice_answer.hpp"
+#include "../core/voice_challenge.hpp"
 #include "../core/voice_session.hpp"
 #include "check.hpp"
 
@@ -90,6 +92,38 @@ static void test_answer_with_long_audio() {
   CHECK(!parse_answer("", a) && !parse_answer("[]", a) && !parse_answer(R"({"audio":5})", a) && !parse_answer(R"({"audio":"unfinished)", a) && !parse_answer(R"({"reply":"x",})", a));
 }
 
+// The number of the spoken challenge: shown on the screen, never said aloud, and a number that is not well formed makes the answer bad so that silencing stays closed.
+static void test_challenge() {
+  CHECK(valid_challenge("10") && valid_challenge("47") && valid_challenge("99") && valid_challenge("123456"));
+  CHECK(!valid_challenge("") && !valid_challenge("4") && !valid_challenge("1234567") && !valid_challenge("4a") && !valid_challenge(" 47") && !valid_challenge("-47") && !valid_challenge("4.7"));
+  Answer a;
+  CHECK(parse_answer(R"({"heard":"silence","reply":"Say the number shown on the screen.","challenge":"47"})", a) && a.challenge == "47" && a.reply.find("47") == std::string::npos);
+  CHECK(parse_answer(R"({"heard":"silence","reply":"ok","audio":"QUJD","challenge":"83"})", a) && a.challenge == "83" && a.audio_base64 == "QUJD");
+  CHECK(parse_answer(R"({"heard":"x","reply":"y"})", a) && a.challenge.empty());
+  CHECK(!parse_answer(R"({"heard":"x","reply":"y","challenge":47})", a) && !parse_answer(R"({"heard":"x","reply":"y","challenge":"4"})", a) && !parse_answer(R"({"heard":"x","reply":"y","challenge":null})", a));
+  // shown for a little less than the service keeps it, then taken away; a reply without a number takes it away at once
+  ChallengeShown shown;
+  CHECK(shown.current(0).empty());
+  shown.set("47", 1000);
+  CHECK(shown.current(1000) == "47" && shown.current(1000 + ChallengeShown::kShowMs - 1) == "47" && shown.current(1000 + ChallengeShown::kShowMs).empty());
+  shown.set("47", 5000);
+  shown.set("", 6000);
+  CHECK(shown.current(6001).empty());
+  shown.set("12", 7000);
+  shown.set("bad", 7100);
+  CHECK(shown.current(7200).empty());
+  shown.set("12", 8000);
+  shown.clear();
+  CHECK(shown.current(8001).empty());
+  // the clock of the chip wraps around: only the difference counts
+  const std::uint32_t before_wrap = 0xFFFFFFF0u;
+  std::uint32_t after_wrap = before_wrap, long_after = before_wrap;
+  after_wrap += 100u;
+  long_after += ChallengeShown::kShowMs + 1u;
+  shown.set("55", before_wrap);
+  CHECK(shown.current(after_wrap) == "55" && shown.current(long_after).empty());
+}
+
 static void test_panel_header() {
   CHECK(panel_header_value("hmi-a1b2c3") == "hmi-a1b2c3");
   CHECK(panel_header_value("hall_2") == "hall_2");
@@ -123,6 +157,7 @@ int main() {
   test_still_while_blocked();
   test_panel_header();
   test_answer_with_long_audio();
+  test_challenge();
   test_happy_path();
   test_order_is_enforced();
   test_time_limits();

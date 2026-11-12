@@ -23,6 +23,7 @@
 #include "core/voice_answer.hpp"
 #include "core/voice_multipart.hpp"
 #include "core/wake_stream.hpp"
+#include "core/voice_challenge.hpp"
 #include "core/board_s3.hpp"
 
 namespace armor::voice_task {
@@ -35,6 +36,7 @@ voice::Session g_session;
 voice::BinaryTurnPolicy g_binary;   // under g_lock: whether the binary request is tried (the setting) and whether the server refused it lately
 config::Settings g_settings;
 std::string g_reply, g_failure;
+voice::ChallengeShown g_challenge;   // under g_lock: the number of the spoken challenge while it is to be shown (core/voice_challenge.hpp)
 std::atomic<bool> g_stop_recording{false};
 armor::wake::Gate g_gate;   // under g_lock: when the next piece of sound may go to the wake word detector (core/wake_stream.hpp)
 std::int16_t* g_wake_buffer = nullptr;   // one piece of the microphone in external RAM, only while the wake word is on
@@ -142,11 +144,12 @@ void send_binary(const std::int16_t* samples, std::size_t count, const config::S
 }
 
 // Reads the JSON answer (the older form, or a server that answered JSON to the binary request) into the words and the spoken reply.
-bool take_json_answer(const Reply& reply, std::string& heard, std::string& reply_text, std::vector<std::int16_t>& reply_audio, std::string& failure) {
+bool take_json_answer(const Reply& reply, std::string& heard, std::string& reply_text, std::string& challenge, std::vector<std::int16_t>& reply_audio, std::string& failure) {
   armor::voice::Answer answer;
   if (!armor::voice::parse_answer(reply.body, answer)) { failure = "bad_answer"; return false; }   // the audio is taken out by hand: the JSON reader refuses documents over 64 KB
   heard = answer.heard;
   reply_text = answer.reply;
+  challenge = answer.challenge;
   const std::string& audio = answer.audio_base64;
   if (!audio.empty()) {
     std::vector<unsigned char> bytes(audio.size());
@@ -159,12 +162,13 @@ bool take_json_answer(const Reply& reply, std::string& heard, std::string& reply
 }
 
 // Reads the multipart/mixed answer: the words in one part and the spoken reply, raw, in the other.
-bool take_binary_answer(const Reply& reply, std::string& heard, std::string& reply_text, std::vector<std::int16_t>& reply_audio, std::string& failure) {
+bool take_binary_answer(const Reply& reply, std::string& heard, std::string& reply_text, std::string& challenge, std::vector<std::int16_t>& reply_audio, std::string& failure) {
   armor::voice::BinaryAnswer answer;
   armor::voice::Refusal why;
   if (!armor::voice::parse_reply(reply.content_type, reply.body, armor::voice::kMaxReplyAudioBytes, answer, why)) { failure = why.status == 413 ? "reply_too_long" : "bad_answer"; return false; }
   heard = answer.heard;
   reply_text = answer.reply;
+  challenge = answer.challenge;
   reply_audio.resize(answer.audio.size() / 2);
   if (!answer.audio.empty()) std::memcpy(reply_audio.data(), answer.audio.data(), reply_audio.size() * 2);
   return true;
@@ -178,7 +182,7 @@ bool is_multipart_mixed(const std::string& content_type) {
 
 // Sends the audio, gets the reply. False with a short code in `failure` when the service did not answer well. The binary request is tried first (unless the setting turned it off or the
 // server refused it lately); a 415, 400 or 422 sends the same recording the older way at once, so the person does not speak twice.
-bool ask_service(const std::int16_t* samples, std::size_t count, const config::Settings& s, std::string& heard, std::string& reply_text, std::vector<std::int16_t>& reply_audio, std::string& failure) {
+bool ask_service(const std::int16_t* samples, std::size_t count, const config::Settings& s, std::string& heard, std::string& reply_text, std::string& challenge, std::vector<std::int16_t>& reply_audio, std::string& failure) {
   bool try_binary;
   { std::lock_guard<std::mutex> guard(g_lock); try_binary = g_binary.should_try(now_ms()); }
   Reply reply;
@@ -198,7 +202,7 @@ bool ask_service(const std::int16_t* samples, std::size_t count, const config::S
   if (reply.status != 200) { failure = "service_error"; return false; }
   if (reply.overflow) { failure = "reply_too_long"; return false; }
   if (binary_used) { std::lock_guard<std::mutex> guard(g_lock); g_binary.on_accepted(); }
-  const bool ok = binary_used && is_multipart_mixed(reply.content_type) ? take_binary_answer(reply, heard, reply_text, reply_audio, failure) : take_json_answer(reply, heard, reply_text, reply_audio, failure);
+  const bool ok = binary_used && is_multipart_mixed(reply.content_type) ? take_binary_answer(reply, heard, reply_text, challenge, reply_audio, failure) : take_json_answer(reply, heard, reply_text, challenge, reply_audio, failure);
   if (!ok) return false;
   if (reply_text.empty() && reply_audio.empty()) { failure = "empty_reply"; return false; }
   return true;
@@ -279,10 +283,10 @@ void run_turn() {
     if (g_session.state() != voice::State::kListening) { heap_caps_free(buffer); return; }   // cancelled while it listened
     g_session.on_event(voice::Event::kSpeechEnded, now_ms());
   }
-  std::string heard, reply_text, failure;
+  std::string heard, reply_text, challenge, failure;
   std::vector<std::int16_t> reply_audio;
   const bool nothing_to_send = no_speech_heard || heard_samples <= static_cast<std::size_t>(board::kAudioSampleRate / 4);   // nobody spoke: nothing goes to the service
-  const bool ok = !nothing_to_send && ask_service(buffer, heard_samples, s, heard, reply_text, reply_audio, failure);
+  const bool ok = !nothing_to_send && ask_service(buffer, heard_samples, s, heard, reply_text, challenge, reply_audio, failure);
   if (nothing_to_send) failure = "no_speech";
   heap_caps_free(buffer);
   {
@@ -290,6 +294,7 @@ void run_turn() {
     if (g_session.state() != voice::State::kThinking) return;   // cancelled while it waited
     if (!ok) { g_failure = failure; g_session.on_event(voice::Event::kFailure, now_ms(), failure); return; }
     g_reply = reply_text;
+    g_challenge.set(challenge, now_ms());   // a reply without a number takes the old one away: the service has forgotten it
     g_failure.clear();
     g_session.on_event(voice::Event::kReply, now_ms());
   }
@@ -356,6 +361,7 @@ View view() {
   v.state = g_session.state();
   v.reply = g_reply;
   v.failure = g_failure;
+  v.challenge = g_challenge.current(now_ms());
   return v;
 }
 

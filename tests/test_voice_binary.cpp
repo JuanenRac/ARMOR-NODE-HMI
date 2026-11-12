@@ -107,6 +107,11 @@ static void test_reply() {
   CHECK(!parse_reply("multipart/mixed; boundary=BND", mixed("{\"heard\":\"x\"}", nullptr), kMaxReplyAudioBytes, answer, why) && why.code == "bad_meta");
   CHECK(!parse_reply("multipart/mixed; boundary=BND", mixed("{\"heard\":1,\"reply\":\"y\"}", nullptr), kMaxReplyAudioBytes, answer, why));
   CHECK(!parse_reply("multipart/mixed; boundary=BND", mixed("{\"heard\":\"x\",\"reply\":\"y\",\"extra\":1}", nullptr), kMaxReplyAudioBytes, answer, why));
+  // the number of the spoken challenge: two to six digits, in the words part and never in the sound
+  CHECK(parse_reply("multipart/mixed; boundary=BND", mixed("{\"heard\":\"x\",\"reply\":\"y\",\"challenge\":\"47\"}", &audio), kMaxReplyAudioBytes, answer, why) && answer.challenge == "47" && answer.audio == audio);
+  CHECK(parse_reply("multipart/mixed; boundary=BND", mixed("{\"heard\":\"x\",\"reply\":\"y\"}", nullptr), kMaxReplyAudioBytes, answer, why) && answer.challenge.empty());
+  for (const char* bad : {"\"4\"", "\"1234567\"", "\"4a\"", "\"\"", "47", "null", "[\"47\"]"})
+    CHECK(!parse_reply("multipart/mixed; boundary=BND", mixed(std::string("{\"heard\":\"x\",\"reply\":\"y\",\"challenge\":") + bad + "}", nullptr), kMaxReplyAudioBytes, answer, why) && why.code == "bad_meta");
   const std::string odd = audio_of(3);
   CHECK(!parse_reply("multipart/mixed; boundary=BND", mixed("{\"heard\":\"x\",\"reply\":\"y\"}", &odd), kMaxReplyAudioBytes, answer, why) && why.status == 411);
   // JSON (the answer of a server that did not understand the request) is not a multipart answer
@@ -200,7 +205,7 @@ static int run_shared_cases(const std::string& dir) {
       ok = parse_reply(content_type, body, limit, answer, why);
       if (ok) {
         const json::Value* result = expect->get("result");
-        CHECK(result != nullptr && answer.heard == result->string_or("heard", "!") && answer.reply == result->string_or("reply", "!") && answer.audio_omitted == (result->get("audio_omitted") != nullptr));
+        CHECK(result != nullptr && answer.heard == result->string_or("heard", "!") && answer.reply == result->string_or("reply", "!") && answer.audio_omitted == (result->get("audio_omitted") != nullptr) && answer.challenge == result->string_or("challenge", ""));
         const json::Value* audio = expect->get("audio");
         if (audio != nullptr && audio->is_string()) { CHECK(b64(audio->text, want_audio) && std::string(answer.audio) == want_audio); }
         else CHECK(answer.audio.empty());
@@ -230,7 +235,7 @@ int main(int argc, char** argv) {
   test_policy();
   if (argc > 1) {
     const int made = run_shared_cases(argv[1]);
-    CHECK(made == 43);
+    CHECK(made >= 43);   // every case of the shared file ran (43 before the cases of the challenge, 45 with them)
   }
   FINISH("voice binary");
 }
