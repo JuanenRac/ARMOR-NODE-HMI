@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-99946%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-99952%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.6-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Verificação de honestidade - o que funciona hoje:** O que não depende da placa é real e está testado num computador (as definições, o que o painel sabe do servidor e quando está desatualizado, o alarme de coação que nunca é mostrado, a conversa de voz e a resposta longa do serviço de voz, os pinos da placa, os textos do ecrã em oito idiomas e os glifos das suas fontes, as verificações de versão e assinatura: 99,946 verificações em 27 programas de teste), e a página web também (executada contra um substituto num navegador real). **O firmware foi compilado uma vez (ESP-IDF 5.5.5, não verificado pela integração contínua) e nunca correu numa placa:** o ecrã, o toque, o som e a ligação ao servidor estão escritos a partir dos exemplos da Waveshare para esta família de placas e precisam do primeiro arranque. O serviço de voz (ARMOR-VOICE-AI) responde aos pedidos deste painel; não há palavra de ativação: toca-se para falar.
+**Verificação de honestidade - o que funciona hoje:** O que não depende da placa é real e está testado num computador (as definições, o que o painel sabe do servidor e quando está desatualizado, o alarme de coação que nunca é mostrado, a conversa de voz e a resposta longa do serviço de voz, os pinos da placa, os textos do ecrã em oito idiomas e os glifos das suas fontes, as verificações de versão e assinatura: 99,952 verificações em 27 programas de teste), e a página web também (executada contra um substituto num navegador real). **O firmware foi compilado uma vez (ESP-IDF 5.5.5, não verificado pela integração contínua) e nunca correu numa placa:** o ecrã, o toque, o som e a ligação ao servidor estão escritos a partir dos exemplos da Waveshare para esta família de placas e precisam do primeiro arranque. O serviço de voz (ARMOR-VOICE-AI) responde aos pedidos deste painel; não há palavra de ativação: toca-se para falar.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturidade | Funcional |
 | Função | Painel tátil de parede para o ARMOR-SERVER (família: Clients, pai: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Testes | 99946 verificações em 27 programas de anfitrião e 6 em Python (`ctest`) |
+| Testes | 99952 verificações em 27 programas de anfitrião e 6 em Python (`ctest`) |
 | Placa | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Funciona em | Uma Waveshare ESP32-S3-Touch-LCD-7C-BOX; testes de anfitrião em qualquer computador |
 | Em hardware real | Nenhum ainda: o firmware compila (ESP-IDF 5.5.5, não verificado pela CI) mas não correu na placa |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-27 programas de teste de anfitrião e 6 verificações Python correm com `ctest`; 99946 verificações contadas pelos programas de anfitrião, compiladas com `-Werror`.
+27 programas de teste de anfitrião e 6 verificações Python correm com `ctest`; 99952 verificações contadas pelos programas de anfitrião, compiladas com `-Werror`.
 
 Verificações Python: os textos do painel em oito línguas, as tarefas, os caminhos de gravação, a sessão Bluetooth sob o seu bloqueio e as rotas que o painel chama (e, em alguns nós, os códigos HTTP ou os glifos dos tipos de letra)
 

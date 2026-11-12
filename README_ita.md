@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Linguaggio">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-99946%20checks-2ea44f.svg" alt="Test">
+  <img src="https://img.shields.io/badge/Tests-99952%20checks-2ea44f.svg" alt="Test">
   <img src="https://img.shields.io/badge/Version-0.4.6-0f6cbd.svg" alt="Versione">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturità">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Ciò che non dipende dalla scheda è reale e provato su un computer (le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme di coercizione che non viene mai mostrato, la conversazione vocale e la lunga risposta del servizio vocale, i pin della scheda, i testi dello schermo in otto lingue e i glifi dei suoi caratteri, i controlli di versione e firma: 99,946 verifiche in 27 programmi di test) e lo è anche la pagina web (eseguita contro un sostituto in un browser reale). **Il firmware è stato compilato una volta (ESP-IDF 5.5.5, non verificato dall'integrazione continua) e non è mai girato su una scheda:** lo schermo, il touch, l'audio e il collegamento al server sono scritti dagli esempi di Waveshare per questa famiglia di schede e attendono la prima accensione. Il servizio vocale (ARMOR-VOICE-AI) risponde alle richieste di questo pannello; non c'è una parola di attivazione: si tocca per parlare.
+**Controllo di onestà - cosa funziona oggi:** Ciò che non dipende dalla scheda è reale e provato su un computer (le impostazioni, ciò che il pannello sa del server e quando è obsoleto, l'allarme di coercizione che non viene mai mostrato, la conversazione vocale e la lunga risposta del servizio vocale, i pin della scheda, i testi dello schermo in otto lingue e i glifi dei suoi caratteri, i controlli di versione e firma: 99,952 verifiche in 27 programmi di test) e lo è anche la pagina web (eseguita contro un sostituto in un browser reale). **Il firmware è stato compilato una volta (ESP-IDF 5.5.5, non verificato dall'integrazione continua) e non è mai girato su una scheda:** lo schermo, il touch, l'audio e il collegamento al server sono scritti dagli esempi di Waveshare per questa famiglia di schede e attendono la prima accensione. Il servizio vocale (ARMOR-VOICE-AI) risponde alle richieste di questo pannello; non c'è una parola di attivazione: si tocca per parlare.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturità | Funzionale |
 | Ruolo | Pannello touch a parete per ARMOR-SERVER (famiglia: Clients, padre: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Test | 99946 verifiche in 27 programmi host e 6 verifiche Python (`ctest`) |
+| Test | 99952 verifiche in 27 programmi host e 6 verifiche Python (`ctest`) |
 | Scheda | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Gira su | Una Waveshare ESP32-S3-Touch-LCD-7C-BOX; test su host su qualsiasi computer |
 | Su hardware reale | Ancora nessuno: il firmware si compila (ESP-IDF 5.5.5, non verificato dalla CI) ma non è girato sulla scheda |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-27 programmi di test su host e 6 verifiche Python girano con `ctest`; 99946 verifiche contate dai programmi host, compilati con `-Werror`.
+27 programmi di test su host e 6 verifiche Python girano con `ctest`; 99952 verifiche contate dai programmi host, compilati con `-Werror`.
 
 Verifiche Python: i testi del pannello in otto lingue, i task, i percorsi di salvataggio, la sessione Bluetooth sotto il suo lock e i percorsi chiamati dal pannello (e, in alcuni nodi, i codici HTTP o i glifi dei caratteri)
 
