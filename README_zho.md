@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-103139%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-337170%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
@@ -41,7 +41,7 @@
 | 成熟度 | 可用 |
 | 角色 | ARMOR-SERVER 的壁挂触摸面板（家族：Clients，上级：ARMOR-SERVER） |
 | 技术栈 | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| 测试 | 103139 项检查（32 个主机程序和 7 项 Python 检查，`ctest`） |
+| 测试 | 337170 项检查（32 个主机程序和 7 项 Python 检查，`ctest`） |
 | 电路板 | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | 运行位置 | Waveshare ESP32-S3-Touch-LCD-7C-BOX；主机测试可在任何计算机上运行 |
 | 真实硬件 | 暂无：固件可以构建（ESP-IDF 5.5.5，CI 未检查），但还没有在板上运行 |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-`ctest` 运行 32 个主机测试程序和 7 个 Python 检查；主机程序统计的检查共 103139 项，使用 `-Werror` 构建。
+`ctest` 运行 32 个主机测试程序和 7 个 Python 检查；主机程序统计的检查共 337170 项，使用 `-Werror` 构建。
 
 Python 检查：八种语言的面板文字、任务、保存路径、受锁保护的蓝牙会话以及面板调用的路由（部分节点还包括 HTTP 状态码或字体字形）
 

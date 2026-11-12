@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-103139%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-337170%20checks-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
@@ -41,7 +41,7 @@
 | 成熟度 | 機能する |
 | 役割 | ARMOR-SERVER 用の壁掛けタッチパネル（ファミリー：Clients、親：ARMOR-SERVER） |
 | 技術 | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| テスト | 103139 件の検査（ホスト用プログラム 32 本と Python 検査 7 個、`ctest`） |
+| テスト | 337170 件の検査（ホスト用プログラム 32 本と Python 検査 7 個、`ctest`） |
 | 基板 | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | 動作環境 | Waveshare ESP32-S3-Touch-LCD-7C-BOX、ホストテストは任意のコンピューター |
 | 実機での確認 | まだありません：ファームウェアはビルドできます（ESP-IDF 5.5.5、CI では未確認）が、ボード上では動作していません |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-ホスト用テストプログラム 32 個と Python の検査 6 個を `ctest` で実行します。ホストのプログラムが数えた検査は 103139 件で、`-Werror` でビルドします。
+ホスト用テストプログラム 32 個と Python の検査 6 個を `ctest` で実行します。ホストのプログラムが数えた検査は 337170 件で、`-Werror` でビルドします。
 
 Python の検査：8 言語のパネル文言、タスク、保存パス、ロック下の Bluetooth セッション、パネルが呼ぶルート（ノードによっては HTTP コードやフォントのグリフも）
 
