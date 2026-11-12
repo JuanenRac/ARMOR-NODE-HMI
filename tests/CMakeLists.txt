@@ -89,4 +89,6 @@ if(Python3_FOUND)
   # the routes every node of the family serves, the routes the panel calls, and the stand-in node the panel is tried against
   add_test(NAME routes COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_routes.py)
   add_test(NAME font_glyphs COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_font_glyphs.py)
+  # LVGL 9 memory: the pool moved to the C allocator, no symbol of LVGL 8, LVGL 9 locked
+  add_test(NAME lvgl_config COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_lvgl_config.py)
 endif()

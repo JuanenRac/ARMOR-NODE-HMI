@@ -69,10 +69,11 @@ void setup_reminder_task(void*) {
 // Once the panel has been up for a while it tells the server it exists, and keeps saying so: a health message every heartbeat and, now and then, where its web page is.
 void presence_task(void*) {
   for (;;) {
-    const armor::config::Settings s = armor::store::settings();
+    struct Presence { bool mqtt_enabled = false; int heartbeat_s = 2; std::string node_id, node_name; } s;   // only what this task needs, not a copy of every setting
+    armor::store::with_settings([&s](const armor::config::Settings& all) { s.mqtt_enabled = all.mqtt.enabled; s.heartbeat_s = all.mqtt.heartbeat_s; s.node_id = all.node_id; s.node_name = all.node_name; });
     const armor::network::Status n = armor::network::status();
     const std::int64_t now_ms = static_cast<std::int64_t>(std::time(nullptr)) * 1000;
-    if (s.mqtt.enabled && n.has_ip && now_ms > 1700000000000LL) {
+    if (s.mqtt_enabled && n.has_ip && now_ms > 1700000000000LL) {
       armor::json::Writer health;
       health.begin_object().field("node_id", s.node_id).key("timestamp_ms").integer(now_ms).field("online", true).field("kind", "panel").end_object();   // a wall panel, not a radar: the server keeps it apart
       armor::mqtt_link::publish("armor/node/" + s.node_id + "/health", health.str());
@@ -84,7 +85,7 @@ void presence_task(void*) {
         armor::mqtt_link::publish("armor/node/" + s.node_id + "/info", info.str());
       }
     }
-    vTaskDelay(pdMS_TO_TICKS(static_cast<std::uint32_t>(std::max(2, s.mqtt.heartbeat_s)) * 1000));
+    vTaskDelay(pdMS_TO_TICKS(static_cast<std::uint32_t>(std::max(2, s.heartbeat_s)) * 1000));
   }
 }
 
@@ -262,11 +263,14 @@ extern "C" void app_main() {
       const std::int64_t now_ms = esp_timer_get_time() / 1000;
       if (now_ms - read_at_ms >= 3000) {
         read_at_ms = now_ms;
-        const armor::config::Settings s = armor::store::settings();
-        context.language = s.language;
-        context.voice_enabled = s.voice.enabled && armor::audio::ready();
-        context.wake_name = s.voice.wake_name;
-        context.ack = armor::hmi::ack_mode_text(s.controls.ack);
+        bool voice_enabled = false;   // read the few fields under the lock instead of copying the whole settings (about forty strings) every few seconds
+        armor::store::with_settings([&](const armor::config::Settings& s) {
+          context.language = s.language;
+          voice_enabled = s.voice.enabled;
+          context.wake_name = s.voice.wake_name;
+          context.ack = armor::hmi::ack_mode_text(s.controls.ack);
+        });
+        context.voice_enabled = voice_enabled && armor::audio::ready();
         context.ip = armor::network::status().ip;
         context.version = esp_app_get_description()->version;
         context.setup = armor::store::users_empty();
