@@ -171,7 +171,7 @@ static int run_shared_cases(const std::string& dir) {
   json::Value doc;
   if (!read_file(dir + "/voice/turn_multipart.json", text) || !json::parse(text, doc)) { std::printf("FAIL the shared cases cannot be read at %s\n", dir.c_str()); ++failures; return 0; }
   const json::Value* cases = doc.get("cases");
-  CHECK(cases != nullptr && cases->is_array() && cases->items.size() == 43);
+  CHECK(cases != nullptr && cases->is_array() && cases->items.size() == 45);
   if (cases == nullptr) return 0;
   int made = 0;
   for (const json::Value& item : cases->items) {
@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
   test_policy();
   if (argc > 1) {
     const int made = run_shared_cases(argv[1]);
-    CHECK(made >= 43);   // every case of the shared file ran (43 before the cases of the challenge, 45 with them)
+    CHECK(made == 45);
   }
   FINISH("voice binary");
 }
