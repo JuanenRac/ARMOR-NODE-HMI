@@ -153,8 +153,56 @@ static void test_still_while_blocked() {
   CHECK(!s.still(State::kListening, 64100) && !s.still(State::kSpeaking, 64100));
 }
 
+// The power goes at random moments of a long random conversation: a new session knows nothing (it is off until the panel switches the voice on), so it never records, plays or shows a failure
+// by itself, and from then on every action follows the order of the steps whatever the events do.
+static void test_random_power_cuts() {
+  std::uint32_t seed = 2026;
+  const auto next = [&seed]() { seed = seed * 1664525u + 1013904223u; return seed >> 8; };
+  int cuts = 0, conversations = 0;
+  for (int round = 0; round < 60; ++round) {
+    Session session;
+    session.set_enabled(true, 0);
+    std::uint32_t now = 0;
+    for (int step = 0; step < 2000; ++step) {
+      now += next() % 900;
+      if (next() % 25 == 0) {   // the power goes
+        ++cuts;
+        session = Session();
+        CHECK(session.state() == State::kOff);
+        CHECK(session.on_event(Event::kWake, now) == Action::kNone && session.on_event(Event::kReply, now) == Action::kNone && session.on_event(Event::kFailure, now, "late") == Action::kNone);
+        CHECK(session.tick(now + 100000) == Action::kNone && session.state() == State::kOff);   // no timer runs in a session that is off
+        now += 1 + next() % 5000;
+        session.set_enabled(true, now);
+        CHECK(session.state() == State::kIdle);
+        CHECK(session.on_event(Event::kSpeechEnded, now) == Action::kNone && session.on_event(Event::kSpeechDone, now) == Action::kNone && session.on_event(Event::kTouch, now) == Action::kNone);   // nothing to end
+        continue;
+      }
+      const State before = session.state();
+      Action action = Action::kNone;
+      switch (next() % 7) {
+        case 0: action = session.on_event(Event::kWake, now); break;
+        case 1: action = session.on_event(Event::kSpeechEnded, now); break;
+        case 2: action = session.on_event(Event::kReply, now); break;
+        case 3: action = session.on_event(Event::kSpeechDone, now); break;
+        case 4: action = session.on_event(Event::kFailure, now, "x"); break;
+        case 5: action = session.on_event(Event::kTouch, now); break;
+        default: action = session.tick(now); break;
+      }
+      const State after = session.state();
+      if (action == Action::kStartRecording) { CHECK(before == State::kIdle && after == State::kListening); ++conversations; }
+      if (action == Action::kStopRecordingAndSend) CHECK(before == State::kListening && after == State::kThinking);
+      if (action == Action::kStartSpeaking) CHECK(before == State::kThinking && after == State::kSpeaking);
+      if (action == Action::kShowFailure) CHECK(before != State::kIdle && before != State::kOff && after == State::kFailed);
+      if (action == Action::kNone && before != State::kFailed) CHECK(after == before || (before == State::kListening && after == State::kThinking));
+      CHECK(after != State::kOff);   // nothing in the conversation switches the voice off by itself
+    }
+  }
+  CHECK(cuts > 1000 && conversations > 500);
+}
+
 int main() {
   test_still_while_blocked();
+  test_random_power_cuts();
   test_panel_header();
   test_answer_with_long_audio();
   test_challenge();
