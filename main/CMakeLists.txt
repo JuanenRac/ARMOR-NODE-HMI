@@ -2,7 +2,7 @@
 # Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
 file(GLOB ARMOR_FONTS "${CMAKE_CURRENT_LIST_DIR}/fonts/*.c")
 set(ARMOR_SOURCES "api_shared.cpp" "chip_temp.cpp" "app_main.cpp" "audio.cpp" "ble_provision.cpp" "clock_sync.cpp" "board_io.cpp" "display.cpp" "entropy.cpp" "github_update.cpp" "log_buffer.cpp" "node_guard.cpp" "psram_mem.cpp" "rtc.cpp" "task_health.cpp" "node_health.cpp" "node_control.cpp" "node_diag.cpp" "improv_serial.cpp" "mqtt_link.cpp" "network.cpp"
-                  "node_store.cpp" "secret_vault.cpp" "server_link.cpp" "tls_cert.cpp" "ui.cpp" "voice.cpp" "web_server.cpp" ${ARMOR_FONTS})
+                  "node_store.cpp" "secret_vault.cpp" "server_link.cpp" "tls_cert.cpp" "ui.cpp" "voice.cpp" "wake_tflite_runtime.cpp" "web_server.cpp" ${ARMOR_FONTS})
 set(ARMOR_REQUIRES driver esp_driver_gpio esp_driver_i2c esp_driver_i2s esp_event esp_netif esp_timer esp_wifi esp_http_server esp_https_server esp_http_client esp-tls
                    app_update esp_partition esp_app_format mbedtls bootloader_support mqtt nvs_flash lwip esp_hw_support esp_system heap log bt esp_lcd esp_psram spi_flash espcoredump esp_driver_tsens)
 idf_component_register(SRCS ${ARMOR_SOURCES}
@@ -27,4 +27,10 @@ endforeach()
 if(EXISTS "${PROJECT_DIR}/certs/ca.pem")
   target_add_binary_data(${COMPONENT_LIB} "${PROJECT_DIR}/certs/ca.pem" TEXT)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE ARMOR_MQTT_HAS_CA=1)
+endif()
+
+# The interpreter of the wake word model (TFLite Micro) is compiled only on request: cmake -DARMOR_WAKE_TFLITE=ON, with the component espressif/esp-tflite-micro added to main/idf_component.yml.
+option(ARMOR_WAKE_TFLITE "Compile the TFLite Micro interpreter of the wake word model" OFF)
+if(ARMOR_WAKE_TFLITE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE ARMOR_WAKE_TFLITE=1)
 endif()
