@@ -106,5 +106,13 @@ int main() {
   CHECK(hmi::tone_from_name("spoken", tone) && tone == hmi::ToneChoice::kSpoken && hmi::tone_from_name("custom", tone) && tone == hmi::ToneChoice::kCustom && !hmi::tone_from_name("clip", tone));
   CHECK(std::string(hmi::tone_name(hmi::ToneChoice::kSpoken)) == "spoken" && std::string(hmi::tone_name(hmi::ToneChoice::kCustom)) == "custom");
 
+  // the words of the severities and of the checks of a clip: one for each, none repeated
+  CHECK(std::string(clip::severity_name(hmi::Severity::kCritical)) == "critical" && std::string(clip::severity_name(hmi::Severity::kHigh)) == "high");
+  CHECK(std::string(clip::severity_name(hmi::Severity::kInfo)) == "info" && std::string(clip::severity_name(hmi::Severity::kWarning)) == "warning");
+  CHECK(std::string(clip::check_name(clip::Check::kOk)) == "ok" && std::string(clip::check_name(clip::Check::kEmpty)) == "empty");
+  CHECK(std::string(clip::check_name(clip::Check::kTooSmall)) == "too_small" && std::string(clip::check_name(clip::Check::kTooLarge)) == "too_large");
+  CHECK(std::string(clip::check_name(clip::Check::kOddSize)) == "odd_size" && std::string(clip::check_name(clip::Check::kNoHash)) == "no_hash");
+  CHECK(std::string(clip::check_name(clip::Check::kBadHash)) == "bad_hash" && std::string(clip::check_name(clip::Check::kHashMismatch)) == "hash_mismatch");
+
   FINISH("alarm clip");
 }
