@@ -208,7 +208,7 @@ std::string wake_url(const config::Settings& s) { return s.voice.url + (s.voice.
 
 // One round of the wake word: listen for one piece of sound (a second), ask the voice service whether the word ended in it and, if it did, start a turn as a touch on the microphone would.
 // Nothing is kept on the panel; a service that is off, away or slow is asked less and less often (core/wake_stream.hpp). The service has its own switch (ARMOR_WAKE_WORD) and answers 403 while it is off.
-void wake_round(const config::Settings& s) {
+void wake_round() {
   constexpr std::size_t kSamples = armor::wake::kRate * armor::wake::kDefaultMs / 1000;
   if (g_wake_buffer == nullptr) g_wake_buffer = static_cast<std::int16_t*>(heap_caps_malloc(kSamples * sizeof(std::int16_t), MALLOC_CAP_SPIRAM));
   if (g_wake_buffer == nullptr) return;
@@ -217,18 +217,30 @@ void wake_round(const config::Settings& s) {
     return g_session.state() == voice::State::kIdle;   // a touch, an alarm or a turn started some other way ends the listening at once
   });
   if (heard < kSamples) return;
+  // Only the few strings the request needs are copied (not the whole settings: this task's stack is small, see tests/check_task_safety.py).
+  std::string url, token, language, panel;
+  {
+    std::lock_guard<std::mutex> guard(g_lock);
+    url = wake_url(g_settings);
+    token = g_settings.voice.token;
+    language = g_settings.language;
+    panel = armor::voice::panel_header_value(g_settings.node_id);
+  }
   Reply reply;
-  const std::string url = wake_url(s);
   esp_http_client_config_t config{};
-  fill_common(config, url, &reply, s);
+  config.url = url.c_str();
+  config.method = HTTP_METHOD_POST;
   config.timeout_ms = 4000;
+  config.event_handler = on_event;
+  config.user_data = &reply;
+  if (url.rfind("https://", 0) == 0) config.crt_bundle_attach = esp_crt_bundle_attach;
   esp_http_client_handle_t client = esp_http_client_init(&config);
   bool ok = false, woke = false;
   if (client != nullptr) {
     esp_http_client_set_header(client, "Content-Type", "audio/L16;rate=16000");
-    esp_http_client_set_header(client, "X-Armor-Language", s.language.c_str());
-    { const std::string panel = armor::voice::panel_header_value(s.node_id); if (!panel.empty()) esp_http_client_set_header(client, "X-Armor-Panel", panel.c_str()); }
-    if (!s.voice.token.empty()) esp_http_client_set_header(client, "X-Armor-Voice-Token", s.voice.token.c_str());
+    esp_http_client_set_header(client, "X-Armor-Language", language.c_str());
+    if (!panel.empty()) esp_http_client_set_header(client, "X-Armor-Panel", panel.c_str());
+    if (!token.empty()) esp_http_client_set_header(client, "X-Armor-Voice-Token", token.c_str());
     esp_http_client_set_post_field(client, reinterpret_cast<const char*>(g_wake_buffer), static_cast<int>(kSamples * sizeof(std::int16_t)));
     const esp_err_t result = esp_http_client_perform(client);
     ok = result == ESP_OK && esp_http_client_get_status_code(client) == 200 && !reply.overflow && armor::wake::parse_answer(reply.body, woke);
@@ -293,7 +305,6 @@ void run_turn() {
 void voice_task(void*) {
   for (;;) {
     bool start_turn = false, listen_for_wake = false;
-    config::Settings wake_settings;
     {
       std::lock_guard<std::mutex> guard(g_lock);
       g_session.tick(now_ms());
@@ -302,10 +313,9 @@ void voice_task(void*) {
       g_gate.set_speaking(state == voice::State::kSpeaking);
       g_gate.set_recording(state == voice::State::kListening || state == voice::State::kThinking);
       listen_for_wake = state == voice::State::kIdle && g_settings.voice.wake_word && g_gate.may_send(now_ms());
-      if (listen_for_wake) wake_settings = g_settings;
     }
     if (start_turn) run_turn();
-    else if (listen_for_wake) wake_round(wake_settings);
+    else if (listen_for_wake) wake_round();
     vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
