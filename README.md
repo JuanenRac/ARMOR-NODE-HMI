@@ -59,7 +59,7 @@ Each line is one part of this repository and the light says how far it is today.
 |---|---|---|
 | Software | 🟠 | The firmware builds (ESP-IDF 5.5.5), but the build is not checked by the continuous integration and it has never run on a board. |
 | Tests | 🟢 | 99,716 checks in 26 host programs pass (`ctest`): the settings, what the panel knows of the server and when that is stale, the duress alarm that is never shown, the voice exchange, the pins, the words of the screen in eight languages and the glyphs of its fonts. |
-| Protocols and data | 🟡 | The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, with no wake word. |
+| Protocols and data | 🟡 | The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, plus an optional wake word (off by default) that has only run against stand-ins, and the number of the spoken challenge is shown on the screen. |
 | Interface | 🟠 | The web page runs against a stand-in in a real browser; the screen, the touch and the sound are written from Waveshare's examples and wait for their first power-up. |
 | Hardware | 🔴 | The firmware has not run on the board: nothing has run on real equipment yet. |
 | Security | 🟡 | The set-up code, the login limit, the Bluetooth PIN, the duress handling and the signed updates are tested on the host; there has been no independent review. |
@@ -76,7 +76,7 @@ Each line is one part of this repository and the light says how far it is today.
 * **The board:** Waveshare ESP32-S3-Touch-LCD-7C-BOX (32 MB flash, 16 MB PSRAM, a 7-inch RGB screen with a GT911 touch, four microphones, a speaker); the pins come from Waveshare's examples and a test proves that no two functions share a GPIO ([the board](docs/HARDWARE.md)).
 * **Signed over-the-air updates:** the node installs from GitHub only an image whose SHA-256 matches and that carries a valid Ed25519 signature of the maintainer (the public key is in the firmware, the private one never leaves the maintainer); a file uploaded by hand by an administrator in the panel is still accepted. The pages and messages of the panel are in eight languages.
 * **Bluetooth pairing with a PIN:** the six-digit PIN is derived from the set-up code, printed on the USB console and shown to an administrator in the panel; the phone has to enter it before it may write the node's settings.
-* **Not yet:** a first compilation and power-up of the firmware, a wake word, the speech service on the Jetson, and a view of the cameras on the screen.
+* **Not yet:** a first compilation and power-up of the firmware, the wake word on the board with a trained model, the speech service on the Jetson, and a view of the cameras on the screen.
 * **Only the house may use the panel:** the panel answers the private network by default (or the networks its owner lists, such as a VPN), refuses a list that would lock out whoever saves it, counts wrong passwords for each person as well as each address, and works behind the server's proxy so that it can be reached from outside the house without publishing the node.
 * **It says what happens:** the screen knows the text, in eight languages, of every alarm code the server raises (network, solar, electrical, alarm zones...), and it tells the server that it is a wall panel, so it is listed as one and does not count as a radar.
 * **Optional encrypted link to the broker (TLS):** off by default, so the node talks plain MQTT as before. A switch and a box for the certificate of the installation's own authority (PEM, at most 2 KB) in the Broker page make it connect with `mqtts://`, trust that authority only and check that the broker's certificate was made for the address it reached; anything that is not one PEM certificate is refused. Covered by host tests; the handshake has not been run on a board yet.
@@ -264,7 +264,7 @@ ARMOR-NODE-HMI/
 **Known limits today**
 
 * The firmware has been built once (ESP-IDF 5.5.5), but the build is not checked by the continuous integration and it has never run on a board.
-* The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, with no wake word.
+* The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, plus an optional wake word (off by default) that has only run against stand-ins, and the number of the spoken challenge is shown on the screen.
 * The web page runs against a stand-in in a real browser; the screen, the touch and the sound are written from Waveshare's examples and wait for their first power-up.
 * The firmware has not run on the board: nothing has run on real equipment yet.
 * The set-up code, the login limit, the Bluetooth PIN, the duress handling and the signed updates are tested on the host; there has been no independent review.
@@ -273,7 +273,7 @@ ARMOR-NODE-HMI/
 
 **Next**
 
-* Do the first full build and the first power-up on the board, then the speech service on the Jetson, a wake word and the camera view on the screen.
+* Do the first full build and the first power-up on the board, then the speech service on the Jetson, the wake word with a trained model and the camera view on the screen.
 
 ## 🌍 Languages
 
