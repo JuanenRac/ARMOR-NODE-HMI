@@ -178,6 +178,12 @@ jobs:
             exit 1
           fi
           echo "no fleet secret in build/generic-$BOARD/sdkconfig"
+          # The graphics memory pool must live in the C allocator in the sdkconfig that the build really made (the defaults file is checked on a computer; this is the file that counts).
+          if ! grep -q '^CONFIG_LV_USE_CLIB_MALLOC=y' "build/generic-$BOARD/sdkconfig"; then
+            echo "::error::build/generic-$BOARD/sdkconfig does not have CONFIG_LV_USE_CLIB_MALLOC=y: the graphics pool would stay in the internal RAM"
+            exit 1
+          fi
+          echo "CONFIG_LV_USE_CLIB_MALLOC=y found in build/generic-$BOARD/sdkconfig"
           mkdir -p out
           cp "$app" "out/armor-$KIND-$VERSION-$BOARD-publica-app.bin"
           cp "$complete" "out/armor-$KIND-$VERSION-$BOARD-publica-complete.bin"
