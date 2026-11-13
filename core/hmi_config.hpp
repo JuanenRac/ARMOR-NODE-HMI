@@ -38,7 +38,9 @@ constexpr std::size_t kMaxPasswordText = 64;
 enum class WifiSecurity { kOpen, kWpa2, kWpa3, kWpa2Wpa3 };
 // The panel over plain HTTP only, over HTTP and HTTPS (a certificate the node made for itself), or over HTTPS only (port 80 sends the browser to HTTPS).
 enum class WebMode { kHttp, kBoth, kHttps };
-enum class BleMode { kOff, kSetup, kAlways };   // when the node listens to a phone over Bluetooth
+enum class BleMode { kOff, kSetup, kAlways };
+// Where the Bluetooth pairing PIN comes from: derived from the setup code on the label (the default) or a random one made for each pairing and shown only on the node's own console.
+enum class BlePasskeyMode { kDerived, kRandomDisplay };   // when the node listens to a phone over Bluetooth
 // When the node listens on its USB serial line for an Improv Wi-Fi packet (ESP Web Tools): never, only while no Wi-Fi network is stored (the default), or always.
 enum class ImprovMode { kOff, kSetup, kAlways };
 // How the node reaches the network: over the Ethernet cable (only the s3-eth board has one) or as a Wi-Fi station.
@@ -171,6 +173,7 @@ struct Settings {
   Controls controls;
   WebMode web = WebMode::kBoth;
   std::string admin_sources;   // the networks that may use the panel; empty = the private ranges of a house (see admin_sources.hpp)
+  BlePasskeyMode ble_passkey = BlePasskeyMode::kDerived;   // "derived" (default) or "random_display"
   BleMode ble = BleMode::kSetup;   // "setup": only while the node has no user; "always"; "off": the Bluetooth stack is not even started
   // Improv Wi-Fi over the USB cable: "setup" (only while the node has no Wi-Fi network stored), "always" or "off". See core/improv.hpp (should_listen).
   ImprovMode improv = ImprovMode::kSetup;
@@ -200,6 +203,7 @@ inline const char* to_text(WifiSecurity v) {
 }
 inline const char* to_text(Uplink v) { return v == Uplink::kEthernet ? "ethernet" : "wifi"; }
 inline const char* to_text(ImprovMode v) { return v == ImprovMode::kAlways ? "always" : v == ImprovMode::kOff ? "off" : "setup"; }
+inline const char* to_text(BlePasskeyMode v) { return v == BlePasskeyMode::kRandomDisplay ? "random_display" : "derived"; }
 inline const char* to_text(BleMode v) { return v == BleMode::kAlways ? "always" : v == BleMode::kOff ? "off" : "setup"; }
 inline const char* to_text(WebMode v) { return v == WebMode::kHttps ? "https" : v == WebMode::kHttp ? "http" : "both"; }
 
@@ -479,6 +483,7 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
   }
   if (const json::Value* ble = document.get("ble"); ble != nullptr && ble->is_object()) {
     if (!read_choice<BleMode>(*ble, "mode", {{"off", BleMode::kOff}, {"setup", BleMode::kSetup}, {"always", BleMode::kAlways}}, s.ble)) bad(problems, "ble.mode", "invalid");
+    if (!read_choice<BlePasskeyMode>(*ble, "passkey_mode", {{"derived", BlePasskeyMode::kDerived}, {"random_display", BlePasskeyMode::kRandomDisplay}}, s.ble_passkey)) bad(problems, "ble.passkey_mode", "invalid");
   }
   if (const json::Value* improv = document.get("improv"); improv != nullptr && improv->is_object()) {
     if (!read_choice<ImprovMode>(*improv, "mode", {{"off", ImprovMode::kOff}, {"setup", ImprovMode::kSetup}, {"always", ImprovMode::kAlways}}, s.improv)) bad(problems, "improv.mode", "invalid");
@@ -713,7 +718,7 @@ inline std::string to_json(const Settings& s, bool secrets) {
   if (secrets) w.field("token", s.voice.token); else w.field("token_set", !s.voice.token.empty());
   w.end_object();
   w.key("web").begin_object().field("mode", to_text(s.web)).field("admin_sources", s.admin_sources).end_object();
-  w.key("ble").begin_object().field("mode", to_text(s.ble)).end_object();
+  w.key("ble").begin_object().field("mode", to_text(s.ble)).field("passkey_mode", to_text(s.ble_passkey)).end_object();
   w.key("improv").begin_object().field("mode", to_text(s.improv)).end_object();
   w.key("retry").begin_object().field("wifi_first_ms", s.retry_wifi_first_ms).field("wifi_max_ms", s.retry_wifi_max_ms).field("mqtt_first_ms", s.retry_mqtt_first_ms).field("mqtt_max_ms", s.retry_mqtt_max_ms).field("scatter_percent", s.retry_scatter_percent).end_object();
   w.key("ui").begin_object().field("language", s.language).end_object();
