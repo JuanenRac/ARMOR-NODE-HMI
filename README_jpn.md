@@ -41,7 +41,7 @@
 | 成熟度 | 機能する |
 | 役割 | ARMOR-SERVER 用の壁掛けタッチパネル（ファミリー：Clients、親：ARMOR-SERVER） |
 | 技術 | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| テスト | 338597 件の検査（ホスト用プログラム 33 本と Python 検査 7 個、`ctest`） |
+| テスト | 338597 件の検査（ホスト用プログラム 33 本と Python 検査 9 個、`ctest`） |
 | 基板 | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | 動作環境 | Waveshare ESP32-S3-Touch-LCD-7C-BOX、ホストテストは任意のコンピューター |
 | 実機での確認 | まだありません：ファームウェアはビルドできます（ESP-IDF 5.5.5、CI では未確認）が、ボード上では動作していません |
