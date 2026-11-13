@@ -96,9 +96,9 @@ void write_network(json::Writer& w) {
 }
 
 // The date and time the node holds, in its own zone, and whether a time server has set it.
-void write_clock(json::Writer& w, const config::Settings& settings) {
+void write_clock(json::Writer& w, bool ntp_enabled) {
   const clocksync::Info c = clocksync::info();
-  w.key("time").begin_object().field("set", c.set).field("synced", c.synced).field("ntp", settings.time.ntp_enabled).field("epoch", static_cast<long long>(c.epoch))
+  w.key("time").begin_object().field("set", c.set).field("synced", c.synced).field("ntp", ntp_enabled).field("epoch", static_cast<long long>(c.epoch))
       .field("local", c.local).field("utc_offset_min", c.utc_offset_min).field("zone", c.zone).end_object();
 }
 
@@ -145,18 +145,20 @@ void write_flash(json::Writer& w) {
 }
 
 std::string status_json() {
-  const config::Settings s = store::settings();
+  std::string node_id, node_name;   // only what the answer needs, taken under the lock: the whole settings are not copied for every request
+  bool ntp_enabled = false;
+  store::with_settings([&](const config::Settings& s) { node_id = s.node_id; node_name = s.node_name; ntp_enabled = s.time.ntp_enabled; });
   const mqtt_link::Status m = mqtt_link::status();
   const esp_partition_t* running = esp_ota_get_running_partition();
   const membudget::Snapshot mem = memory::snapshot();   // heap_free below counts the external RAM too; these three are the internal memory on its own
   json::Writer w;
-  w.begin_object().field("node_id", s.node_id).field("name", s.node_name).field("version", version_text()).field("uptime_s", static_cast<long long>(esp_timer_get_time() / 1000000LL))
+  w.begin_object().field("node_id", node_id).field("name", node_name).field("version", version_text()).field("uptime_s", static_cast<long long>(esp_timer_get_time() / 1000000LL))
       .field("reset_reason", reset_reason_text()).field("heap_free", static_cast<long long>(esp_get_free_heap_size())).field("heap_min", static_cast<long long>(esp_get_minimum_free_heap_size()))
       .field("psram_free", static_cast<long long>(heap_caps_get_free_size(MALLOC_CAP_SPIRAM)))
       .field("heap_internal_free", static_cast<long long>(mem.internal_free)).field("heap_internal_min", static_cast<long long>(mem.internal_min)).field("heap_internal_largest", static_cast<long long>(mem.internal_largest)).field("partition", running != nullptr ? running->label : "?")
       .field("board", board::kName).field("sound", audio::ready());
   write_hardware(w);
-  write_clock(w, s);
+  write_clock(w, ntp_enabled);
   write_flash(w);
   write_network(w);
   w.key("mqtt").begin_object().field("enabled", m.enabled).field("connected", m.connected).field("clock_set", m.clock_set).field("published", static_cast<long long>(m.published))
@@ -188,14 +190,18 @@ std::string screen_json() {
 }
 
 std::string config_get_json() {
-  const config::Settings s = store::settings();
+  const std::unique_ptr<config::Settings> held(new (std::nothrow) config::Settings(store::settings()));   // on the heap: a whole Settings is about a kilobyte of the small stack of the web task
+  if (!held) return "{\"error\":\"no_memory\"}";
+  const config::Settings& s = *held;
   json::Writer w;
   w.begin_object().key("config").raw(config::to_json(s, false)).field("channel_auto", config::effective_channel(s.ap, store::mac_sum())).field("firmware", version_text()).end_object();
   return w.str();
 }
 
 std::string config_export_json() {
-  const config::Settings s = store::settings();
+  const std::unique_ptr<config::Settings> held(new (std::nothrow) config::Settings(store::settings()));   // on the heap, like the read above
+  if (!held) return "{\"error\":\"no_memory\"}";
+  const config::Settings& s = *held;
   json::Writer w;
   w.begin_object().key("config").raw(config::to_json(s, true)).field("firmware", version_text()).end_object();
   return w.str();
