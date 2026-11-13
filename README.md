@@ -41,7 +41,7 @@
 | Maturity | Functional |
 | Role | Wall touch panel for ARMOR-SERVER (family: Clients, parent: ARMOR-SERVER) |
 | Stack | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 338597 checks in 33 host programs and 7 Python checks (`ctest`) |
+| Tests | 338597 checks in 33 host programs and 9 Python checks (`ctest`) |
 | Board | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Runs on | A Waveshare ESP32-S3-Touch-LCD-7C-BOX; host tests on any computer |
 | On real hardware | None yet: the firmware builds (ESP-IDF 5.5.5, not checked by CI) but has not run on the board |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-33 host test programs and 7 Python checks run under `ctest`; 338597 checks counted by the host programs, built with `-Werror`.
+33 host test programs and 9 Python checks run under `ctest`; 338597 checks counted by the host programs, built with `-Werror`.
 
 Python checks: the panel texts in eight languages, the tasks, the save paths, the Bluetooth session under its lock and the routes the panel calls (and, in some nodes, the HTTP codes or the glyphs of the fonts)
 

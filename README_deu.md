@@ -41,7 +41,7 @@
 | Reifegrad | Funktionsfähig |
 | Rolle | Wand-Touchpanel für ARMOR-SERVER (Familie: Clients, übergeordnet: ARMOR-SERVER) |
 | Technik | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 338597 Prüfungen in 33 Host-Programmen und 7 Python-Prüfungen (`ctest`) |
+| Tests | 338597 Prüfungen in 33 Host-Programmen und 9 Python-Prüfungen (`ctest`) |
 | Platine | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Läuft auf | Ein Waveshare ESP32-S3-Touch-LCD-7C-BOX; Host-Tests auf jedem Computer |
 | Auf echter Hardware | Noch keiner: die Firmware baut (ESP-IDF 5.5.5, von der CI nicht geprüft), lief aber nicht auf der Platine |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-33 Host-Testprogramme und 7 Python-Prüfungen laufen unter `ctest`; 338597 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
+33 Host-Testprogramme und 9 Python-Prüfungen laufen unter `ctest`; 338597 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
 
 Python-Prüfungen: die Panel-Texte in acht Sprachen, die Tasks, die Speicherpfade, die Bluetooth-Sitzung unter ihrer Sperre und die vom Panel aufgerufenen Routen (und in manchen Knoten die HTTP-Codes oder die Glyphen der Schriften)
 

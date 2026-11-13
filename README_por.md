@@ -41,7 +41,7 @@
 | Maturidade | Funcional |
 | Função | Painel tátil de parede para o ARMOR-SERVER (família: Clients, pai: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Testes | 338597 verificações em 33 programas de anfitrião e 7 em Python (`ctest`) |
+| Testes | 338597 verificações em 33 programas de anfitrião e 9 em Python (`ctest`) |
 | Placa | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Funciona em | Uma Waveshare ESP32-S3-Touch-LCD-7C-BOX; testes de anfitrião em qualquer computador |
 | Em hardware real | Nenhum ainda: o firmware compila (ESP-IDF 5.5.5, não verificado pela CI) mas não correu na placa |
@@ -200,7 +200,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-33 programas de teste de anfitrião e 7 verificações Python correm com `ctest`; 338597 verificações contadas pelos programas de anfitrião, compiladas com `-Werror`.
+33 programas de teste de anfitrião e 9 verificações Python correm com `ctest`; 338597 verificações contadas pelos programas de anfitrião, compiladas com `-Werror`.
 
 Verificações Python: os textos do painel em oito línguas, as tarefas, os caminhos de gravação, a sessão Bluetooth sob o seu bloqueio e as rotas que o painel chama (e, em alguns nós, os códigos HTTP ou os glifos dos tipos de letra)
 
