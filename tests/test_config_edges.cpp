@@ -162,6 +162,10 @@ static void test_the_choices_and_the_lists_of_a_document() {
   CHECK(read("{\"ble\":{\"mode\":\"always\"}}", s).empty() && s.ble == config::BleMode::kAlways);
   CHECK(read("{\"ble\":{\"mode\":\"off\"}}", s).empty() && s.ble == config::BleMode::kOff);
   CHECK(has(read("{\"ble\":{\"mode\":\"sometimes\"}}", s), "ble.mode", "invalid"));
+  // the pairing PIN comes from the setup code unless the node is told to make a random one
+  CHECK(s.ble_passkey == config::BlePasskeyMode::kDerived);
+  CHECK(read("{\"ble\":{\"passkey_mode\":\"random_display\"}}", s).empty() && s.ble_passkey == config::BlePasskeyMode::kRandomDisplay);
+  CHECK(has(read("{\"ble\":{\"passkey_mode\":\"label\"}}", s), "ble.passkey_mode", "invalid"));
   // the numbers that have a rule of their own
   CHECK(has(read("{\"audio\":{\"siren_repeat_s\":7}}", s), "audio.siren_repeat_s", "range") || s.audio.siren_repeat_s == 7);
   CHECK(has(read("{\"ap\":{\"bandwidth_mhz\":30}}", s), "ap.bandwidth_mhz", "range"));
