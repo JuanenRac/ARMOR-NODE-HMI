@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The firmware build checks the configuration it really made:** after building each board the workflow fails when the generated `sdkconfig` does not have `CONFIG_LV_USE_CLIB_MALLOC=y` (the graphics pool in the C allocator), not only the defaults file that the host check reads.
 - **The shared wire header gives the followed object number of a vision event a ceiling:** `track_id` is at most 9007199254740991 (copy of the shared firmware base, with its lock).
 - **The host check of the shared firmware also refuses a sign-in that hashes the password while the lock of the settings store is held** (synchronised from the common base, with its lock file updated).
 
