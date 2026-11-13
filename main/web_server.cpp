@@ -255,17 +255,22 @@ void start_session(httpd_req_t* r, const std::string& user, auth::Role role, std
 
 esp_err_t get_session(httpd_req_t* r) {
   const Who who = authenticate(r);
-  const config::Settings s = store::settings();
+  std::string node_id, language;   // only the two texts the answer needs, taken under the lock: the whole settings are not copied for every request
+  store::with_settings([&](const config::Settings& s) { node_id = s.node_id; language = s.language; });
   const network::Status n = network::status();
   json::Writer w;
   w.begin_object().field("setup", store::users_empty()).field("authenticated", who.ok).field("user", who.ok ? who.user : "").field("role", who.ok ? auth::to_text(who.role) : "")
-      .field("node_id", s.node_id).field("language", s.language).field("version", version_text()).field("setup_ssid", n.ap_setup ? n.ap_ssid : "").field("mac", n.mac)
+      .field("node_id", node_id).field("language", language).field("version", version_text()).field("setup_ssid", n.ap_setup ? n.ap_ssid : "").field("mac", n.mac)
       .field("kind", "hmi").field("board", board::kId).field("cert_sha256", tls_status().fingerprint).field("ethernet", board::kHasEthernet).end_object();
   return send_json(r, 200, w.str());
 }
 
 // The node's own limit on wrong passwords per minute (system.login_limit_per_minute: 30 by default, 0 for none), read from the settings each time somebody tries to sign in.
-unsigned login_limit() { return static_cast<unsigned>(store::settings().login_limit_per_minute); }
+unsigned login_limit() {
+  long long limit = 0;
+  store::with_settings([&](const config::Settings& s) { limit = s.login_limit_per_minute; });
+  return static_cast<unsigned>(limit);
+}
 
 // The answer when the node as a whole has seen too many wrong passwords this minute.
 esp_err_t send_minute_wait(httpd_req_t* r, unsigned wait_s) {
@@ -813,8 +818,9 @@ esp_err_t post_server_fingerprint(httpd_req_t* r) {
   if (!require(r, who, true, true)) return ESP_OK;
   json::Value in;
   if (!read_json(r, in)) return ESP_OK;
-  std::string host = store::settings().server.host;
-  long long port = store::settings().server.port;
+  std::string host;
+  long long port = 0;
+  store::with_settings([&](const config::Settings& s) { host = s.server.host; port = s.server.port; });
   if (const json::Value* typed = in.get("host"); typed != nullptr && typed->is_string()) host = typed->text;
   port = in.integer_or("port", port, 1, 65535);
   if (host.empty() || !net::valid_host(host)) return send_error(r, 422, "invalid_host");
@@ -837,7 +843,12 @@ esp_err_t api_handler(httpd_req_t* r) {
   const int method = r->method;
   // The panel is for the house (or a VPN into it): a request from another network is refused, except the public look at the node's identity. A port opened by mistake on the router
   // therefore does not let the Internet try passwords here.
-  if (!(method == HTTP_GET && route == "session") && !adminsrc::allowed(source_of(r), store::settings().admin_sources)) return send_error(r, 403, "outside_network");
+  if (!(method == HTTP_GET && route == "session")) {
+    const auto source = source_of(r);
+    bool allowed = false;
+    store::with_settings([&](const config::Settings& s) { allowed = adminsrc::allowed(source, s.admin_sources); });
+    if (!allowed) return send_error(r, 403, "outside_network");
+  }
   if (method == HTTP_GET) {
     if (route == "session") return get_session(r);
     if (route == "status") return get_status(r);
