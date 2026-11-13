@@ -33,9 +33,18 @@ def main() -> int:
                 failures.append(f"{path.name}: {line} is a symbol of LVGL 8")
     lock = ROOT / "dependencies.lock"
     if lock.is_file():
-        match = re.search(r"lvgl/lvgl:\s*\n(?:\s+.*\n)*?\s+version:\s*([0-9]+)\.", lock.read_text(encoding="utf-8"))
-        if match and match.group(1) != "9":
-            failures.append(f"dependencies.lock locks LVGL {match.group(1)}, the configuration is for LVGL 9")
+        locked = None
+        in_block = False
+        for raw in lock.read_text(encoding="utf-8").splitlines():
+            if re.fullmatch(r"\s*lvgl/lvgl:\s*", raw):
+                in_block = True
+            elif in_block and raw[:1] not in (" ", "\t") and raw.strip():
+                in_block = False
+            elif in_block and (found := re.match(r"\s+version:\s*([0-9]+)\.", raw)):
+                locked = found.group(1)
+                break
+        if locked and locked != "9":
+            failures.append(f"dependencies.lock locks LVGL {locked}, the configuration is for LVGL 9")
     manifest = (ROOT / "main" / "idf_component.yml").read_text(encoding="utf-8")
     if not re.search(r'lvgl/lvgl:\s*"[^"]*9\.', manifest):
         failures.append("main/idf_component.yml does not ask for LVGL 9")
