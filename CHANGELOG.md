@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A host check keeps the firmware upload from taking an image of another node:** the panel has one board, so the project name of the image (422 `wrong_firmware`, before the boot slot is set, also when switching to the other slot) is what tells its images apart and the mark of the board of the other four nodes is not needed. `tests/check_ota_firmware.py` fails when the upload or the switch stops comparing the project, when a failed write does not abort the update, when a file that is not an image is not refused, or when a second board appears without the mark of the board; each guard is also tried on a damaged copy of the server.
 - **The firmware build checks the configuration it really made:** after building each board the workflow fails when the generated `sdkconfig` does not have `CONFIG_LV_USE_CLIB_MALLOC=y` (the graphics pool in the C allocator), not only the defaults file that the host check reads.
 - **The shared wire header gives the followed object number of a vision event a ceiling:** `track_id` is at most 9007199254740991 (copy of the shared firmware base, with its lock).
 - **The host check of the shared firmware also refuses a sign-in that hashes the password while the lock of the settings store is held** (synchronised from the common base, with its lock file updated).

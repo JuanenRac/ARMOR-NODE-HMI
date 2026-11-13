@@ -93,4 +93,6 @@ if(Python3_FOUND)
   add_test(NAME font_glyphs COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_font_glyphs.py)
   # LVGL 9 memory: the pool moved to the C allocator, no symbol of LVGL 8, LVGL 9 locked
   add_test(NAME lvgl_config COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_lvgl_config.py)
+  # the firmware upload: one board, and the image of another node is refused before the boot slot is set (the mark of the board of the other four nodes is not needed with one board)
+  add_test(NAME ota_firmware COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_ota_firmware.py)
 endif()
