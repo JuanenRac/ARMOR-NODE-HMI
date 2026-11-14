@@ -22,7 +22,7 @@ struct Row {
 };
 
 // clang-format off
-constexpr std::array<Row, 119> kRows{{
+constexpr std::array<Row, 123> kRows{{
     {"armed", {"ARMED", "ARMADO", "SCHARF", "ARMÉ", "ATTIVO", "警戒中", "已布防", "ARMADO"}},
     {"disarmed", {"DISARMED", "DESARMADO", "UNSCHARF", "DÉSARMÉ", "DISATTIVO", "解除中", "已撤防", "DESARMADO"}},
     {"arm", {"Arm", "Armar", "Scharf schalten", "Armer", "Attiva", "警戒する", "布防", "Armar"}},
@@ -142,6 +142,10 @@ constexpr std::array<Row, 119> kRows{{
     {"cam_close", {"Close", "Cerrar", "Schließen", "Fermer", "Chiudi", "閉じる", "关闭", "Fechar"}},
     {"cam_none", {"No picture", "Sin imagen", "Kein Bild", "Pas d'image", "Nessuna immagine", "画像がありません", "无画面", "Sem imagem"}},
     {"cam_wait", {"Loading the picture...", "Cargando la imagen...", "Bild wird geladen ...", "Chargement de l'image ...", "Caricamento dell'immagine...", "画像を読み込み中...", "正在加载画面...", "A carregar a imagem..."}},
+    {"pw_battery", {"Battery", "Batería", "Akku", "Batterie", "Batteria", "バッテリー", "电池", "Bateria"}},
+    {"pw_on_battery", {"on battery", "con batería", "im Akkubetrieb", "sur batterie", "a batteria", "バッテリー駆動", "电池供电", "com bateria"}},
+    {"pw_low", {"low", "baja", "schwach", "faible", "scarica", "残量低下", "电量低", "fraca"}},
+    {"pw_gauge", {"Battery gauge not answering", "El medidor de la batería no responde", "Akkumessung antwortet nicht", "La jauge de la batterie ne répond pas", "Il misuratore della batteria non risponde", "バッテリー残量計が応答しません", "电池电量计无响应", "O medidor da bateria não responde"}},
 }};
 // clang-format on
 

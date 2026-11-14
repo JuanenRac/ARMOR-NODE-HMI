@@ -485,6 +485,12 @@ function serverPage() {
     card(t("controlsTitle"), field("controlsAck", "controls.ack", { type: "select", options: [["pin", t("controlsAckPin")], ["confirm", t("controlsAckConfirm")], ["off", t("controlsAckOff")]] }),
       field("controlsPreflight", "controls.preflight", { type: "checkbox" }), field("controlsBeeps", "controls.countdown_beeps", { type: "checkbox" }),
       note(t("controlsNote"), "info")),
+    card(t("powerTitle"), field("powerEnabled", "power.enabled", { type: "checkbox", rerender: true }),
+      getValue("power.enabled") ? [field("powerLow", "power.low_percent", { type: "number", min: 5, max: 50 }), field("powerConfirm", "power.lost_confirm_s", { type: "number", min: 3, max: 120 })] : null,
+      field("storageEnabled", "storage.enabled", { type: "checkbox", rerender: true }),
+      getValue("storage.enabled") ? [field("storageSize", "storage.max_kb", { type: "number", min: 16, max: 4096 }), field("storageKeep", "storage.keep", { type: "number", min: 2, max: 10 }),
+        el("div", { class: "actions" }, el("a", { class: "b", href: "api/v1/events-log", download: "panel_events.log" }, t("storageDownload")))] : null,
+      note(t("powerNote"), "info")),
     card(t("cameraTitle"), field("cameraEnabled", "camera.enabled", { type: "checkbox", rerender: true }),
       getValue("camera.enabled") ? [field("cameraId", "camera.id", { max: 48, placeholder: "gate-camera" }), field("cameraRefresh", "camera.refresh_s", { type: "number", min: 2, max: 60 })] : null,
       note(t("cameraNote"), "info")));
