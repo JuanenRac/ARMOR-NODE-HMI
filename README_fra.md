@@ -133,6 +133,18 @@ Capturées sur un banc d'essai avec des données d'exemple fictives et sans inst
 
 <p align="center"><em>Serveur : l'adresse du serveur A.R.M.O.R., l'utilisateur du panneau et la fréquence d'interrogation.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="L'écran mural : désarmé" width="100%">
+</p>
+
+<p align="center"><em>L'écran tactile du panneau (800x480) dessiné sur un ordinateur par le simulateur d'écran, avec des données fictives : le système désarmé, deux alarmes à acquitter, les nœuds et l'équipement solaire. Les images des huit langues sont dans images/screens.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="L'écran mural : alarmes" width="100%">
+</p>
+
+<p align="center"><em>Le même écran avec le système armé et trois alarmes, dont deux critiques (dessiné par le simulateur d'écran avec des données fictives).</em></p>
+
 ## 🔒 Sécurité et protection
 
 | Menace | Défense |

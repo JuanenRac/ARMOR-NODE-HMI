@@ -133,6 +133,18 @@ Captured on a test bench with made-up sample data and no real installation behin
 
 <p align="center"><em>Server: the address of the A.R.M.O.R. server, the user of the panel and how often it asks.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="The wall screen: disarmed" width="100%">
+</p>
+
+<p align="center"><em>The touch screen of the panel (800x480) drawn on a computer by the screen simulator, with made-up data: the system disarmed, two alarms to acknowledge, the nodes and the solar equipment. The pictures of the eight languages are in images/screens.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="The wall screen: alarms" width="100%">
+</p>
+
+<p align="center"><em>The same screen with the system armed and three alarms, two of them critical (drawn by the screen simulator with made-up data).</em></p>
+
 ## 🔒 Security & Safety
 
 | Threat | Defence |

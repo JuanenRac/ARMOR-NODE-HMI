@@ -91,6 +91,52 @@
         "ja": "サーバー：A.R.M.O.R. サーバーのアドレス、パネルのユーザー、問い合わせの間隔。",
         "pt": "Servidor: o endereço do servidor A.R.M.O.R., o utilizador do painel e de quanto em quanto tempo pergunta."
       }
+    },
+    {
+      "file": "wall-disarmed.png",
+      "alt": {
+        "en": "The wall screen: disarmed",
+        "es": "La pantalla de pared: desarmado",
+        "fr": "L'écran mural : désarmé",
+        "it": "Lo schermo a parete: disarmato",
+        "de": "Der Wandbildschirm: unscharf",
+        "zh": "壁挂屏幕：已撤防",
+        "ja": "壁面スクリーン：解除中",
+        "pt": "O ecrã de parede: desarmado"
+      },
+      "caption": {
+        "en": "The touch screen of the panel (800x480) drawn on a computer by the screen simulator, with made-up data: the system disarmed, two alarms to acknowledge, the nodes and the solar equipment. The pictures of the eight languages are in images/screens.",
+        "es": "La pantalla táctil del panel (800x480) dibujada en un ordenador por el simulador de pantalla, con datos inventados: el sistema desarmado, dos alarmas por reconocer, los nodos y el equipo solar. Las imágenes de los ocho idiomas están en images/screens.",
+        "fr": "L'écran tactile du panneau (800x480) dessiné sur un ordinateur par le simulateur d'écran, avec des données fictives : le système désarmé, deux alarmes à acquitter, les nœuds et l'équipement solaire. Les images des huit langues sont dans images/screens.",
+        "it": "Lo schermo tattile del pannello (800x480) disegnato su un computer dal simulatore di schermo, con dati inventati: il sistema disarmato, due allarmi da riconoscere, i nodi e l'impianto solare. Le immagini delle otto lingue sono in images/screens.",
+        "de": "Der Touchscreen des Panels (800x480), von einem Bildschirm-Simulator auf einem Computer mit erfundenen Daten gezeichnet: das System unscharf, zwei Alarme zum Quittieren, die Knoten und die Solaranlage. Die Bilder der acht Sprachen liegen in images/screens.",
+        "zh": "面板触摸屏（800x480），由屏幕模拟器在计算机上使用虚构数据绘制：系统已撤防、两个待确认的警报、节点和太阳能设备。八种语言的图片位于 images/screens。",
+        "ja": "パネルのタッチスクリーン（800x480）を、画面シミュレーターが架空のデータでコンピューター上に描画したものです：解除中のシステム、確認待ちのアラーム 2 件、ノード、太陽光設備。8 言語の画像は images/screens にあります。",
+        "pt": "O ecrã tátil do painel (800x480) desenhado num computador pelo simulador de ecrã, com dados inventados: o sistema desarmado, dois alarmes por reconhecer, os nós e o equipamento solar. As imagens dos oito idiomas estão em images/screens."
+      }
+    },
+    {
+      "file": "wall-alarm.png",
+      "alt": {
+        "en": "The wall screen: alarms",
+        "es": "La pantalla de pared: alarmas",
+        "fr": "L'écran mural : alarmes",
+        "it": "Lo schermo a parete: allarmi",
+        "de": "Der Wandbildschirm: Alarme",
+        "zh": "壁挂屏幕：警报",
+        "ja": "壁面スクリーン：アラーム",
+        "pt": "O ecrã de parede: alarmes"
+      },
+      "caption": {
+        "en": "The same screen with the system armed and three alarms, two of them critical (drawn by the screen simulator with made-up data).",
+        "es": "La misma pantalla con el sistema armado y tres alarmas, dos de ellas críticas (dibujada por el simulador de pantalla con datos inventados).",
+        "fr": "Le même écran avec le système armé et trois alarmes, dont deux critiques (dessiné par le simulateur d'écran avec des données fictives).",
+        "it": "Lo stesso schermo con il sistema armato e tre allarmi, due dei quali critici (disegnato dal simulatore di schermo con dati inventati).",
+        "de": "Derselbe Bildschirm mit scharfem System und drei Alarmen, zwei davon kritisch (vom Bildschirm-Simulator mit erfundenen Daten gezeichnet).",
+        "zh": "同一屏幕，系统已布防并有三个警报，其中两个为严重警报（由屏幕模拟器使用虚构数据绘制）。",
+        "ja": "同じ画面で、システムが警戒中で 3 件のアラーム（うち 2 件は重大）があります（画面シミュレーターが架空のデータで描画）。",
+        "pt": "O mesmo ecrã com o sistema armado e três alarmes, dois deles críticos (desenhado pelo simulador de ecrã com dados inventados)."
+      }
     }
   ]
 }

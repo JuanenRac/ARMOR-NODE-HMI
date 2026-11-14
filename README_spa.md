@@ -133,6 +133,18 @@ Capturadas en un banco de pruebas con datos de ejemplo inventados y sin ninguna 
 
 <p align="center"><em>Servidor: la dirección del servidor A.R.M.O.R., el usuario del panel y cada cuánto pregunta.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="La pantalla de pared: desarmado" width="100%">
+</p>
+
+<p align="center"><em>La pantalla táctil del panel (800x480) dibujada en un ordenador por el simulador de pantalla, con datos inventados: el sistema desarmado, dos alarmas por reconocer, los nodos y el equipo solar. Las imágenes de los ocho idiomas están en images/screens.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="La pantalla de pared: alarmas" width="100%">
+</p>
+
+<p align="center"><em>La misma pantalla con el sistema armado y tres alarmas, dos de ellas críticas (dibujada por el simulador de pantalla con datos inventados).</em></p>
+
 ## 🔒 Seguridad y protección
 
 | Amenaza | Defensa |
