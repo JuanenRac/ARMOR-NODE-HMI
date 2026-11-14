@@ -236,10 +236,11 @@ ARMOR-NODE-HMI/
 ├── core/                                ESP-IDF なしのロジック（コンピューターでテスト）
 ├── panel/                               ファームウェアに埋め込まれた Web パネル
 ├── tests/                               ホストテストと Python 検査
+├── simulator/                           コンピューター上で描画した画面（8 言語）
 ├── docs/                                9 つのガイド：設計、音声、フォント、ハードウェア
 ├── tools/                               ビルド・パッケージ・検査のツール
 ├── .github/                             CI ワークフローと Issue・Pull Request のテンプレート
-├── images/                              バナー、アイコン、この README の 2 つの図
+├── images/                              バナー、アイコン、README の図、スクリーンショット
 ├── build.sh build.bat                   共通のプロジェクトワークフローでビルド
 ├── test.sh test.bat                     共通のワークフローでテストを実行
 ├── run.sh run.bat                       共通のプロジェクトワークフローで起動

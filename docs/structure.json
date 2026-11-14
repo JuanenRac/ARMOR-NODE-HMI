@@ -179,6 +179,34 @@
       ]
     },
     {
+      "name": "simulator/",
+      "span": 1,
+      "tree": {
+        "en": "the screen drawn on a computer, in eight languages",
+        "es": "la pantalla dibujada en un ordenador, en ocho idiomas",
+        "de": "der Bildschirm auf einem Computer gezeichnet, in acht Sprachen",
+        "fr": "l'écran dessiné sur un ordinateur, en huit langues",
+        "it": "lo schermo disegnato su un computer, in otto lingue",
+        "ja": "コンピューター上で描画した画面（8 言語）",
+        "zh": "在计算机上绘制的屏幕（八种语言）",
+        "pt": "o ecrã desenhado num computador, em oito idiomas"
+      },
+      "rows": [
+        {
+          "desc": {
+            "en": "screen simulator",
+            "es": "simulador de pantalla",
+            "de": "Bildschirm-Simulator",
+            "fr": "simulateur d'écran",
+            "it": "simulatore dello schermo",
+            "ja": "画面シミュレーター",
+            "zh": "屏幕模拟器",
+            "pt": "simulador do ecrã"
+          }
+        }
+      ]
+    },
+    {
       "name": "docs/",
       "span": 1,
       "tree": {

@@ -1,0 +1,69 @@
+# =============================================================================
+# A.R.M.O.R. - Pictures of the screen of the panel, drawn by the screen simulator
+# Copyright (C) 2026 JuanenRac (Electro Hobby 3D)
+# GPL-3.0-or-later - see LICENSE
+# =============================================================================
+# Started by hand only (workflow_dispatch). It builds simulator/ (main/ui.cpp, the real screen, with LVGL 9 on a computer and stand-ins for the server link, the battery gauge, the
+# voice assistant and the display driver), draws the 800x480 screen in the eight languages in six scenes (set-up, disarmed, the question before arming, armed, alarms and a paused
+# panel), turns the pictures into 128-colour PNG files of at most 400 KiB and keeps them as an artifact for two weeks. Evidence: simulator. It publishes and signs nothing.
+
+name: Screen pictures (simulator)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag or commit of this repository"
+        type: string
+        required: true
+        default: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hmi-screens-${{ inputs.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pictures:
+    name: Draw the screen in eight languages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+
+      - name: Build the simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S simulator -B build-sim -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-sim -j "$(nproc)"
+
+      - name: Draw the pictures
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p shots
+          ./build-sim/armor_hmi_screen_sim shots | tee shots/result.txt
+          grep -q '^SCREENS=PASS languages=8$' shots/result.txt
+          test "$(ls shots/*.ppm | wc -l)" -eq 48
+
+      - name: Turn them into small PNG files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pillow
+          python3 simulator/ppm_to_png.py shots images/screens
+
+      - name: Keep the pictures
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: hmi-screens
+          path: images/screens
+          retention-days: 14
+          if-no-files-found: error
