@@ -133,6 +133,18 @@ ARMOR-NODE-HMI は壁掛けパネルです。Android アプリと同じく [ARMO
 
 <p align="center"><em>サーバー：A.R.M.O.R. サーバーのアドレス、パネルのユーザー、問い合わせの間隔。</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="壁面スクリーン：解除中" width="100%">
+</p>
+
+<p align="center"><em>パネルのタッチスクリーン（800x480）を、画面シミュレーターが架空のデータでコンピューター上に描画したものです：解除中のシステム、確認待ちのアラーム 2 件、ノード、太陽光設備。8 言語の画像は images/screens にあります。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="壁面スクリーン：アラーム" width="100%">
+</p>
+
+<p align="center"><em>同じ画面で、システムが警戒中で 3 件のアラーム（うち 2 件は重大）があります（画面シミュレーターが架空のデータで描画）。</em></p>
+
 ## 🔒 セキュリティと安全
 
 | 脅威 | 対策 |

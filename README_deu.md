@@ -133,6 +133,18 @@ Aufgenommen auf einem Prüfstand mit erfundenen Beispieldaten und ohne eine echt
 
 <p align="center"><em>Server: die Adresse des A.R.M.O.R.-Servers, der Benutzer des Panels und wie oft es nachfragt.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="Der Wandbildschirm: unscharf" width="100%">
+</p>
+
+<p align="center"><em>Der Touchscreen des Panels (800x480), von einem Bildschirm-Simulator auf einem Computer mit erfundenen Daten gezeichnet: das System unscharf, zwei Alarme zum Quittieren, die Knoten und die Solaranlage. Die Bilder der acht Sprachen liegen in images/screens.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="Der Wandbildschirm: Alarme" width="100%">
+</p>
+
+<p align="center"><em>Derselbe Bildschirm mit scharfem System und drei Alarmen, zwei davon kritisch (vom Bildschirm-Simulator mit erfundenen Daten gezeichnet).</em></p>
+
 ## 🔒 Sicherheit und Schutz
 
 | Bedrohung | Abwehr |

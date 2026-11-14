@@ -133,6 +133,18 @@ Catturate su un banco di prova con dati di esempio inventati e senza alcuna inst
 
 <p align="center"><em>Server: l'indirizzo del server A.R.M.O.R., l'utente del pannello e ogni quanto interroga.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="Lo schermo a parete: disarmato" width="100%">
+</p>
+
+<p align="center"><em>Lo schermo tattile del pannello (800x480) disegnato su un computer dal simulatore di schermo, con dati inventati: il sistema disarmato, due allarmi da riconoscere, i nodi e l'impianto solare. Le immagini delle otto lingue sono in images/screens.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="Lo schermo a parete: allarmi" width="100%">
+</p>
+
+<p align="center"><em>Lo stesso schermo con il sistema armato e tre allarmi, due dei quali critici (disegnato dal simulatore di schermo con dati inventati).</em></p>
+
 ## 🔒 Sicurezza e protezione
 
 | Minaccia | Difesa |

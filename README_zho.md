@@ -133,6 +133,18 @@ ARMOR-NODE-HMI 是壁挂面板：与 Android 应用一样是 [ARMOR-SERVER](http
 
 <p align="center"><em>服务器：A.R.M.O.R. 服务器的地址、面板所用的用户以及查询间隔。</em></p>
 
+<p align="center">
+  <img src="images/screenshots/wall-disarmed.png" alt="壁挂屏幕：已撤防" width="100%">
+</p>
+
+<p align="center"><em>面板触摸屏（800x480），由屏幕模拟器在计算机上使用虚构数据绘制：系统已撤防、两个待确认的警报、节点和太阳能设备。八种语言的图片位于 images/screens。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/wall-alarm.png" alt="壁挂屏幕：警报" width="100%">
+</p>
+
+<p align="center"><em>同一屏幕，系统已布防并有三个警报，其中两个为严重警报（由屏幕模拟器使用虚构数据绘制）。</em></p>
+
 ## 🔒 安全与防护
 
 | 威胁 | 防御 |
