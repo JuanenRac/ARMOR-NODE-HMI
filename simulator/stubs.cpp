@@ -49,6 +49,7 @@ View view() { return sim::g_scene.power; }
 }  // namespace power_watch
 
 namespace voice_task {
+void press() {}
 View view() { return sim::g_scene.voice; }
 }  // namespace voice_task
 
