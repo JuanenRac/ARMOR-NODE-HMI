@@ -70,10 +70,10 @@ static void test_the_setting() {
   s.sta.enabled = true; s.sta.ssid = "casa"; s.sta.password = "una-clave-larga";
   CHECK(s.controls.ack == AckMode::kPin);   // the safe way until the owner says otherwise
   const std::string text = config::to_json(s, true);
-  CHECK(text.find("\"controls\":{\"ack\":\"pin\"}") != std::string::npos);
+  CHECK(text.find("\"controls\":{\"ack\":\"pin\",\"preflight\":false,\"countdown_beeps\":false}") != std::string::npos);
   config::Problems problems;
   config::Settings back;
-  CHECK(config::load("{\"controls\":{\"ack\":\"confirm\"}}", s, back, problems) && back.controls.ack == AckMode::kConfirm && config::to_json(back, true).find("\"controls\":{\"ack\":\"confirm\"}") != std::string::npos);
+  CHECK(config::load("{\"controls\":{\"ack\":\"confirm\"}}", s, back, problems) && back.controls.ack == AckMode::kConfirm && config::to_json(back, true).find("\"controls\":{\"ack\":\"confirm\",\"preflight\":false,\"countdown_beeps\":false}") != std::string::npos);
   problems.clear();
   CHECK(config::load("{\"controls\":{\"ack\":\"off\"}}", s, back, problems) && back.controls.ack == AckMode::kOff);
   problems.clear();

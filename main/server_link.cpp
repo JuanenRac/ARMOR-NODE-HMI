@@ -24,6 +24,7 @@
 #include "core/panel_feed.hpp"
 #include "core/ack_flow.hpp"
 #include "core/pin_entry.hpp"
+#include "core/still_view.hpp"
 #include "core/server_pin.hpp"
 #include "network.hpp"
 #include "psram_mem.hpp"
@@ -53,6 +54,16 @@ hmi::ViewBoard g_board;                                   // under g_lock: what 
 std::vector<std::string> g_known_alarm_ids;
 bool g_first_summary = true;
 TaskHandle_t g_task = nullptr;
+std::atomic<bool> g_preflight_wanted{false};   // the screen wants the check before arming
+bool g_preflight_asking = false;               // under g_lock
+std::int64_t g_preflight_since_ms = 0;         // under g_lock: when it was asked for
+hmi::Preflight g_preflight;                    // under g_lock: the latest answer
+constexpr std::int64_t kPreflightWaitMs = 8000;
+std::atomic<bool> g_camera_open{false};        // the picture of the camera is open on the screen
+std::string g_camera_id;                       // under g_lock
+hmi::StillSchedule g_still_schedule;           // under g_lock
+std::string g_still_jpeg, g_still_error;       // under g_lock: the latest picture, or why there is none
+std::uint32_t g_still_width = 0, g_still_height = 0, g_still_generation = 0;   // under g_lock
 hmi::LiveChannel g_live;                      // under g_lock: whether the panel listens to the live channel and when it tries again
 hmi::FrameAssembler g_frame_parts;            // only the socket's task touches it
 esp_websocket_client_handle_t g_ws = nullptr; // only the link task touches it
@@ -434,6 +445,50 @@ void do_pending_actions() {
   g_action_pending = false;
 }
 
+// The two reads of the panel that are not the summary: the check before arming and the camera picture. Both are read only, and a refusal (the server's option is off) is not an error: nothing is shown.
+void do_panel_views() {
+  if (g_preflight_wanted.exchange(false)) {
+    Answer answer = request(HTTP_METHOD_GET, "/api/v1/preflight", "", true);
+    if (answer.status == 401) { std::lock_guard<std::mutex> guard(g_lock); g_cookie.clear(); }
+    hmi::Preflight parsed;
+    const bool good = answer.status == 200 && !answer.truncated && hmi::parse_preflight(answer.body, parsed);
+    std::lock_guard<std::mutex> guard(g_lock);
+    g_preflight = good ? parsed : hmi::Preflight{};
+    g_preflight_asking = false;
+  }
+  if (!g_camera_open.load()) return;
+  std::string id;
+  {
+    std::lock_guard<std::mutex> guard(g_lock);
+    if (!g_still_schedule.due(now_ms())) return;
+    id = g_camera_id;
+  }
+  if (id.empty()) return;
+  Answer answer = request(HTTP_METHOD_GET, "/api/v1/cameras/" + id + "/snapshot", "", true, hmi::kStillMaxBytes + 1);
+  if (answer.status == 401) { std::lock_guard<std::mutex> guard(g_lock); g_cookie.clear(); }
+  std::uint32_t width = 0, height = 0;
+  std::string error;
+  if (answer.status == 0) error = "no_reply";
+  else if (answer.status != 200) error = "http_" + std::to_string(answer.status);
+  else if (answer.truncated) error = hmi::still_check_name(hmi::StillCheck::kTooBig);
+  else { const hmi::StillCheck verdict = hmi::check_still(answer.body, width, height); if (verdict != hmi::StillCheck::kOk) error = hmi::still_check_name(verdict); }
+  std::lock_guard<std::mutex> guard(g_lock);
+  if (!g_camera_open.load()) return;   // the person closed the picture while it was on its way
+  if (error.empty()) {
+    g_still_jpeg = std::move(answer.body);
+    g_still_width = width;
+    g_still_height = height;
+    g_still_error.clear();
+    g_still_schedule.succeeded(now_ms());
+  } else {
+    g_still_jpeg.clear();
+    g_still_jpeg.shrink_to_fit();
+    g_still_error = error;
+    g_still_schedule.failed(now_ms());
+  }
+  ++g_still_generation;
+}
+
 // The person's order is for now. If the link could not carry it within `kOrderValidMs` it is dropped, the PIN with it, and the screen is told it was not sent: arming or disarming the house
 // hours later, when the Wi-Fi comes back, on an order nobody remembers, is worse than not arming.
 void expire_pending_orders(std::int64_t now) {
@@ -475,6 +530,7 @@ void link_task(void*) {
         delay_ms = g_tracker.next_delay_ms();
       } else {
         do_pending_actions();
+        do_panel_views();
         const bool listening = live_step();   // the summary arrives by the live channel: nothing to ask
         if (!listening) poll_summary();
         std::lock_guard<std::mutex> guard(g_lock);
@@ -483,6 +539,7 @@ void link_task(void*) {
         delay_ms = listening ? kLiveRoundMs : g_tracker.next_delay_ms();
       }
     }
+    if (g_camera_open.load()) delay_ms = std::min<std::int64_t>(delay_ms, 1000);   // the picture on screen is asked for on its own pace
     if (g_action_pending) delay_ms = std::min<std::int64_t>(delay_ms, 2000);   // an order that waits is looked at soon, to be sent or dropped
     // an order of the person cuts the wait short
     ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(static_cast<std::uint32_t>(delay_ms)));
@@ -534,6 +591,60 @@ void request_acknowledge_all(const std::string& pin) {
   g_action_pending = true;
   g_pending_acknowledge = true;
   if (g_task != nullptr) xTaskNotifyGive(g_task);
+}
+
+void request_preflight() {
+  {
+    std::lock_guard<std::mutex> guard(g_lock);
+    g_preflight = hmi::Preflight{};
+    g_preflight_asking = true;
+    g_preflight_since_ms = now_ms();
+  }
+  g_preflight_wanted = true;
+  if (g_task != nullptr) xTaskNotifyGive(g_task);
+}
+
+PreflightState preflight_state() {
+  std::lock_guard<std::mutex> guard(g_lock);
+  PreflightState state;
+  state.asking = g_preflight_asking && now_ms() - g_preflight_since_ms < kPreflightWaitMs;
+  state.result = g_preflight;
+  return state;
+}
+
+void camera_open(const std::string& camera_id, int refresh_s) {
+  {
+    std::lock_guard<std::mutex> guard(g_lock);
+    g_camera_id = camera_id;
+    g_still_schedule.configure(refresh_s);
+    g_still_schedule.opened(now_ms());
+    g_still_jpeg.clear();
+    g_still_error.clear();
+    g_still_width = g_still_height = 0;
+    ++g_still_generation;
+  }
+  g_camera_open = true;
+  if (g_task != nullptr) xTaskNotifyGive(g_task);
+}
+
+void camera_close() {
+  g_camera_open = false;
+  std::lock_guard<std::mutex> guard(g_lock);
+  g_still_jpeg.clear();
+  g_still_jpeg.shrink_to_fit();
+  g_still_error.clear();
+  ++g_still_generation;
+}
+
+bool camera_take(std::uint32_t& seen, std::string& jpeg, std::uint32_t& width, std::uint32_t& height, std::string& error) {
+  std::lock_guard<std::mutex> guard(g_lock);
+  if (seen == g_still_generation) return false;
+  seen = g_still_generation;
+  jpeg = g_still_jpeg;
+  width = g_still_width;
+  height = g_still_height;
+  error = g_still_error;
+  return true;
 }
 
 void on_new_alarms(std::function<void(const std::vector<hmi::AlarmLine>&)> callback) {

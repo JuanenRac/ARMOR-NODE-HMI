@@ -483,7 +483,11 @@ function serverPage() {
       S.screen ? linkPill(S.screen.link.state) : null,
       note(t("serverNote"), "info")),
     card(t("controlsTitle"), field("controlsAck", "controls.ack", { type: "select", options: [["pin", t("controlsAckPin")], ["confirm", t("controlsAckConfirm")], ["off", t("controlsAckOff")]] }),
-      note(t("controlsNote"), "info")));
+      field("controlsPreflight", "controls.preflight", { type: "checkbox" }), field("controlsBeeps", "controls.countdown_beeps", { type: "checkbox" }),
+      note(t("controlsNote"), "info")),
+    card(t("cameraTitle"), field("cameraEnabled", "camera.enabled", { type: "checkbox", rerender: true }),
+      getValue("camera.enabled") ? [field("cameraId", "camera.id", { max: 48, placeholder: "gate-camera" }), field("cameraRefresh", "camera.refresh_s", { type: "number", min: 2, max: 60 })] : null,
+      note(t("cameraNote"), "info")));
 }
 
 function screenPage() {

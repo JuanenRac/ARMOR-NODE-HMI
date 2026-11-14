@@ -274,6 +274,11 @@ extern "C" void app_main() {
           voice_enabled = s.voice.enabled;
           context.wake_name = s.voice.wake_name;
           context.ack = armor::hmi::ack_mode_text(s.controls.ack);
+          context.preflight = s.controls.preflight;
+          context.countdown_beeps = s.controls.countdown_beeps;
+          context.camera = s.camera.enabled && !s.camera.id.empty();
+          context.camera_id = s.camera.id;
+          context.camera_refresh_s = s.camera.refresh_s;
         });
         context.voice_enabled = voice_enabled && armor::audio::ready();
         context.ip = armor::network::status().ip;

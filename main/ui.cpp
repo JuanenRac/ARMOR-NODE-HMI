@@ -25,6 +25,9 @@
 #include "esp_timer.h"
 #include "lvgl.h"
 #include "core/ack_flow.hpp"
+#include "core/countdown.hpp"
+#include "core/preflight_view.hpp"
+#include "core/still_view.hpp"
 #include "core/pin_entry.hpp"
 #include "core/screen_text.hpp"
 #include "core/server_view.hpp"
@@ -88,6 +91,16 @@ struct Screen {
   bool was_pending = false;      // an order of the person was on its way at the last look
   bool done_shown = false;       // an order was answered and went through: the footer says so for a few seconds
   std::uint32_t done_since_ms = 0;
+  lv_obj_t *pf_text = nullptr;                  // the check before arming, in the confirmation
+  bool pf_wanted = false;                       // the confirmation that is open is an arming with the check
+  lv_obj_t *cd_bar = nullptr, *cd_label = nullptr;   // the countdown of the exit and entry delays, over everything
+  hmi::Countdown countdown;
+  lv_obj_t *cam_button = nullptr, *cam_button_label = nullptr, *cam_panel = nullptr, *cam_image = nullptr, *cam_note = nullptr, *cam_close = nullptr, *cam_close_label = nullptr;   // the camera picture
+  bool cam_open = false;
+  std::uint32_t cam_seen = 0;
+  std::string cam_data;                         // the JPEG on the screen: LVGL reads it from here, so it stays until the next one replaces it
+  lv_image_dsc_t cam_dsc{};
+  bool cam_have = false;
 };
 Screen g_screen;
 
@@ -146,15 +159,19 @@ void show_pin() {
 std::int64_t g_confirm_opened_ms = 0;   // when the confirmation was shown (hmi::confirm_expired closes it when it has been left)
 
 // The question that covers the screen: `text_key` is the words, `with_pin` shows the keypad (disarming and, by default, acknowledging the alarms ask for the PIN).
-void open_confirm(const char* text_key, bool with_pin) {
+void open_confirm(const char* text_key, bool with_pin, bool with_findings = false) {
   g_confirm_opened_ms = esp_timer_get_time() / 1000;
   g_screen.pin.clear();
   const bool disarming = with_pin;
+  g_screen.pf_wanted = with_findings;
   lv_label_set_text(g_screen.confirm_text, text_of(text_key).c_str());
   // the PIN is asked: the question goes to the top, the keypad under it and the two buttons at the bottom
-  lv_obj_align(g_screen.confirm_text, disarming ? LV_ALIGN_TOP_MID : LV_ALIGN_CENTER, 0, disarming ? 14 : -60);
-  lv_obj_set_pos(g_screen.confirm_yes, 140, disarming ? 384 : 300);
-  lv_obj_set_pos(g_screen.confirm_no, 440, disarming ? 384 : 300);
+  const bool top = disarming || with_findings;   // the question goes to the top when the keypad or the findings need the room
+  lv_obj_align(g_screen.confirm_text, top ? LV_ALIGN_TOP_MID : LV_ALIGN_CENTER, 0, top ? 14 : -60);
+  lv_obj_set_pos(g_screen.confirm_yes, 140, disarming ? 384 : (with_findings ? 360 : 300));
+  lv_obj_set_pos(g_screen.confirm_no, 440, disarming ? 384 : (with_findings ? 360 : 300));
+  if (with_findings) { lv_label_set_text(g_screen.pf_text, text_of("pf_checking").c_str()); lv_obj_clear_flag(g_screen.pf_text, LV_OBJ_FLAG_HIDDEN); } else lv_obj_add_flag(g_screen.pf_text, LV_OBJ_FLAG_HIDDEN);
+  lv_label_set_text(g_screen.confirm_yes_label, text_of("yes").c_str());
   lv_obj_set_height(g_screen.confirm_yes, disarming ? 76 : 90);
   lv_obj_set_height(g_screen.confirm_no, disarming ? 76 : 90);
   for (lv_obj_t* key : g_screen.keys) { if (disarming) lv_obj_clear_flag(key, LV_OBJ_FLAG_HIDDEN); else lv_obj_add_flag(key, LV_OBJ_FLAG_HIDDEN); }
@@ -166,7 +183,11 @@ void open_confirm(const char* text_key, bool with_pin) {
 void show_confirm(hmi::Mode target) {
   g_screen.confirm_ack = false;
   g_screen.confirm_for = target;
-  open_confirm(target == hmi::Mode::kArmed ? "confirm_arm" : "confirm_disarm", target == hmi::Mode::kDisarmed);
+  // Arming with the check before it (controls.preflight, off by default): the server is asked what would leave the house blind or noisy, and the confirmation shows it. The person decides.
+  const Context context = g_screen.context ? g_screen.context() : Context{};
+  const bool check = target == hmi::Mode::kArmed && context.preflight;
+  if (check) server_link::request_preflight();
+  open_confirm(target == hmi::Mode::kArmed ? "confirm_arm" : "confirm_disarm", target == hmi::Mode::kDisarmed, check);
 }
 // Acknowledging every alarm: with the keypad (the PIN goes to the server with the order) or as a plain question.
 void show_confirm_ack(bool with_pin) {
@@ -175,7 +196,7 @@ void show_confirm_ack(bool with_pin) {
   g_screen.confirm_for = hmi::Mode::kUnknown;
   open_confirm("confirm_ack", with_pin);
 }
-void hide_confirm() { g_screen.pin.clear(); show_pin(); lv_obj_add_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN); }
+void hide_confirm() { g_screen.pf_wanted = false; g_screen.pin.clear(); show_pin(); lv_obj_add_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN); }
 
 void on_arm(lv_event_t*) {
   const server_link::Snapshot snap = server_link::snapshot();
@@ -205,6 +226,29 @@ void on_ack(lv_event_t*) {
     case hmi::AckStep::kAskToConfirm: show_confirm_ack(false); break;
     case hmi::AckStep::kAskForPin: show_confirm_ack(true); break;
   }
+}
+// The camera picture on demand (camera.enabled, off by default): the link's task asks the server for a JPEG every few seconds while this is open; closing it frees the picture.
+void on_camera_open(lv_event_t*) {
+  const Context context = g_screen.context ? g_screen.context() : Context{};
+  if (!context.camera || context.camera_id.empty()) return;
+  g_screen.cam_open = true;
+  g_screen.cam_have = false;
+  g_screen.cam_seen = 0;
+  lv_label_set_text(g_screen.cam_note, text_of("cam_wait").c_str());
+  lv_obj_clear_flag(g_screen.cam_note, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(g_screen.cam_image, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_clear_flag(g_screen.cam_panel, LV_OBJ_FLAG_HIDDEN);
+  server_link::camera_open(context.camera_id, context.camera_refresh_s);
+}
+void on_camera_close(lv_event_t*) {
+  g_screen.cam_open = false;
+  server_link::camera_close();
+  lv_obj_add_flag(g_screen.cam_panel, LV_OBJ_FLAG_HIDDEN);
+  if (g_screen.cam_have) lv_image_cache_drop(&g_screen.cam_dsc);
+  lv_obj_add_flag(g_screen.cam_image, LV_OBJ_FLAG_HIDDEN);
+  g_screen.cam_have = false;
+  g_screen.cam_data.clear();
+  g_screen.cam_data.shrink_to_fit();
 }
 void on_mic(lv_event_t*) { voice_task::press(); }
 
@@ -241,6 +285,8 @@ bool apply_language(const std::string& language) {
   lv_label_set_text(g_screen.confirm_yes_label, text_of("yes").c_str());
   lv_label_set_text(g_screen.confirm_no_label, text_of("no").c_str());
   lv_label_set_text(g_screen.pin_prompt, text_of("pin_prompt").c_str());
+  lv_label_set_text(g_screen.cam_button_label, text_of("cam_open").c_str());
+  lv_label_set_text(g_screen.cam_close_label, text_of("cam_close").c_str());
   return true;
 }
 
@@ -248,6 +294,74 @@ bool apply_language(const std::string& language) {
 void set_text(lv_obj_t* label, const std::string& text) {
   const char* now = lv_label_get_text(label);
   if (now == nullptr || text != now) lv_label_set_text(label, text.c_str());
+}
+
+// The findings of the check before arming, in the confirmation: all clear, or the findings that block first, and the button says what the person is about to do.
+void update_preflight() {
+  const server_link::PreflightState state = server_link::preflight_state();
+  const hmi::PreflightShown shown = hmi::preflight_shown(true, state.asking, state.result);
+  std::string text;
+  std::uint32_t colour = kMuted;
+  bool findings = false;
+  if (shown == hmi::PreflightShown::kChecking) text = text_of("pf_checking");
+  else if (shown == hmi::PreflightShown::kAllClear) { text = text_of("pf_clear"); colour = kGreen; }
+  else if (shown == hmi::PreflightShown::kFindings) {
+    findings = true;
+    colour = state.result.blocking > 0 ? kRed : kAmber;
+    text = text_of("pf_title");
+    for (std::size_t i = 0; i < state.result.row_count; ++i) {
+      const hmi::PreflightRow& row = state.result.rows[i];
+      text += "\n- " + text_of(hmi::preflight_key(row.code));
+      if (row.id[0] != '\0') text += std::string(": ") + row.id;
+    }
+    if (state.result.more > 0) text += "\n" + text_of("pf_more");
+  }
+  set_text(g_screen.pf_text, text);
+  lv_obj_set_style_text_color(g_screen.pf_text, lv_color_hex(colour), 0);
+  set_text(g_screen.confirm_yes_label, text_of(findings ? "pf_arm_anyway" : "yes"));
+}
+
+// The countdown of the exit and entry delays: the seconds the server said, counted on the panel's own clock between two summaries; the beeps are a setting (off by default).
+void update_countdown(const Context& context, bool news, const hmi::ViewModel& view) {
+  const std::int64_t now = esp_timer_get_time() / 1000;
+  if (news) g_screen.countdown.update(view.have_summary && view.current && view.delay.present, view.delay.entry, view.delay.remaining_s, now);
+  const int left = g_screen.countdown.remaining_s(now);
+  if (left <= 0) { lv_obj_add_flag(g_screen.cd_bar, LV_OBJ_FLAG_HIDDEN); return; }
+  const bool entry = g_screen.countdown.kind(now) == hmi::DelayKind::kEntry;
+  set_text(g_screen.cd_label, text_of(entry ? "cd_entry" : "cd_exit") + "   " + std::to_string(left) + " s");
+  lv_obj_set_style_bg_color(g_screen.cd_bar, lv_color_hex(entry ? kRed : kAmber), 0);
+  lv_obj_clear_flag(g_screen.cd_bar, LV_OBJ_FLAG_HIDDEN);
+  if (g_screen.countdown.beep_due(now, context.countdown_beeps) && audio::ready()) audio::beep(audio::Tone::kNotice);
+}
+
+// The camera: the button is offered only when the setting is on and the link is current; the picture on screen follows what the link's task keeps.
+void update_camera(const Context& context, const hmi::ViewModel& view) {
+  const bool offer = context.camera && view.current && !g_screen.cam_open;
+  if (offer) lv_obj_clear_flag(g_screen.cam_button, LV_OBJ_FLAG_HIDDEN); else lv_obj_add_flag(g_screen.cam_button, LV_OBJ_FLAG_HIDDEN);
+  if (!g_screen.cam_open) return;
+  std::string jpeg, error;
+  std::uint32_t width = 0, height = 0;
+  if (!server_link::camera_take(g_screen.cam_seen, jpeg, width, height, error)) return;
+  if (g_screen.cam_have) { lv_image_cache_drop(&g_screen.cam_dsc); g_screen.cam_have = false; }
+  if (jpeg.empty()) {   // there is no picture: the reason is a short code, the screen says only that there is none
+    lv_obj_add_flag(g_screen.cam_image, LV_OBJ_FLAG_HIDDEN);
+    lv_label_set_text(g_screen.cam_note, text_of("cam_none").c_str());
+    lv_obj_clear_flag(g_screen.cam_note, LV_OBJ_FLAG_HIDDEN);
+    return;
+  }
+  g_screen.cam_data = std::move(jpeg);
+  g_screen.cam_dsc = lv_image_dsc_t{};
+  g_screen.cam_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+  g_screen.cam_dsc.header.cf = LV_COLOR_FORMAT_RAW;
+  g_screen.cam_dsc.header.w = width;
+  g_screen.cam_dsc.header.h = height;
+  g_screen.cam_dsc.data_size = static_cast<std::uint32_t>(g_screen.cam_data.size());
+  g_screen.cam_dsc.data = reinterpret_cast<const std::uint8_t*>(g_screen.cam_data.data());
+  lv_image_set_src(g_screen.cam_image, &g_screen.cam_dsc);
+  lv_obj_align(g_screen.cam_image, LV_ALIGN_CENTER, 0, -20);
+  lv_obj_clear_flag(g_screen.cam_image, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(g_screen.cam_note, LV_OBJ_FLAG_HIDDEN);
+  g_screen.cam_have = true;
 }
 
 // Twice a second. What comes from the server is drawn from the block of core/view_model.hpp, and only when that block has changed since it was last drawn (or the language has): a
@@ -261,6 +375,9 @@ void refresh(lv_timer_t*) {
   const bool redraw = news || words_changed || !g_screen.drawn;
   g_screen.drawn = true;
   const hmi::ViewModel& view = g_screen.view;
+  if (!lv_obj_has_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN) && g_screen.pf_wanted) update_preflight();
+  update_countdown(context, news, view);
+  update_camera(context, view);
   const voice_task::View voice = voice_task::view();
 
   if (redraw) {
@@ -458,6 +575,8 @@ void build(lv_obj_t* screen_object) {
     g_screen.alarm_row[i] = row; g_screen.alarm_dot[i] = dot; g_screen.alarm_text[i] = label;
   }
   g_screen.ack_button = make_button(right, 0, 268, 358, 46, kAmber, on_ack, &g_screen.ack_label, Size::kSmall);
+  g_screen.cam_button = make_button(right, 252, 0, 106, 34, kCyan, on_camera_open, &g_screen.cam_button_label, Size::kSmall);   // offered only when camera.enabled is on
+  lv_obj_add_flag(g_screen.cam_button, LV_OBJ_FLAG_HIDDEN);
 
   // the bottom bar
   g_screen.footer = make_label(screen_object, Size::kSmall, kAmber);
@@ -466,6 +585,23 @@ void build(lv_obj_t* screen_object) {
   lv_label_set_long_mode(g_screen.footer, LV_LABEL_LONG_DOT);
   g_screen.version = make_label(screen_object, Size::kSmall, kMuted);
   lv_obj_align(g_screen.version, LV_ALIGN_BOTTOM_RIGHT, -20, -12);
+
+  // the camera picture: it covers the screen while it is open
+  g_screen.cam_panel = lv_obj_create(screen_object);
+  lv_obj_set_size(g_screen.cam_panel, 800, 480);
+  lv_obj_set_pos(g_screen.cam_panel, 0, 0);
+  lv_obj_set_style_bg_color(g_screen.cam_panel, lv_color_hex(0x000000), 0);
+  lv_obj_set_style_bg_opa(g_screen.cam_panel, LV_OPA_COVER, 0);
+  lv_obj_set_style_border_width(g_screen.cam_panel, 0, 0);
+  lv_obj_set_style_radius(g_screen.cam_panel, 0, 0);
+  lv_obj_clear_flag(g_screen.cam_panel, LV_OBJ_FLAG_SCROLLABLE);
+  g_screen.cam_image = lv_image_create(g_screen.cam_panel);
+  lv_obj_add_flag(g_screen.cam_image, LV_OBJ_FLAG_HIDDEN);
+  g_screen.cam_note = make_label(g_screen.cam_panel, Size::kNormal, kMuted);
+  lv_obj_align(g_screen.cam_note, LV_ALIGN_CENTER, 0, -20);
+  g_screen.cam_close = make_button(g_screen.cam_panel, 580, 404, 200, 60, kBorder, on_camera_close, &g_screen.cam_close_label, Size::kNormal);
+  lv_obj_set_style_text_color(g_screen.cam_close_label, lv_color_hex(kText), 0);
+  lv_obj_add_flag(g_screen.cam_panel, LV_OBJ_FLAG_HIDDEN);
 
   // the question before arming or disarming: it covers everything
   g_screen.confirm = lv_obj_create(screen_object);
@@ -480,6 +616,11 @@ void build(lv_obj_t* screen_object) {
   g_screen.confirm_yes = make_button(g_screen.confirm, 140, 300, 220, 90, kGreen, on_yes, &g_screen.confirm_yes_label, Size::kNormal);
   g_screen.confirm_no = make_button(g_screen.confirm, 440, 300, 220, 90, kBorder, on_no, &g_screen.confirm_no_label, Size::kNormal);
   lv_obj_set_style_text_color(g_screen.confirm_no_label, lv_color_hex(kText), 0);
+  g_screen.pf_text = make_label(g_screen.confirm, Size::kSmall, kText);   // the check before arming, under the question
+  lv_obj_set_width(g_screen.pf_text, 680);
+  lv_label_set_long_mode(g_screen.pf_text, LV_LABEL_LONG_WRAP);
+  lv_obj_align(g_screen.pf_text, LV_ALIGN_TOP_MID, 0, 70);
+  lv_obj_add_flag(g_screen.pf_text, LV_OBJ_FLAG_HIDDEN);
   g_screen.pin_prompt = make_label(g_screen.confirm, Size::kSmall, kMuted);
   lv_obj_align(g_screen.pin_prompt, LV_ALIGN_TOP_MID, 0, 52);
   g_screen.pin_dots = make_label(g_screen.confirm, Size::kLarge, kText);
@@ -503,6 +644,19 @@ void build(lv_obj_t* screen_object) {
     }
   }
   lv_obj_add_flag(g_screen.confirm, LV_OBJ_FLAG_HIDDEN);
+
+  // the countdown of the exit and entry delays: a bar over everything but the screens of a paused panel
+  g_screen.cd_bar = lv_obj_create(screen_object);
+  lv_obj_set_size(g_screen.cd_bar, 800, 50);
+  lv_obj_set_pos(g_screen.cd_bar, 0, 0);
+  lv_obj_set_style_bg_color(g_screen.cd_bar, lv_color_hex(kAmber), 0);
+  lv_obj_set_style_bg_opa(g_screen.cd_bar, LV_OPA_COVER, 0);
+  lv_obj_set_style_border_width(g_screen.cd_bar, 0, 0);
+  lv_obj_set_style_radius(g_screen.cd_bar, 0, 0);
+  lv_obj_clear_flag(g_screen.cd_bar, LV_OBJ_FLAG_SCROLLABLE);
+  g_screen.cd_label = make_label(g_screen.cd_bar, Size::kLarge, 0x06121c);
+  lv_obj_center(g_screen.cd_label);
+  lv_obj_add_flag(g_screen.cd_bar, LV_OBJ_FLAG_HIDDEN);
 
   // the screen of a paused panel or one in standby: it covers everything, including the question above
   g_screen.cover = lv_obj_create(screen_object);

@@ -42,6 +42,13 @@ struct Energy {
   int soc_percent = 0;
 };
 
+// The countdown the server says is running: the time left to leave after arming (exit) or to disarm after a door opened (entry). Absent when none runs, and from a server that does not send it.
+struct Delay {
+  bool present = false;
+  bool entry = false;
+  int remaining_s = 0;
+};
+
 struct Summary {
   Mode mode = Mode::kUnknown;
   long long revision = 0;
@@ -50,6 +57,7 @@ struct Summary {
   int alarms_active = 0, alarms_unacknowledged = 0;
   std::vector<AlarmLine> alarms;   // at most six, the ones nobody has seen first
   Energy energy;                   // what the solar equipment says (a server older than this block sends none)
+  Delay delay;                     // the exit or entry countdown that runs, if any
 };
 
 inline Severity severity_from(std::string_view text) {
@@ -119,6 +127,15 @@ inline bool summary_from_value(const json::Value& document, Summary& out) {
       summary.energy.has_battery = true;
       summary.energy.soc_percent = static_cast<int>(energy->integer_or("soc_percent", 0, 0, 100));
       summary.energy.battery_w = static_cast<int>(energy->integer_or("battery_w", 0, -10000000, 10000000));
+    }
+  }
+  if (const json::Value* delay = document.get("delay"); delay != nullptr && delay->is_object()) {
+    const std::string phase = delay->string_or("phase", "");
+    const int left = static_cast<int>(delay->integer_or("remaining_s", 0, 0, 3600));
+    if ((phase == "exit" || phase == "entry") && left > 0) {
+      summary.delay.present = true;
+      summary.delay.entry = phase == "entry";
+      summary.delay.remaining_s = left;
     }
   }
   out = std::move(summary);
