@@ -4,6 +4,12 @@
 
 struct host_semaphore;
 typedef host_semaphore* SemaphoreHandle_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
 SemaphoreHandle_t xSemaphoreCreateBinary();
 int xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t ticks);
 int xSemaphoreGive(SemaphoreHandle_t semaphore);
+#ifdef __cplusplus
+}
+#endif
