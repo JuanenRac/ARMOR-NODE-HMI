@@ -9,6 +9,7 @@
 
 #include "core/alarm_clip.hpp"
 #include "core/hmi_config.hpp"
+#include "core/preflight_view.hpp"
 #include "core/server_view.hpp"
 #include "core/view_model.hpp"
 
@@ -36,6 +37,21 @@ bool view_changed(std::uint32_t& seen, hmi::ViewModel& out);
 // Disarming carries the PIN typed at the screen (the server checks it); arming never does.
 void request_mode(hmi::Mode mode, const std::string& pin = "");
 void request_acknowledge_all(const std::string& pin = std::string());
+
+// The check before arming (core/preflight_view.hpp): the screen asks for it when the person presses Arm (only if the setting controls.preflight is on) and reads the answer at its next turn.
+// `asking` is true from the request until the answer comes, and for at most eight seconds (a server that does not answer, or that refuses this account, shows nothing).
+struct PreflightState {
+  bool asking = false;
+  hmi::Preflight result;      // valid == false when nothing came or what came was refused
+};
+void request_preflight();
+PreflightState preflight_state();
+
+// The camera picture on demand (core/still_view.hpp): while the picture is open the link's task asks the server for a JPEG every `refresh_s` seconds and keeps the latest. Closing it frees it.
+// camera_take is true, with the picture, when something changed since the generation in `seen` (a picture, or the reason there is none: then `jpeg` is empty and `error` is a short code).
+void camera_open(const std::string& camera_id, int refresh_s);
+void camera_close();
+bool camera_take(std::uint32_t& seen, std::string& jpeg, std::uint32_t& width, std::uint32_t& height, std::string& error);
 
 // Called, from the link's task, with the alarms that are new and nobody has acknowledged (never for the ones that existed when the panel started).
 void on_new_alarms(std::function<void(const std::vector<hmi::AlarmLine>&)> callback);

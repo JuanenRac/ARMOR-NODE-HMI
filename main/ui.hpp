@@ -14,6 +14,11 @@ struct Context {
   std::string ack = "pin";   // what a touch on "Acknowledge all" asks first: "pin", "confirm" or "off" (core/ack_flow.hpp)
   std::string ip;            // the panel's own address ("" until it has one)
   std::string version;
+  bool preflight = false;         // controls.preflight: ask the server for the check before arming and show it in the confirmation
+  bool countdown_beeps = false;   // controls.countdown_beeps: beep while the exit or entry countdown runs
+  bool camera = false;            // camera.enabled with an id: the screen offers the camera picture
+  std::string camera_id;
+  int camera_refresh_s = 5;
   bool setup = false;        // no user yet: the screen only says how to set the panel up
   std::string setup_ssid;
 };

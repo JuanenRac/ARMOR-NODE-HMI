@@ -145,6 +145,18 @@ struct Voice {
 // (a yes or a no) or "off" (one touch, as before). Acknowledging a critical alarm stops the server from going on warning people, so the safe way is the default.
 struct Controls {
   hmi::AckMode ack = hmi::AckMode::kPin;
+  // Ask the server for the check before arming and show what it found in the confirmation (core/preflight_view.hpp). Off by default; the server's option panel.preflight must be on too.
+  bool preflight = false;
+  // Beep while the exit or entry countdown runs (core/countdown.hpp). Off by default.
+  bool countdown_beeps = false;
+};
+
+// The camera picture on demand (core/still_view.hpp): off by default; shows the camera `id` while the person has it open, a new picture every `refresh_s` seconds (2 to 60).
+// The server's option panel.camera_view must be on too.
+struct Camera {
+  bool enabled = false;
+  std::string id;
+  int refresh_s = 5;
 };
 
 // What time the node believes it is: a time server on the Internet (or the browser's clock when that is off) and the zone the local time is
@@ -171,6 +183,7 @@ struct Settings {
   Audio audio;
   Voice voice;
   Controls controls;
+  Camera camera;
   WebMode web = WebMode::kBoth;
   std::string admin_sources;   // the networks that may use the panel; empty = the private ranges of a house (see admin_sources.hpp)
   BlePasskeyMode ble_passkey = BlePasskeyMode::kDerived;   // "derived" (default) or "random_display"
@@ -451,6 +464,17 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
   }
   if (const json::Value* controls = document.get("controls"); controls != nullptr && controls->is_object()) {
     if (const json::Value* ack = controls->get("ack"); ack != nullptr && (!ack->is_string() || !hmi::parse_ack_mode(ack->text, s.controls.ack))) bad(problems, "controls.ack", "invalid");
+    read_bool(*controls, "preflight", s.controls.preflight, "controls.preflight", problems);
+    read_bool(*controls, "countdown_beeps", s.controls.countdown_beeps, "controls.countdown_beeps", problems);
+  }
+  if (const json::Value* camera = document.get("camera"); camera != nullptr && camera->is_object()) {
+    read_bool(*camera, "enabled", s.camera.enabled, "camera.enabled", problems);
+    read_text(*camera, "id", s.camera.id, 48, "camera.id", problems);
+    for (char c : s.camera.id) {   // the id goes into the address of the picture: letters, digits and - _ . only
+      const bool plain = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.';
+      if (!plain) { bad(problems, "camera.id", "invalid"); break; }
+    }
+    read_int(*camera, "refresh_s", s.camera.refresh_s, 2, 60, "camera.refresh_s", problems);
   }
   if (const json::Value* voice = document.get("voice"); voice != nullptr && voice->is_object()) {
     read_bool(*voice, "enabled", s.voice.enabled, "voice.enabled", problems);
@@ -711,7 +735,8 @@ inline std::string to_json(const Settings& s, bool secrets) {
   w.key("tone_by_source").begin_object();
   for (int kind = 0; kind < hmi::kSourceKinds; ++kind) w.field(hmi::source_name(kind), hmi::tone_name(s.audio.tone_by_source[static_cast<std::size_t>(kind)]));
   w.end_object().end_object();
-  w.key("controls").begin_object().field("ack", hmi::ack_mode_text(s.controls.ack)).end_object();
+  w.key("controls").begin_object().field("ack", hmi::ack_mode_text(s.controls.ack)).field("preflight", s.controls.preflight).field("countdown_beeps", s.controls.countdown_beeps).end_object();
+  w.key("camera").begin_object().field("enabled", s.camera.enabled).field("id", s.camera.id).field("refresh_s", s.camera.refresh_s).end_object();
   w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("wake_word", s.voice.wake_word).field("wake_local", s.voice.wake_local).field("binary_turn", s.voice.binary_turn)
       .field("end_of_speech", s.voice.end_of_speech.enabled).field("silence_ms", s.voice.end_of_speech.silence_ms).field("min_speech_ms", s.voice.end_of_speech.min_speech_ms).field("level_percent", s.voice.end_of_speech.level_percent)
       .field("min_level", s.voice.end_of_speech.min_level).field("lead_ms", s.voice.end_of_speech.lead_ms).field("calibrate_ms", s.voice.end_of_speech.calibrate_ms);

@@ -22,7 +22,7 @@ struct Row {
 };
 
 // clang-format off
-constexpr std::array<Row, 100> kRows{{
+constexpr std::array<Row, 119> kRows{{
     {"armed", {"ARMED", "ARMADO", "SCHARF", "ARMÉ", "ATTIVO", "警戒中", "已布防", "ARMADO"}},
     {"disarmed", {"DISARMED", "DESARMADO", "UNSCHARF", "DÉSARMÉ", "DISATTIVO", "解除中", "已撤防", "DESARMADO"}},
     {"arm", {"Arm", "Armar", "Scharf schalten", "Armer", "Attiva", "警戒する", "布防", "Armar"}},
@@ -123,6 +123,25 @@ constexpr std::array<Row, 100> kRows{{
     {"node_standby_hint", {"This panel is in standby: it stays connected and shows nothing until it is resumed from Studio.", "Este panel está en espera: sigue conectado y no muestra nada hasta que se reanude desde Studio.", "Dieses Panel ist im Standby: Es bleibt verbunden und zeigt nichts an, bis es in Studio fortgesetzt wird.", "Ce panneau est en veille : il reste connecté et n'affiche rien jusqu'à sa reprise depuis Studio.", "Questo pannello è in standby: resta connesso e non mostra nulla finché non viene ripreso da Studio.", "このパネルは待機中です。接続したまま、Studio から再開するまで何も表示しません。", "此面板处于待机状态：保持连接，在 Studio 中恢复前不显示任何内容。", "Este painel está em espera: continua ligado e não mostra nada até ser retomado a partir do Studio."}},
     {"node_identify", {"This panel is being identified from Studio", "Se está identificando este panel desde Studio", "Dieses Panel wird von Studio aus identifiziert", "Ce panneau est identifié depuis Studio", "Questo pannello viene identificato da Studio", "Studio からこのパネルを識別しています", "正在从 Studio 识别此面板", "Este painel está a ser identificado a partir do Studio"}},
     {"alarm_unknown", {"Alarm", "Alarma", "Alarm", "Alarme", "Allarme", "アラーム", "警报", "Alarme"}},
+    {"pf_title", {"Before arming", "Antes de armar", "Vor dem Scharfschalten", "Avant d'armer", "Prima di attivare", "警戒する前に", "布防之前", "Antes de armar"}},
+    {"pf_checking", {"Checking the house...", "Comprobando la casa...", "Das Haus wird geprüft ...", "Vérification de la maison ...", "Controllo della casa...", "家を確認中...", "正在检查住宅...", "A verificar a casa..."}},
+    {"pf_clear", {"Everything is ready", "Todo está listo", "Alles ist bereit", "Tout est prêt", "Tutto è pronto", "準備はできています", "一切就绪", "Tudo está pronto"}},
+    {"pf_node_offline", {"Node not answering", "Nodo sin respuesta", "Knoten antwortet nicht", "Nœud sans réponse", "Nodo non risponde", "ノードが応答しません", "节点无响应", "Nó sem resposta"}},
+    {"pf_panel_silent", {"Alarm panel silent", "Panel de alarma en silencio", "Alarmpanel schweigt", "Panneau d'alarme muet", "Pannello d'allarme muto", "警報パネルが無応答", "报警面板无信号", "Painel de alarme em silêncio"}},
+    {"pf_zone_open", {"Zone open", "Zona abierta", "Zone offen", "Zone ouverte", "Zona aperta", "ゾーンが開いています", "防区敞开", "Zona aberta"}},
+    {"pf_camera_down", {"Camera not answering", "Cámara sin respuesta", "Kamera antwortet nicht", "Caméra sans réponse", "Telecamera non risponde", "カメラが応答しません", "摄像头无响应", "Câmara sem resposta"}},
+    {"pf_opening_open", {"Door or window open", "Puerta o ventana abierta", "Tür oder Fenster offen", "Porte ou fenêtre ouverte", "Porta o finestra aperta", "ドアか窓が開いています", "门或窗未关", "Porta ou janela aberta"}},
+    {"pf_device_offline", {"Device not answering", "Dispositivo sin respuesta", "Gerät antwortet nicht", "Appareil sans réponse", "Dispositivo non risponde", "機器が応答しません", "设备无响应", "Dispositivo sem resposta"}},
+    {"pf_alarm_unseen", {"Alarm not seen yet", "Alarma sin ver", "Alarm noch nicht gesehen", "Alarme non vue", "Allarme non ancora visto", "未確認の警報", "警报尚未查看", "Alarme por ver"}},
+    {"pf_other", {"Something to check", "Algo que revisar", "Bitte prüfen", "À vérifier", "Da controllare", "確認が必要です", "需要检查", "Algo a verificar"}},
+    {"pf_more", {"and more...", "y más...", "und mehr ...", "et d'autres ...", "e altro...", "ほかにもあります...", "还有更多...", "e mais..."}},
+    {"pf_arm_anyway", {"Arm anyway", "Armar igualmente", "Trotzdem scharf schalten", "Armer quand même", "Attiva comunque", "このまま警戒する", "仍然布防", "Armar mesmo assim"}},
+    {"cd_exit", {"Leave the house", "Sal de la casa", "Haus verlassen", "Quittez la maison", "Esci di casa", "家から出てください", "请离开住宅", "Saia de casa"}},
+    {"cd_entry", {"Disarm now", "Desarma ahora", "Jetzt unscharf schalten", "Désarmez maintenant", "Disattiva ora", "今すぐ解除してください", "请立即撤防", "Desarme agora"}},
+    {"cam_open", {"Camera", "Cámara", "Kamera", "Caméra", "Telecamera", "カメラ", "摄像头", "Câmara"}},
+    {"cam_close", {"Close", "Cerrar", "Schließen", "Fermer", "Chiudi", "閉じる", "关闭", "Fechar"}},
+    {"cam_none", {"No picture", "Sin imagen", "Kein Bild", "Pas d'image", "Nessuna immagine", "画像がありません", "无画面", "Sem imagem"}},
+    {"cam_wait", {"Loading the picture...", "Cargando la imagen...", "Bild wird geladen ...", "Chargement de l'image ...", "Caricamento dell'immagine...", "画像を読み込み中...", "正在加载画面...", "A carregar a imagem..."}},
 }};
 // clang-format on
 

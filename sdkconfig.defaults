@@ -100,3 +100,5 @@ CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH=y
 CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF=y
 CONFIG_ESP_COREDUMP_CHECKSUM_CRC32=y
 CONFIG_ESP_COREDUMP_MAX_TASKS_NUM=32
+# The picture of a camera on demand (camera.enabled): the small baseline-JPEG decoder of LVGL reads it from memory.
+CONFIG_LV_USE_TJPGD=y

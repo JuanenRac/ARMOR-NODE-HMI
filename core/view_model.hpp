@@ -36,6 +36,12 @@ struct EnergyView {
   }
 };
 
+struct DelayView {
+  bool present = false, entry = false;
+  int remaining_s = 0;
+  bool operator==(const DelayView& other) const { return present == other.present && entry == other.entry && remaining_s == other.remaining_s; }
+};
+
 struct ViewModel {
   Link link = Link::kNotConfigured;
   bool have_summary = false;
@@ -44,6 +50,7 @@ struct ViewModel {
   Tone tone = Tone::kCalm;           // the colour of the screen: the worst alarm nobody has seen
   int nodes_online = 0, nodes_total = 0, alarms_active = 0, alarms_unacknowledged = 0;
   EnergyView energy;
+  DelayView delay;                   // the exit or entry countdown the server says runs (the screen counts the seconds on its own clock)
   std::size_t alarm_count = 0;
   std::array<AlarmRowView, kViewAlarmRows> alarms{};
   bool action_pending = false;
@@ -51,7 +58,7 @@ struct ViewModel {
 
   bool operator==(const ViewModel& other) const {
     if (link != other.link || have_summary != other.have_summary || current != other.current || mode != other.mode || tone != other.tone || nodes_online != other.nodes_online ||
-        nodes_total != other.nodes_total || alarms_active != other.alarms_active || alarms_unacknowledged != other.alarms_unacknowledged || !(energy == other.energy) ||
+        nodes_total != other.nodes_total || alarms_active != other.alarms_active || alarms_unacknowledged != other.alarms_unacknowledged || !(energy == other.energy) || !(delay == other.delay) ||
         alarm_count != other.alarm_count || action_pending != other.action_pending || std::strncmp(action_error, other.action_error, kViewErrorBytes) != 0) return false;
     for (std::size_t i = 0; i < alarm_count; ++i) if (!(alarms[i] == other.alarms[i])) return false;
     return true;
@@ -92,6 +99,9 @@ inline ViewModel make_view(const Summary& summary, Link link, bool have_summary,
   view.energy.load_w = summary.energy.load_w;
   view.energy.battery_w = summary.energy.battery_w;
   view.energy.soc_percent = summary.energy.soc_percent;
+  view.delay.present = summary.delay.present;
+  view.delay.entry = summary.delay.entry;
+  view.delay.remaining_s = summary.delay.remaining_s;
   for (const AlarmLine& line : summary.alarms) {
     if (view.alarm_count >= kViewAlarmRows) break;
     AlarmRowView& row = view.alarms[view.alarm_count++];
