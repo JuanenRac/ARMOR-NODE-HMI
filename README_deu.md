@@ -236,10 +236,11 @@ ARMOR-NODE-HMI/
 ├── core/                                die Logik ohne ESP-IDF, am Rechner getestet
 ├── panel/                               das in die Firmware eingebettete Web-Panel
 ├── tests/                               Host-Tests und Python-Prüfungen
+├── simulator/                           der Bildschirm auf einem Computer gezeichnet, in acht Sprachen
 ├── docs/                                9 Anleitungen: Entwurf, Sprache, Schriften, Hardware
 ├── tools/                               Werkzeuge für Build, Packen und Prüfung
 ├── .github/                             CI-Workflow sowie Vorlagen für Issues und Pull Requests
-├── images/                              Banner, Symbol und die zwei Bilder dieses READMEs
+├── images/                              Banner, Symbol, README-Bilder, Screenshots
 ├── build.sh build.bat                   Build über den gemeinsamen Projekt-Workflow
 ├── test.sh test.bat                     Tests über den gemeinsamen Workflow ausführen
 ├── run.sh run.bat                       Start über den gemeinsamen Projekt-Workflow

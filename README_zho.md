@@ -236,10 +236,11 @@ ARMOR-NODE-HMI/
 ├── core/                                不依赖 ESP-IDF 的逻辑，在计算机上测试
 ├── panel/                               嵌入固件的网页面板
 ├── tests/                               主机测试和 Python 检查
+├── simulator/                           在计算机上绘制的屏幕（八种语言）
 ├── docs/                                9 份指南：设计、语音、字体、硬件
 ├── tools/                               构建、打包和检查工具
 ├── .github/                             CI 工作流以及 Issue 和 Pull Request 模板
-├── images/                              横幅、图标和本 README 的两幅图
+├── images/                              横幅、图标、README 图片、屏幕截图
 ├── build.sh build.bat                   通过共享的项目工作流构建
 ├── test.sh test.bat                     通过共享工作流运行测试
 ├── run.sh run.bat                       通过共享的项目工作流启动

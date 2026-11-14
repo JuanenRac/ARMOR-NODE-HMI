@@ -236,10 +236,11 @@ ARMOR-NODE-HMI/
 ├── core/                                la logique sans ESP-IDF, testée sur ordinateur
 ├── panel/                               le panneau web intégré au firmware
 ├── tests/                               tests sur hôte et contrôles Python
+├── simulator/                           l'écran dessiné sur un ordinateur, en huit langues
 ├── docs/                                9 guides : conception, voix, polices, matériel
 ├── tools/                               outils de build, d'empaquetage et de contrôle
 ├── .github/                             workflow CI et modèles d'issues et de pull requests
-├── images/                              bannière, icône et les deux images de ce README
+├── images/                              bannière, icône, images du README, captures
 ├── build.sh build.bat                   build par le flux de projet partagé
 ├── test.sh test.bat                     lancer les tests par le flux partagé
 ├── run.sh run.bat                       démarrer par le flux de projet partagé
