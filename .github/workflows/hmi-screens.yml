@@ -11,18 +11,12 @@ name: Screen pictures (simulator)
 
 on:
   workflow_dispatch:
-    inputs:
-      ref:
-        description: "Branch, tag or commit of this repository"
-        type: string
-        required: true
-        default: main
 
 permissions:
   contents: read
 
 concurrency:
-  group: hmi-screens-${{ inputs.ref }}
+  group: hmi-screens-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -34,7 +28,8 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          # the commit this run was started from (start the run from the branch, tag or commit to build); never a ref typed into an input
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Build the simulator
