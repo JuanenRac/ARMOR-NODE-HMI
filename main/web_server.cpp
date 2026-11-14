@@ -34,6 +34,7 @@
 #include "core/json.hpp"
 #include "core/web_policy.hpp"
 #include "entropy.hpp"
+#include "event_store.hpp"
 #include "github_update.hpp"
 #include "log_buffer.hpp"
 #include "mqtt_link.hpp"
@@ -638,6 +639,19 @@ esp_err_t get_coredump_info(httpd_req_t* r) {
   return send_json(r, 200, node_diag::core_info_json());
 }
 
+// The panel's own record of events (setting storage.enabled, off by default), as text. Only an administrator.
+esp_err_t get_events_log(httpd_req_t* r) {
+  Who who;
+  if (!require(r, who, true, false)) return ESP_OK;
+  if (!event_store::active()) return send_error(r, 404, "events_log_off");
+  const std::string text = event_store::text(64 * 1024);
+  security_headers(r);
+  httpd_resp_set_status(r, status_line(200));
+  httpd_resp_set_type(r, "text/plain; charset=utf-8");
+  httpd_resp_set_hdr(r, "Content-Disposition", "attachment; filename=\"panel_events.log\"");
+  return httpd_resp_send(r, text.c_str(), static_cast<ssize_t>(text.size()));
+}
+
 esp_err_t get_coredump(httpd_req_t* r) {
   Who who;
   if (!require(r, who, true, false)) return ESP_OK;
@@ -863,6 +877,7 @@ esp_err_t api_handler(httpd_req_t* r) {
     if (route == "ble-pin") return get_ble_pin(r);
     if (route == "log") return get_log(r);
     if (route == "coredump") return get_coredump(r);
+    if (route == "events-log") return get_events_log(r);
     if (route == "coredump/info") return get_coredump_info(r);
     if (route == "ota/check") return get_ota_check(r);
     if (route == "ota/progress") return get_ota_progress(r);

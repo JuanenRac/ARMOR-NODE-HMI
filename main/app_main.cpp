@@ -39,6 +39,8 @@
 #include "core/screen_text.hpp"
 #include "core/server_view.hpp"
 #include "display.hpp"
+#include "event_store.hpp"
+#include "power_watch.hpp"
 #include "log_buffer.hpp"
 #include "psram_mem.hpp"
 #include "rtc.hpp"
@@ -211,6 +213,9 @@ extern "C" void app_main() {
   const bool sound_ok = armor::audio::start();
   if (!sound_ok) ESP_LOGW(kTag, "no sound: the voice assistant and the alarm tone are off");
   armor::audio::set_volume(settings.audio.volume);
+  // The record of events and the battery of the panel: both off by default. The record comes first so that the first thing the battery says is written down; the battery needs the I2C bus that the screen started.
+  armor::event_store::start(settings);
+  armor::power_watch::start(settings);
   armor::audio::set_alarm_options(settings.audio.critical_min_volume, armor::hmi::RepeatPolicy{settings.audio.siren_repeat_s, settings.audio.siren_max_repeats});
 
   const armor::netplan::Plan plan = armor::netplan::plan_network(settings, setup, armor::store::setup_code(), armor::store::mac_tail(), armor::store::mac_sum());

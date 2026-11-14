@@ -41,6 +41,8 @@ const config = {
   voice: { enabled: false, url: "", wake_name: "armor", listen_s: 8, wake_word: false, wake_local: false, binary_turn: true, token_set: false, end_of_speech: false, silence_ms: 900, min_speech_ms: 250, level_percent: 300, min_level: 200, lead_ms: 4000, calibrate_ms: 300 },
   controls: { ack: "pin", preflight: false, countdown_beeps: false },
   camera: { enabled: false, id: "", refresh_s: 5 },
+  power: { enabled: false, low_percent: 20, lost_confirm_s: 10 },
+  storage: { enabled: false, max_kb: 256, keep: 4 },
   time: { ntp_enabled: true, rtc_enabled: true, ntp: "pool.ntp.org", zone: "CET-1CEST,M3.5.0,M10.5.0/3" },
   system: { auto_restart_hours: 0, login_limit_per_minute: 30 },
   security: { seal_secrets: false },

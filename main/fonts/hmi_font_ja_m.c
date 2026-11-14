@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 24 px
  * Bpp: 4
- * Opts: --font inter-latin-500-normal.woff -r 0x20-0x7F,0x2014,0x2018-0x201F,0x2026 --font noto-sans-jp-100-500-normal.woff --symbols 依給統 --font noto-sans-jp-101-500-normal.woff --symbols 圧故破陽 --font noto-sans-jp-102-500-normal.woff --symbols 充池 --font noto-sans-jp-103-500-normal.woff --symbols 側 --font noto-sans-jp-104-500-normal.woff --symbols 失振答頼 --font noto-sans-jp-105-500-normal.woff --symbols 低囲押温誰識 --font noto-sans-jp-106-500-normal.woff --symbols 視 --font noto-sans-jp-107-500-normal.woff --symbols 去改替準 --font noto-sans-jp-108-500-normal.woff --symbols 域声太宅接消異 --font noto-sans-jp-109-500-normal.woff --symbols 区残系聞量 --font noto-sans-jp-110-500-normal.woff --symbols 備台器待放断止閉 --font noto-sans-jp-111-500-normal.woff --symbols 光再強未線除 --font noto-sans-jp-112-500-normal.woff --symbols 住何供参古常素考計違音 --font noto-sans-jp-113-500-normal.woff --symbols 切口商少必確続解認読 --font noto-sans-jp-114-500-normal.woff --symbols 不像化告応込 --font noto-sans-jp-115-500-normal.woff --symbols 別力加回多実家機水的示設話電 --font noto-sans-jp-116-500-normal.woff --symbols 下今作取外検知自表要通部開高：？ --font noto-sans-jp-117-500-normal.woff --symbols 一上中入出前動報定情新時気無用画行（） --font noto-sans-jp-119-500-normal.woff --symbols 、。あいえおかがきぎくぐこさざしじすせただちっつてでなにのはべほまみもよらりるれわをんアィイォオカガクグケコサザシスセソゾタダッテデトドニネノバパフプボポマムメユョラリルレロワンー --font noto-sans-jp-61-500-normal.woff --symbols 衡 --font noto-sans-jp-77-500-normal.woff --symbols 戒 --font noto-sans-jp-79-500-normal.woff --symbols 脅 --font noto-sans-jp-84-500-normal.woff --symbols 拒 --font noto-sans-jp-85-500-normal.woff --symbols 劣 --font noto-sans-jp-88-500-normal.woff --symbols 漏炭網 --font noto-sans-jp-90-500-normal.woff --symbols 侵煙酸鳴 --font noto-sans-jp-93-500-normal.woff --symbols 否範 --font noto-sans-jp-94-500-normal.woff --symbols 誤 --font noto-sans-jp-95-500-normal.woff --symbols 迫 --font noto-sans-jp-96-500-normal.woff --symbols 操警 --font noto-sans-jp-97-500-normal.woff --symbols 損触 --font noto-sans-jp-98-500-normal.woff --symbols 均監盤窓障 --font noto-sans-jp-99-500-normal.woff --symbols 停源遅 --size 24 --bpp 4 --format lvgl --lv-include lvgl.h --no-compress -o hmi_font_ja_m.c --lv-font-name hmi_font_ja_m
+ * Opts: --font inter-latin-500-normal.woff -r 0x20-0x7F,0x2014,0x2018-0x201F,0x2026 --font noto-sans-jp-100-500-normal.woff --symbols 依給統 --font noto-sans-jp-101-500-normal.woff --symbols 圧故破陽 --font noto-sans-jp-102-500-normal.woff --symbols 充池 --font noto-sans-jp-103-500-normal.woff --symbols 側 --font noto-sans-jp-104-500-normal.woff --symbols 失振答頼 --font noto-sans-jp-105-500-normal.woff --symbols 低囲押温誰識 --font noto-sans-jp-106-500-normal.woff --symbols 視 --font noto-sans-jp-107-500-normal.woff --symbols 去改替準 --font noto-sans-jp-108-500-normal.woff --symbols 域声太宅接消異 --font noto-sans-jp-109-500-normal.woff --symbols 区残系聞量 --font noto-sans-jp-110-500-normal.woff --symbols 備台器待放断止閉 --font noto-sans-jp-111-500-normal.woff --symbols 光再強未線除 --font noto-sans-jp-112-500-normal.woff --symbols 住何供参古常素考計違音 --font noto-sans-jp-113-500-normal.woff --symbols 切口商少必確続解認読 --font noto-sans-jp-114-500-normal.woff --symbols 不像化告応込 --font noto-sans-jp-115-500-normal.woff --symbols 別力加回多実家機水的示設話電 --font noto-sans-jp-116-500-normal.woff --symbols 下今作取外検知自表要通部開高：？ --font noto-sans-jp-117-500-normal.woff --symbols 一上中入出前動報定情新時気無用画行（） --font noto-sans-jp-119-500-normal.woff --symbols 、。あいえおかがきぎくぐこさざしじすせただちっつてでなにのはべほまみもよらりるれわをんアィイォオカガクグケコサザシスセソゾタダッテデトドニネノバパフプボポマムメユョラリルレロワンー --font noto-sans-jp-61-500-normal.woff --symbols 衡 --font noto-sans-jp-77-500-normal.woff --symbols 戒 --font noto-sans-jp-79-500-normal.woff --symbols 脅 --font noto-sans-jp-84-500-normal.woff --symbols 拒 --font noto-sans-jp-85-500-normal.woff --symbols 劣 --font noto-sans-jp-88-500-normal.woff --symbols 漏炭網 --font noto-sans-jp-90-500-normal.woff --symbols 侵煙酸鳴 --font noto-sans-jp-93-500-normal.woff --symbols 否範 --font noto-sans-jp-94-500-normal.woff --symbols 誤駆 --font noto-sans-jp-95-500-normal.woff --symbols 迫 --font noto-sans-jp-96-500-normal.woff --symbols 操警 --font noto-sans-jp-97-500-normal.woff --symbols 損触 --font noto-sans-jp-98-500-normal.woff --symbols 均監盤窓障 --font noto-sans-jp-99-500-normal.woff --symbols 停源遅 --size 24 --bpp 4 --format lvgl --lv-include lvgl.h --no-compress -o hmi_font_ja_m.c --lv-font-name hmi_font_ja_m
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -9235,6 +9235,41 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0x0, 0x0, 0x1c, 0x90, 0x0, 0x0, 0x0, 0x0,
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 
+    /* U+99C6 "駆" */
+    0x0, 0x22, 0x22, 0x22, 0x22, 0x20, 0x11, 0x11,
+    0x11, 0x11, 0x11, 0x10, 0x0, 0xff, 0xff, 0xff,
+    0xff, 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xe0,
+    0x0, 0xff, 0xbc, 0xff, 0xbb, 0xb0, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xd0, 0x0, 0xfe, 0x1, 0xfc,
+    0x0, 0x0, 0xff, 0x20, 0x0, 0x1, 0x20, 0x0,
+    0x0, 0xff, 0xbb, 0xff, 0xbb, 0x60, 0xff, 0x20,
+    0x0, 0x7, 0xfb, 0x0, 0x0, 0xff, 0xff, 0xff,
+    0xff, 0x90, 0xff, 0x25, 0x0, 0xb, 0xf7, 0x0,
+    0x0, 0xfe, 0x1, 0xfc, 0x0, 0x0, 0xff, 0xaf,
+    0xb0, 0xf, 0xf4, 0x0, 0x0, 0xfe, 0x1, 0xfc,
+    0x0, 0x0, 0xff, 0x5f, 0xf9, 0x3f, 0xf0, 0x0,
+    0x0, 0xff, 0xff, 0xff, 0xff, 0x90, 0xff, 0x24,
+    0xff, 0xdf, 0xb0, 0x0, 0x0, 0xff, 0xbb, 0xff,
+    0xbb, 0x60, 0xff, 0x20, 0x6f, 0xff, 0x60, 0x0,
+    0x0, 0xfe, 0x1, 0xfc, 0x0, 0x0, 0xff, 0x20,
+    0xa, 0xff, 0x20, 0x0, 0x0, 0xfe, 0x23, 0xfd,
+    0x22, 0x20, 0xff, 0x20, 0x9, 0xff, 0xb0, 0x0,
+    0x0, 0xff, 0xff, 0xff, 0xff, 0xf3, 0xff, 0x20,
+    0x1f, 0xff, 0xf6, 0x0, 0x0, 0xaa, 0xaa, 0xaa,
+    0xae, 0xf1, 0xff, 0x20, 0x9f, 0xd7, 0xff, 0x10,
+    0x0, 0x0, 0x0, 0x6, 0x1d, 0xf0, 0xff, 0x23,
+    0xff, 0x40, 0xcf, 0xb0, 0x3, 0xf6, 0x97, 0x99,
+    0x8e, 0xf0, 0xff, 0x3e, 0xfa, 0x0, 0x3f, 0xb0,
+    0x4, 0xf5, 0xd3, 0xe2, 0xef, 0xe0, 0xff, 0xdf,
+    0xe1, 0x0, 0x4, 0x0, 0x7, 0xe2, 0xf0, 0xf2,
+    0x9f, 0xd0, 0xff, 0x3c, 0x30, 0x0, 0x0, 0x0,
+    0xb, 0xb1, 0xf0, 0xb3, 0x2f, 0xc0, 0xff, 0x42,
+    0x22, 0x22, 0x22, 0x20, 0x1f, 0x71, 0x70, 0x0,
+    0x6f, 0x90, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf2,
+    0x8, 0x10, 0x0, 0x9c, 0xff, 0x50, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xf2, 0x0, 0x0, 0x0, 0x7f,
+    0xe9, 0x0, 0xff, 0x20, 0x0, 0x0, 0x0, 0x0,
+
     /* U+9AD8 "高" */
     0x0, 0x0, 0x0, 0x0, 0x1, 0x33, 0x0, 0x0,
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x8,
@@ -9708,12 +9743,13 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
     {.bitmap_index = 66468, .adv_w = 384, .box_w = 23, .box_h = 21, .ofs_x = 1, .ofs_y = -2},
     {.bitmap_index = 66710, .adv_w = 384, .box_w = 22, .box_h = 22, .ofs_x = 1, .ofs_y = -2},
     {.bitmap_index = 66952, .adv_w = 384, .box_w = 24, .box_h = 24, .ofs_x = 0, .ofs_y = -3},
-    {.bitmap_index = 67240, .adv_w = 384, .box_w = 22, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
-    {.bitmap_index = 67504, .adv_w = 384, .box_w = 23, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
-    {.bitmap_index = 67780, .adv_w = 384, .box_w = 7, .box_h = 24, .ofs_x = 16, .ofs_y = -3},
-    {.bitmap_index = 67864, .adv_w = 384, .box_w = 7, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
-    {.bitmap_index = 67948, .adv_w = 384, .box_w = 6, .box_h = 16, .ofs_x = 9, .ofs_y = 1},
-    {.bitmap_index = 67996, .adv_w = 384, .box_w = 12, .box_h = 20, .ofs_x = 6, .ofs_y = -1}
+    {.bitmap_index = 67240, .adv_w = 384, .box_w = 24, .box_h = 22, .ofs_x = 0, .ofs_y = -2},
+    {.bitmap_index = 67504, .adv_w = 384, .box_w = 22, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
+    {.bitmap_index = 67768, .adv_w = 384, .box_w = 23, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
+    {.bitmap_index = 68044, .adv_w = 384, .box_w = 7, .box_h = 24, .ofs_x = 16, .ofs_y = -3},
+    {.bitmap_index = 68128, .adv_w = 384, .box_w = 7, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
+    {.bitmap_index = 68212, .adv_w = 384, .box_w = 6, .box_h = 16, .ofs_x = 9, .ofs_y = 1},
+    {.bitmap_index = 68260, .adv_w = 384, .box_w = 12, .box_h = 20, .ofs_x = 6, .ofs_y = -1}
 };
 
 /*---------------------
@@ -9751,8 +9787,8 @@ static const uint16_t unicode_list_1[] = {
     0x684d, 0x6854, 0x696d, 0x6982, 0x69cf, 0x69d2, 0x69f4, 0x6a19,
     0x6a5d, 0x6a79, 0x6a90, 0x6a99, 0x6a9c, 0x6b44, 0x6b52, 0x6fa8,
     0x6fd7, 0x7006, 0x7031, 0x7041, 0x70d4, 0x7164, 0x71bb, 0x7575,
-    0x7577, 0x7650, 0x7669, 0x7688, 0x76e7, 0x77df, 0x7828, 0x7ac4,
-    0x7ce0, 0xdef4, 0xdef5, 0xdf06, 0xdf0b
+    0x7577, 0x7650, 0x7669, 0x7688, 0x76e7, 0x77df, 0x7828, 0x79b2,
+    0x7ac4, 0x7ce0, 0xdef4, 0xdef5, 0xdf06, 0xdf0b
 };
 
 /*Collect the unicode lists and glyph_id offsets*/
@@ -9764,7 +9800,7 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
     },
     {
         .range_start = 8212, .range_length = 57100, .glyph_id_start = 96,
-        .unicode_list = unicode_list_1, .glyph_id_ofs_list = NULL, .list_length = 253, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
+        .unicode_list = unicode_list_1, .glyph_id_ofs_list = NULL, .list_length = 254, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
     }
 };
 

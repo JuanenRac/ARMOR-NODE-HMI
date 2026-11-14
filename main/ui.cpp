@@ -35,6 +35,7 @@
 #include "audio.hpp"
 #include "display.hpp"
 #include "node_control.hpp"
+#include "power_watch.hpp"
 #include "server_link.hpp"
 #include "voice.hpp"
 
@@ -68,6 +69,7 @@ struct Screen {
   std::function<Context()> context;
   std::string language;                 // the language the fonts were last set for
   std::vector<Labelled> labels;
+  lv_obj_t *battery = nullptr;   // the battery of the panel, under the clock (only while power.enabled and the gauge answered)
   lv_obj_t *mode = nullptr, *link = nullptr, *clock = nullptr, *arm_button = nullptr, *arm_label = nullptr, *nodes = nullptr, *energy = nullptr, *mic_button = nullptr, *voice_label = nullptr;
   lv_obj_t *alarms_title = nullptr, *ack_button = nullptr, *ack_label = nullptr, *footer = nullptr, *version = nullptr, *none = nullptr;
   lv_obj_t* alarm_row[kAlarmRows] = {};
@@ -439,6 +441,21 @@ void refresh(lv_timer_t*) {
     set_text(g_screen.version, context.version);
   }
 
+  // the battery of the panel (setting power.enabled, off by default): nothing is drawn until the gauge has answered once
+  {
+    const power_watch::View power = power_watch::view();
+    std::string battery;
+    std::uint32_t battery_colour = kMuted;
+    if (power.gauge_lost) { battery = text_of("pw_gauge"); battery_colour = kRed; }
+    else if (power.have) {
+      battery = text_of("pw_battery") + " " + std::to_string(power.percent) + " %";
+      if (power.low) { battery += "  " + text_of("pw_low"); battery_colour = kRed; }
+      else if (power.on_battery) { battery += "  " + text_of("pw_on_battery"); battery_colour = kAmber; }
+    }
+    set_text(g_screen.battery, battery);
+    lv_obj_set_style_text_color(g_screen.battery, lv_color_hex(battery_colour), 0);
+  }
+
   std::time_t now = std::time(nullptr);
   char clock_text[16] = "";
   if (now > 1700000000) { std::tm local{}; localtime_r(&now, &local); std::snprintf(clock_text, sizeof clock_text, "%02d:%02d", local.tm_hour, local.tm_min); }
@@ -527,6 +544,11 @@ void build(lv_obj_t* screen_object) {
   lv_obj_set_width(g_screen.link, 230);
   g_screen.clock = make_label(screen_object, Size::kNormal, kText);
   lv_obj_align(g_screen.clock, LV_ALIGN_TOP_RIGHT, -20, 18);
+  g_screen.battery = make_label(screen_object, Size::kSmall, kMuted);
+  lv_obj_set_width(g_screen.battery, 330);
+  lv_obj_set_style_text_align(g_screen.battery, LV_TEXT_ALIGN_RIGHT, 0);
+  lv_label_set_long_mode(g_screen.battery, LV_LABEL_LONG_DOT);
+  lv_obj_align(g_screen.battery, LV_ALIGN_TOP_RIGHT, -20, 48);
 
   // the left column: the button, the nodes and the microphone
   lv_obj_t* left = make_panel(screen_object, 16, 76, 372, 330);

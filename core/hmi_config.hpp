@@ -151,6 +151,21 @@ struct Controls {
   bool countdown_beeps = false;
 };
 
+// The battery of the panel (core/power_gauge.hpp): off by default. The gauge chip is read every few seconds; losing the mains (the battery giving for lost_confirm_s seconds in a row) and a low charge
+// (at or below low_percent while on the battery) are logged and shown on the screen.
+struct Power {
+  bool enabled = false;
+  int low_percent = 20;
+  int lost_confirm_s = 10;
+};
+
+// The panel's own record of events in its storage (core/event_log.hpp): off by default. Rotates in `keep` files of `max_kb` each, so it never fills the storage.
+struct Storage {
+  bool enabled = false;
+  int max_kb = 256;
+  int keep = 4;
+};
+
 // The camera picture on demand (core/still_view.hpp): off by default; shows the camera `id` while the person has it open, a new picture every `refresh_s` seconds (2 to 60).
 // The server's option panel.camera_view must be on too.
 struct Camera {
@@ -184,6 +199,8 @@ struct Settings {
   Voice voice;
   Controls controls;
   Camera camera;
+  Power power;
+  Storage storage;
   WebMode web = WebMode::kBoth;
   std::string admin_sources;   // the networks that may use the panel; empty = the private ranges of a house (see admin_sources.hpp)
   BlePasskeyMode ble_passkey = BlePasskeyMode::kDerived;   // "derived" (default) or "random_display"
@@ -476,6 +493,16 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
     }
     read_int(*camera, "refresh_s", s.camera.refresh_s, 2, 60, "camera.refresh_s", problems);
   }
+  if (const json::Value* power = document.get("power"); power != nullptr && power->is_object()) {
+    read_bool(*power, "enabled", s.power.enabled, "power.enabled", problems);
+    read_int(*power, "low_percent", s.power.low_percent, 5, 50, "power.low_percent", problems);
+    read_int(*power, "lost_confirm_s", s.power.lost_confirm_s, 3, 120, "power.lost_confirm_s", problems);
+  }
+  if (const json::Value* storage = document.get("storage"); storage != nullptr && storage->is_object()) {
+    read_bool(*storage, "enabled", s.storage.enabled, "storage.enabled", problems);
+    read_int(*storage, "max_kb", s.storage.max_kb, 16, 4096, "storage.max_kb", problems);
+    read_int(*storage, "keep", s.storage.keep, 2, 10, "storage.keep", problems);
+  }
   if (const json::Value* voice = document.get("voice"); voice != nullptr && voice->is_object()) {
     read_bool(*voice, "enabled", s.voice.enabled, "voice.enabled", problems);
     const std::string stored_voice_host = broker_host(s.voice.url);
@@ -737,6 +764,8 @@ inline std::string to_json(const Settings& s, bool secrets) {
   w.end_object().end_object();
   w.key("controls").begin_object().field("ack", hmi::ack_mode_text(s.controls.ack)).field("preflight", s.controls.preflight).field("countdown_beeps", s.controls.countdown_beeps).end_object();
   w.key("camera").begin_object().field("enabled", s.camera.enabled).field("id", s.camera.id).field("refresh_s", s.camera.refresh_s).end_object();
+  w.key("power").begin_object().field("enabled", s.power.enabled).field("low_percent", s.power.low_percent).field("lost_confirm_s", s.power.lost_confirm_s).end_object();
+  w.key("storage").begin_object().field("enabled", s.storage.enabled).field("max_kb", s.storage.max_kb).field("keep", s.storage.keep).end_object();
   w.key("voice").begin_object().field("enabled", s.voice.enabled).field("url", s.voice.url).field("wake_name", s.voice.wake_name).field("listen_s", s.voice.listen_s).field("wake_word", s.voice.wake_word).field("wake_local", s.voice.wake_local).field("binary_turn", s.voice.binary_turn)
       .field("end_of_speech", s.voice.end_of_speech.enabled).field("silence_ms", s.voice.end_of_speech.silence_ms).field("min_speech_ms", s.voice.end_of_speech.min_speech_ms).field("level_percent", s.voice.end_of_speech.level_percent)
       .field("min_level", s.voice.end_of_speech.min_level).field("lead_ms", s.voice.end_of_speech.lead_ms).field("calibrate_ms", s.voice.end_of_speech.calibrate_ms);
