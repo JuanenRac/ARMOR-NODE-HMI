@@ -46,11 +46,23 @@ add_executable(test_broker_failover test_broker_failover.cpp)
 add_executable(test_log_line test_log_line.cpp)
 add_executable(test_diag test_diag.cpp)
 
+# The real broker link of the panel (main/mqtt_link.cpp, unchanged) against a double of esp-mqtt, FreeRTOS and the rest of ESP-IDF (host_idf/, mqtt_link_double.cpp).
+find_package(Threads REQUIRED)
+foreach(name test_mqtt_link test_mqtt_link_off)
+  add_executable(${name} ${name}.cpp mqtt_link_double.cpp ../main/mqtt_link.cpp)
+  target_include_directories(${name} BEFORE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/host_idf)
+  target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../main ${CMAKE_CURRENT_SOURCE_DIR}/..)
+  target_compile_options(${name} PRIVATE -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable)   # what the firmware only logs
+  target_link_libraries(${name} PRIVATE Threads::Threads)
+endforeach()
+
 enable_testing()
 add_test(NAME release COMMAND test_release)
 add_test(NAME link_watch COMMAND test_link_watch)
 add_test(NAME broker_failover COMMAND test_broker_failover)
 add_test(NAME log_line COMMAND test_log_line)
+add_test(NAME mqtt_link COMMAND test_mqtt_link)
+add_test(NAME mqtt_link_off COMMAND test_mqtt_link_off)
 add_test(NAME mqtt_tls COMMAND test_mqtt_tls)
 add_test(NAME server_pin COMMAND test_server_pin)
 add_test(NAME base COMMAND test_base)
