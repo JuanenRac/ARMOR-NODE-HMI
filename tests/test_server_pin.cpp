@@ -90,6 +90,33 @@ int main() {
   entry.clear();
   CHECK(entry.empty() && entry.digits().empty());
 
+  // the context of a handshake is put back to the safe state whatever way the request ends
+  {
+    server_pin::PinContext context;
+    {
+      server_pin::PinContext::Scope scope(context, "", true);
+      CHECK(context.capture && context.want.empty());
+      context.seen = hex;
+      CHECK(scope.seen() == hex);
+    }
+    CHECK(!context.capture && context.want.empty() && context.seen.empty());
+    auto early_exit = [&]() {
+      server_pin::PinContext::Scope scope(context, hex, false);
+      if (context.want == hex) return;   // an early return, as a failed request makes
+      context.capture = true;
+    };
+    early_exit();
+    CHECK(!context.capture && context.want.empty());
+    {
+      server_pin::PinContext::Scope scope(context, hex, true);
+      CHECK(context.want == hex && context.capture);
+    }
+    CHECK(!context.capture);
+    // the lock is released: another request can take the context at once
+    server_pin::PinContext::Scope again(context, hex, false);
+    CHECK(!context.capture && context.want == hex);
+  }
+
   std::printf("%d checks, %d failures\n", checks, failures);
   return failures == 0 ? 0 : 1;
 }

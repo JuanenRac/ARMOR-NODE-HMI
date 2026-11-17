@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <atomic>
 #include <mutex>
+#include <optional>
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "esp_log.h"
@@ -108,17 +109,14 @@ esp_err_t on_http_event(esp_http_client_event_t* event) {
 // ESP-IDF's own attach function gives the connection a placeholder authority list (so the handshake looks at the certificate at all); ours then replaces its verify callback by one
 // that accepts the certificate of the server only when its SHA-256 fingerprint is the one fixed at set-up. Whatever the library says about the name or the signer is ignored: the
 // fingerprint is the whole decision, and a different certificate fails the handshake.
-std::mutex g_pin_mutex;
-std::string g_pin_want;            // under g_pin_mutex: the stored fingerprint
-bool g_pin_capture = false;        // under g_pin_mutex: only read the fingerprint (the person is setting the panel up and will compare it before saving)
-std::string g_pin_seen;            // under g_pin_mutex: the fingerprint of the certificate of the last handshake, "" when none arrived
+server_pin::PinContext g_pin;   // the context of the handshake in progress; a request owns it through a Scope, which puts it back to the safe state on every way out
 
 int pin_verify(void*, mbedtls_x509_crt* certificate, int depth, uint32_t* flags) {
   if (depth != 0) { *flags = 0; return 0; }   // the certificate of the server is the one that is compared, whoever signed it
   std::uint8_t digest[server_pin::kDigestBytes];
   if (mbedtls_sha256(certificate->raw.p, certificate->raw.len, digest, 0) != 0) return MBEDTLS_ERR_X509_CERT_VERIFY_FAILED;
-  g_pin_seen = server_pin::to_hex(digest, sizeof digest);
-  if (g_pin_capture || server_pin::matches(digest, g_pin_want)) { *flags = 0; return 0; }
+  g_pin.seen = server_pin::to_hex(digest, sizeof digest);
+  if (g_pin.capture || server_pin::matches(digest, g_pin.want)) { *flags = 0; return 0; }
   return MBEDTLS_ERR_X509_CERT_VERIFY_FAILED;
 }
 
@@ -173,11 +171,9 @@ Answer request(esp_http_client_method_t method, const std::string& path, const s
   // https is never accepted unchecked (core/server_pin.hpp): the certificate must be the one whose fingerprint was fixed at set-up, or end at the pinned PEM, or be vouched for by the
   // usual certificate authorities. A panel that cannot meet any of those does not connect.
   const server_pin::Trust trust = server_pin::trust_for(s.server.tls, s.server.cert_sha256, s.server.cert_pem);
-  std::unique_lock<std::mutex> pin_guard(g_pin_mutex, std::defer_lock);
+  std::optional<server_pin::PinContext::Scope> pin_scope;
   if (trust == server_pin::Trust::kFingerprint) {
-    pin_guard.lock();   // the check reads a fingerprint kept in this file (the library gives the callback no pointer of ours): one such request at a time
-    g_pin_want = s.server.cert_sha256;
-    g_pin_capture = false;
+    pin_scope.emplace(g_pin, s.server.cert_sha256, false);   // the check reads a fingerprint kept in this file (the library gives the callback no pointer of ours): one such request at a time
     config.crt_bundle_attach = pin_attach;
   } else if (trust == server_pin::Trust::kChain) {
     config.cert_pem = s.server.cert_pem.c_str();
@@ -204,9 +200,7 @@ Answer request(esp_http_client_method_t method, const std::string& path, const s
 std::string probe_fingerprint(const std::string& host, int port, std::string& error) {
   error.clear();
   const std::string url = "https://" + host + ":" + std::to_string(port) + "/";
-  std::lock_guard<std::mutex> guard(g_pin_mutex);
-  g_pin_capture = true;
-  g_pin_seen.clear();
+  server_pin::PinContext::Scope scope(g_pin, "", true);
   esp_http_client_config_t config{};
   config.url = url.c_str();
   config.method = HTTP_METHOD_GET;
@@ -214,12 +208,10 @@ std::string probe_fingerprint(const std::string& host, int port, std::string& er
   config.disable_auto_redirect = true;
   config.crt_bundle_attach = pin_attach;
   esp_http_client_handle_t client = esp_http_client_init(&config);
-  if (client == nullptr) { g_pin_capture = false; error = "no_answer"; return ""; }
+  if (client == nullptr) { error = "no_answer"; return ""; }
   esp_http_client_perform(client);   // the answer does not matter: the handshake did what was needed
   esp_http_client_cleanup(client);
-  g_pin_capture = false;
-  const std::string seen = g_pin_seen;
-  g_pin_seen.clear();
+  const std::string seen = scope.seen();
   if (seen.empty()) error = "no_certificate";
   return seen;
 }
