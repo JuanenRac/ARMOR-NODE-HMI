@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The signature code is the shared one:** `core/command_sig.hpp` and `core/hmac_sha256.hpp` come from the shared firmware base, ready for signed orders.
+
 - **The fingerprint check of the server link cannot be left in its read-only mode:** the data of a handshake is now owned by each request and put back to the safe state on every way out, an early return included.
 
 - **The copy of the running firmware to the other slot waits for an install or a manual write that is on:** `start_copy()` takes the same lock as `install()` and the manual writes (not only the flag of its own job) and gives it back when it ends, so two writers can no longer open the same slot.
