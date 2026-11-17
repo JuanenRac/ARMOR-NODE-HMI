@@ -166,6 +166,26 @@ static void test_the_choices_and_the_lists_of_a_document() {
   CHECK(s.ble_passkey == config::BlePasskeyMode::kDerived);
   CHECK(read("{\"ble\":{\"passkey_mode\":\"random_display\"}}", s).empty() && s.ble_passkey == config::BlePasskeyMode::kRandomDisplay);
   CHECK(has(read("{\"ble\":{\"passkey_mode\":\"label\"}}", s), "ble.passkey_mode", "invalid"));
+  // a PIN of the operator's own, a key of its own for the set-up access point and the erase of a refused firmware slot: all off until they are set, and the secrets are never shown
+  CHECK(s.ble_passkey_pin.empty() && s.ap.setup_password.empty() && !s.ota_invalidate_rejected);
+  CHECK(read("{\"ble\":{\"passkey_mode\":\"fixed\",\"passkey_pin\":\"042042\"},\"ap\":{\"setup_password\":\"a-good-setup-key\"},\"security\":{\"ota_invalidate_rejected\":true}}", s).empty());
+  CHECK(s.ble_passkey == config::BlePasskeyMode::kFixed && s.ble_passkey_pin == "042042" && s.ap.setup_password == "a-good-setup-key" && s.ota_invalidate_rejected);
+  CHECK(config::to_json(s, false).find("042042") == std::string::npos && config::to_json(s, false).find("a-good-setup-key") == std::string::npos);
+  CHECK(config::to_json(s, true).find("\"passkey_pin\":\"042042\"") != std::string::npos && config::to_json(s, false).find("\"ota_invalidate_rejected\":true") != std::string::npos);
+  s.ble_passkey_pin.clear();
+  CHECK(has(config::validate(s), "ble.passkey_pin", "required"));
+  s.ble_passkey = config::BlePasskeyMode::kDerived; s.ble_passkey_pin = "12ab56";
+  CHECK(has(config::validate(s), "ble.passkey_pin", "invalid"));
+  s.ble_passkey_pin.clear(); s.ap.setup_password = "short";
+  CHECK(has(config::validate(s), "ap.setup_password", "invalid_key"));
+  s.ap.setup_password.clear(); s.ota_invalidate_rejected = false;
+  CHECK(has(read("{\"ble\":{\"passkey_pin\":5}}", s), "ble.passkey_pin", "invalid"));
+  CHECK(has(read("{\"ap\":{\"setup_password\":5}}", s), "ap.setup_password", "invalid"));
+  CHECK(has(read("{\"security\":{\"ota_invalidate_rejected\":\"x\"}}", s), "security.ota_invalidate_rejected", "invalid"));
+  CHECK(read("{\"ble\":{\"passkey_pin\":\"123456\"},\"ap\":{\"setup_password\":\"another-good-key\"}}", s).empty() && !has(config::validate(s), "ble.passkey_pin", "invalid") && !has(config::validate(s), "ble.passkey_pin", "required"));
+  CHECK(config::to_json(s, false).find("\"passkey_pin_set\":true") != std::string::npos && config::to_json(s, false).find("\"setup_password_set\":true") != std::string::npos);
+  CHECK(read("{\"ble\":{\"passkey_pin_clear\":true},\"ap\":{\"setup_password_clear\":true}}", s).empty() && s.ble_passkey_pin.empty() && s.ap.setup_password.empty());
+  CHECK(config::to_json(s, false).find("\"passkey_pin_set\":false") != std::string::npos && config::to_json(s, false).find("\"setup_password_set\":false") != std::string::npos);
   // the numbers that have a rule of their own
   CHECK(has(read("{\"audio\":{\"siren_repeat_s\":7}}", s), "audio.siren_repeat_s", "range") || s.audio.siren_repeat_s == 7);
   CHECK(has(read("{\"ap\":{\"bandwidth_mhz\":30}}", s), "ap.bandwidth_mhz", "range"));

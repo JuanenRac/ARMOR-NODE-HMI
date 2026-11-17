@@ -176,7 +176,7 @@ static void test_document() {
   CHECK(!config::load("{\"security\":{\"seal_secrets\":\"yes\"}}", base, out, problems) && has(problems, "security.seal_secrets", "invalid"));
   problems.clear();
   CHECK(config::load("{\"security\":{\"seal_secrets\":true}}", base, out, problems) && out.seal_secrets);
-  { config::Settings on = out; config::Settings back; problems.clear(); CHECK(config::to_json(on, true).find("\"security\":{\"seal_secrets\":true}") != std::string::npos && config::load(config::to_json(on, true), base, back, problems) && back.seal_secrets); }
+  { config::Settings on = out; config::Settings back; problems.clear(); CHECK(config::to_json(on, true).find("\"security\":{\"seal_secrets\":true,\"ota_invalidate_rejected\":false}") != std::string::npos && config::load(config::to_json(on, true), base, back, problems) && back.seal_secrets); }
   // a password never leaves: the panel's copy says only that there is one
   config::Settings with_secret = base;
   with_secret.server.password = "secreto-secreto";
