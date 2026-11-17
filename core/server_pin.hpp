@@ -8,6 +8,7 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <string_view>
 
@@ -79,5 +80,37 @@ inline bool matches(const std::uint8_t* digest, std::string_view stored) {
   }
   return diff == 0;
 }
+
+// What the verify callback of a handshake reads, since the library gives it no pointer of ours: the fingerprint it must meet, whether it only reads the one presented (the person is
+// setting the panel up and will compare it before saving) and the one that arrived. A Scope owns it for one request: it takes the lock, sets the context and, on every way out of
+// the request (an early return included), puts it back to the safe state, so that the "only read it" mode can never be left on for the next request.
+struct PinContext {
+  std::mutex mutex;
+  std::string want;
+  bool capture = false;
+  std::string seen;
+
+  class Scope {
+   public:
+    Scope(PinContext& context, std::string_view want, bool capture) : context_(context), guard_(context.mutex) {
+      context_.want.assign(want);
+      context_.capture = capture;
+      context_.seen.clear();
+    }
+    ~Scope() {
+      context_.capture = false;
+      context_.want.clear();
+      context_.seen.clear();
+    }
+    Scope(const Scope&) = delete;
+    Scope& operator=(const Scope&) = delete;
+    /// The fingerprint of the certificate of the last handshake of this request, "" when none arrived.
+    std::string seen() const { return context_.seen; }
+
+   private:
+    PinContext& context_;
+    std::lock_guard<std::mutex> guard_;
+  };
+};
 
 }  // namespace armor::server_pin
