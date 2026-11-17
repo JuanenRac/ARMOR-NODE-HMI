@@ -31,6 +31,7 @@
 #include "sdkconfig.h"
 #include "audio.hpp"
 #include "ble_provision.hpp"
+#include "github_update.hpp"
 #include "clock_sync.hpp"
 #include "contract_version.hpp"
 #include "improv_serial.hpp"
@@ -63,10 +64,11 @@ void setup_reminder_task(void*) {
     if (!armor::store::users_empty()) vTaskDelete(nullptr);
     const armor::network::Status n = armor::network::status();
     bool random_pin = false;
-    armor::store::with_settings([&](const armor::config::Settings& s) { random_pin = s.ble_passkey == armor::config::BlePasskeyMode::kRandomDisplay; });
+    std::string fixed_pin;   // the PIN the operator chose (ble.passkey_mode "fixed"), empty otherwise
+    armor::store::with_settings([&](const armor::config::Settings& s) { random_pin = s.ble_passkey == armor::config::BlePasskeyMode::kRandomDisplay; if (s.ble_passkey == armor::config::BlePasskeyMode::kFixed) fixed_pin = s.ble_passkey_pin; });
     char pin_text[40];
     if (random_pin) std::snprintf(pin_text, sizeof pin_text, "random, shown here when a phone pairs");
-    else std::snprintf(pin_text, sizeof pin_text, "%06u", static_cast<unsigned>(armor::auth::ble_passkey_from(armor::store::setup_code())));
+    else std::snprintf(pin_text, sizeof pin_text, "%06u", static_cast<unsigned>(armor::auth::ble_effective_passkey(fixed_pin, armor::store::setup_code())));
     ESP_LOGW(kTag, "SETUP: this panel has no user yet. Join the Wi-Fi \"%s\", open http://192.168.4.1/ and enter the setup code %s (to pair over Bluetooth the phone asks for the PIN %s)",
              n.ap_ssid.empty() ? "ARMOR-SETUP-..." : n.ap_ssid.c_str(), armor::store::setup_code().c_str(), pin_text);
     vTaskDelay(pdMS_TO_TICKS(15000));
@@ -218,6 +220,7 @@ extern "C" void app_main() {
   armor::power_watch::start(settings);
   armor::audio::set_alarm_options(settings.audio.critical_min_volume, armor::hmi::RepeatPolicy{settings.audio.siren_repeat_s, settings.audio.siren_max_repeats});
 
+  armor::github_update::set_invalidate_rejected(settings.ota_invalidate_rejected);   // security.ota_invalidate_rejected
   const armor::netplan::Plan plan = armor::netplan::plan_network(settings, setup, armor::store::setup_code(), armor::store::mac_tail(), armor::store::mac_sum());
   const bool network_ok = armor::network::start(settings, plan);
   if (network_ok && !plan.ap.enabled) {
