@@ -179,6 +179,13 @@ static void test_the_choices_and_the_lists_of_a_document() {
   s.ble_passkey_pin.clear(); s.ap.setup_password = "short";
   CHECK(has(config::validate(s), "ap.setup_password", "invalid_key"));
   s.ap.setup_password.clear(); s.ota_invalidate_rejected = false;
+  CHECK(has(read("{\"ble\":{\"passkey_pin\":5}}", s), "ble.passkey_pin", "invalid"));
+  CHECK(has(read("{\"ap\":{\"setup_password\":5}}", s), "ap.setup_password", "invalid"));
+  CHECK(has(read("{\"security\":{\"ota_invalidate_rejected\":\"x\"}}", s), "security.ota_invalidate_rejected", "invalid"));
+  CHECK(read("{\"ble\":{\"passkey_pin\":\"123456\"},\"ap\":{\"setup_password\":\"another-good-key\"}}", s).empty() && !has(config::validate(s), "ble.passkey_pin", "invalid") && !has(config::validate(s), "ble.passkey_pin", "required"));
+  CHECK(config::to_json(s, false).find("\"passkey_pin_set\":true") != std::string::npos && config::to_json(s, false).find("\"setup_password_set\":true") != std::string::npos);
+  CHECK(read("{\"ble\":{\"passkey_pin_clear\":true},\"ap\":{\"setup_password_clear\":true}}", s).empty() && s.ble_passkey_pin.empty() && s.ap.setup_password.empty());
+  CHECK(config::to_json(s, false).find("\"passkey_pin_set\":false") != std::string::npos && config::to_json(s, false).find("\"setup_password_set\":false") != std::string::npos);
   // the numbers that have a rule of their own
   CHECK(has(read("{\"audio\":{\"siren_repeat_s\":7}}", s), "audio.siren_repeat_s", "range") || s.audio.siren_repeat_s == 7);
   CHECK(has(read("{\"ap\":{\"bandwidth_mhz\":30}}", s), "ap.bandwidth_mhz", "range"));
