@@ -263,6 +263,7 @@ ARMOR-NODE-HMI/
 ├── SECURITY.md SUPPORT.md LICENSE       セキュリティポリシー、サポート、ライセンス
 ├── CONTRIBUTING.md CODE_OF_CONDUCT.md   貢献方法と行動規範
 ├── CMakeLists.txt                       ESP-IDF プロジェクト
+├── firmware_base.lock                   この複製が同期された共有ベースのバージョン
 ├── partitions.csv                       フラッシュのテーブル
 ├── sdkconfig.defaults                   ファームウェアの設定
 ├── sdkconfig.board.lcd7box              基板ごとの設定
