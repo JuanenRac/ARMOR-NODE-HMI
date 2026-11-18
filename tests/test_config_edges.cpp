@@ -186,6 +186,18 @@ static void test_the_choices_and_the_lists_of_a_document() {
   CHECK(config::to_json(s, false).find("\"passkey_pin_set\":true") != std::string::npos && config::to_json(s, false).find("\"setup_password_set\":true") != std::string::npos);
   CHECK(read("{\"ble\":{\"passkey_pin_clear\":true},\"ap\":{\"setup_password_clear\":true}}", s).empty() && s.ble_passkey_pin.empty() && s.ap.setup_password.empty());
   CHECK(config::to_json(s, false).find("\"passkey_pin_set\":false") != std::string::npos && config::to_json(s, false).find("\"setup_password_set\":false") != std::string::npos);
+  // the signature of the orders to the node itself: off until asked for, the key is a secret that is never shown, and only a key of 64 hexadecimal digits is taken
+  const std::string order_key = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+  CHECK(!s.control_require_sig && s.command_key.empty() && config::to_json(s, false).find("\"control_require_sig\":false") != std::string::npos);
+  CHECK(read("{\"security\":{\"control_require_sig\":true,\"command_key\":\"" + order_key + "\"}}", s).empty() && s.control_require_sig && s.command_key == order_key);
+  CHECK(config::to_json(s, false).find(order_key) == std::string::npos && config::to_json(s, false).find("\"command_key_set\":true") != std::string::npos);
+  CHECK(config::to_json(s, true).find("\"command_key\":\"" + order_key) != std::string::npos);
+  CHECK(read("{\"security\":{\"command_key_clear\":true}}", s).empty() && s.command_key.empty() && s.control_require_sig);
+  CHECK(has(read("{\"security\":{\"command_key\":5}}", s), "security.command_key", "invalid"));
+  s.command_key = "abc";
+  CHECK(has(config::validate(s), "security.command_key", "invalid"));
+  s.command_key.clear(); s.control_require_sig = false;
+  CHECK(has(read("{\"security\":{\"control_require_sig\":\"x\"}}", s), "security.control_require_sig", "invalid"));
   // the numbers that have a rule of their own
   CHECK(has(read("{\"audio\":{\"siren_repeat_s\":7}}", s), "audio.siren_repeat_s", "range") || s.audio.siren_repeat_s == 7);
   CHECK(has(read("{\"ap\":{\"bandwidth_mhz\":30}}", s), "ap.bandwidth_mhz", "range"));
