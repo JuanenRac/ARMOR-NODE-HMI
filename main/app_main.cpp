@@ -47,6 +47,7 @@
 #include "rtc.hpp"
 #include "mqtt_link.hpp"
 #include "node_health.hpp"
+#include "core/command_sig.hpp"
 #include "node_control.hpp"
 #include "network.hpp"
 #include "node_store.hpp"
@@ -207,6 +208,12 @@ extern "C" void app_main() {
     control.node_id = settings.node_id;
     control.publish = [](const std::string& topic, const std::string& payload) { armor::mqtt_link::publish(topic, payload); };
     control.publish_retained = [](const std::string& topic, const std::string& payload) { armor::mqtt_link::publish_retained(topic, payload); };
+    // The orders to the node itself may need the signature of the server (security.control_require_sig, off by default); the nonces of the last ones are kept for the replay check.
+    control.authorize = [require = settings.control_require_sig, key = settings.command_key](const std::string& payload, std::string& plain) {
+      static armor::command_sig::NonceCache nonces;
+      const std::int64_t wall = armor::mqtt_link::clock_is_set() ? static_cast<std::int64_t>(armor::mqtt_link::wall_clock_ms()) : 0;
+      return armor::command_sig::control_authorized(require, key, payload, nonces, wall, plain);
+    };
     armor::node_control::start(control);
   }
   // The screen comes first: a panel that cannot reach its server still has to say so. If the screen cannot start, the web page still runs and says why.

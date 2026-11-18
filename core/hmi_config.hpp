@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "board_s3.hpp"
+#include "command_sig.hpp"
 #include "admin_sources.hpp"
 #include "ack_flow.hpp"
 #include "alarm_clip.hpp"
@@ -211,6 +212,10 @@ struct Settings {
   // After a firmware the node downloaded was refused (wrong project, wrong version, not newer, bad signature, no way to boot it) the slot it was written to is erased at its first sector, so the
   // refused image cannot be started by a later fault. Off, as the node always was: the slot keeps what was written. The running slot is never touched.
   bool ota_invalidate_rejected = false;
+  // The orders the server sends to this node itself (restart, pause, standby...) may need the signature of the server (command_sig.hpp). Off, as the node always was: any order of the broker is read.
+  // On, only an order signed with command_key is read, and with no valid key every order is refused. command_key is the 64 hexadecimal digits of the node's `command_key` of the server (a secret like the passwords).
+  bool control_require_sig = false;
+  std::string command_key;
   BleMode ble = BleMode::kSetup;   // "setup": only while the node has no user; "always"; "off": the Bluetooth stack is not even started
   // Improv Wi-Fi over the USB cable: "setup" (only while the node has no Wi-Fi network stored), "always" or "off". See core/improv.hpp (should_listen).
   ImprovMode improv = ImprovMode::kSetup;
@@ -569,6 +574,8 @@ inline void read_settings(const json::Value& document, Settings& s, Problems& pr
   if (const json::Value* security = document.get("security"); security != nullptr && security->is_object()) {
     read_bool(*security, "seal_secrets", s.seal_secrets, "security.seal_secrets", problems);
     read_bool(*security, "ota_invalidate_rejected", s.ota_invalidate_rejected, "security.ota_invalidate_rejected", problems);
+    read_bool(*security, "control_require_sig", s.control_require_sig, "security.control_require_sig", problems);
+    read_secret(*security, "command_key", s.command_key, "security.command_key", problems);
   }
 }
 
@@ -673,6 +680,7 @@ inline Problems validate(const Settings& s) {
     if (s.ap.security != WifiSecurity::kOpen && !net::valid_wpa_passphrase(s.ap.password)) bad(problems, "ap.password", s.ap.password.empty() ? "required" : "invalid_key");
   }
   if (!s.ap.setup_password.empty() && !net::valid_wpa_passphrase(s.ap.setup_password)) bad(problems, "ap.setup_password", "invalid_key");
+  if (!s.command_key.empty() && !command_sig::key_is_valid(s.command_key)) bad(problems, "security.command_key", "invalid");
   {   // the fixed PIN of the Bluetooth pairing: six digits when it is given, and given when the mode asks for it
     const auto six_digits = [](const std::string& text) { return text.size() == 6 && std::all_of(text.begin(), text.end(), [](char c) { return c >= '0' && c <= '9'; }); };
     if (!s.ble_passkey_pin.empty() && !six_digits(s.ble_passkey_pin)) bad(problems, "ble.passkey_pin", "invalid");
@@ -799,7 +807,9 @@ inline std::string to_json(const Settings& s, bool secrets) {
   w.key("ui").begin_object().field("language", s.language).end_object();
   w.key("time").begin_object().field("ntp_enabled", s.time.ntp_enabled).field("rtc_enabled", s.time.rtc_enabled).field("ntp", s.time.ntp).field("zone", s.time.zone).end_object();
   w.key("system").begin_object().field("auto_restart_hours", s.auto_restart_hours).field("login_limit_per_minute", s.login_limit_per_minute).end_object();
-  w.key("security").begin_object().field("seal_secrets", s.seal_secrets).field("ota_invalidate_rejected", s.ota_invalidate_rejected).end_object();
+  w.key("security").begin_object().field("seal_secrets", s.seal_secrets).field("ota_invalidate_rejected", s.ota_invalidate_rejected).field("control_require_sig", s.control_require_sig);
+  if (secrets) w.field("command_key", s.command_key); else w.field("command_key_set", !s.command_key.empty());
+  w.end_object();
   w.end_object();
   return w.str();
 }
