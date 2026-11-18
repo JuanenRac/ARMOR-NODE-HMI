@@ -185,6 +185,8 @@ ARMOR-NODE-HMI は壁掛けパネルです。Android アプリと同じく [ARMO
 | `voice.enabled`, `voice.url`, `voice.token` | false, "", - | 音声サービス：初期はオフ。アドレスは 160 文字以内で検証され（満たさないと `required` か `invalid`）、ホストが変わるとトークンは消えます |
 | `CONFIG_ARMOR_NODE_ID`, `_SETUP_CODE`, `_FLEET_SECRET`, `_MQTT_*`, `_HEARTBEAT_S`, `_BLE_SETUP_MINUTES`, `_BOOT_FACTORY_RESET` | - | すべてのノードに共通する設定：名前（空なら `armor-` と MAC の下位バイト）、セットアップコード（空ならランダム）、フリートシークレット（16 文字以上、リポジトリには置かない）、最初のブローカー設定、ハートビート（2〜300 秒）、Bluetooth セットアップの分数（1〜120）、BOOT によるリセット（最初の 30 秒に 8 秒） |
 | `system.login_limit_per_minute` | 30 (0-120) | パネルが全員のログインをロックするまでの 1 分あたりの誤パスワード数（0 = 全体の上限なし）。Studio（各ノードのボタン）または `POST /api/v1/admin/nodes/settings` で読み取り・変更でき、パネルのログイン情報は 1 回だけ使われ保存されません |
+| `security.control_require_sig` | off | オンにすると、ノードは自分宛ての命令（再起動、一時停止、待機など）を、サーバーがそのノードの鍵で署名したときだけ実行します。有効な鍵がなければすべて拒否します |
+| `security.command_key` | `""` | ノードの鍵（16 進数 64 桁。サーバーの `GET /api/v1/admin/nodes/<id>/token` の `command_key`）。秘密情報で、封印でき、再表示されません |
 | `controls.ack` | pin | 「すべて確認」に触れたとき最初に求めるもの。`pin`（キーパッド。PIN は操作とともにサーバーへ送られそこで検証されます）、`confirm`（はい／いいえ）、`off`（1 回のタッチ） |
 | `voice.end_of_speech` | off | 話し終えたら録音を止めます（最初の短い間は部屋の音。最後の言葉の後の無音で要求を終え、誰も話さなければ送信しません） |
 | `voice.silence_ms`, `min_speech_ms`, `level_percent`, `min_level`, `lead_ms`, `calibrate_ms` | 900, 250, 300, 200, 4000, 300 | 要求を終える無音の長さ、有効とみなすために聞こえるべき声の長さ、声が部屋よりどれだけ大きいか（％）、声とみなす最小レベル、最初の言葉を待つ時間、部屋の音を測る時間 |
