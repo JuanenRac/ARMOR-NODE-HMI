@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The repository structure picture lists `firmware_base.lock`:** the file that records the version of the shared base this copy was synced from now appears in the picture, in the eight languages.
 - **The shared tools of the manifest and the status lights gain an opt-in strict check of the evidence:** `sync_manifests.py` and `status_lights.py` take `--strict-evidence` (off by default; `ARMOR_STRICT_EVIDENCE=1` switches it on for `armor_ci_validate.py`).
 - **The README lists the settings that sign the orders to the node:** `security.control_require_sig` and `security.command_key` in the configuration table, in the eight languages.
 - **The orders to the node can be required signed:** the new settings `security.control_require_sig` (off by default) and `security.command_key` (the 64 hexadecimal digits of the node key of the server, a secret kept and sealed like the passwords and never shown by the panel) make the node read an order of the server to itself (restart, pause, standby...) only when it carries a good signature made with that key; with the option on and no valid key every such order is refused. Both are in the web panel in eight languages. Off, the node behaves as it always did.
