@@ -263,6 +263,7 @@ ARMOR-NODE-HMI/
 ├── SECURITY.md SUPPORT.md LICENSE       Sicherheitsrichtlinie, Support und Lizenz
 ├── CONTRIBUTING.md CODE_OF_CONDUCT.md   Mitwirkung und Verhaltenskodex
 ├── CMakeLists.txt                       das ESP-IDF-Projekt
+├── firmware_base.lock                   die Version der gemeinsamen Basis, mit der diese Kopie abgeglichen wurde
 ├── partitions.csv                       die Flash-Tabelle
 ├── sdkconfig.defaults                   die Firmware-Einstellungen
 ├── sdkconfig.board.lcd7box              die Einstellungen einer Platine
