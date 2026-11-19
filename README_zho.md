@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-338597%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-38%20host%20programs-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.9-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
@@ -41,7 +41,7 @@
 | 成熟度 | 可用 |
 | 角色 | ARMOR-SERVER 的壁挂触摸面板（家族：Clients，上级：ARMOR-SERVER） |
 | 技术栈 | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| 测试 | 338597 项检查（38 个主机程序和 9 项 Python 检查，`ctest`） |
+| 测试 | 38 个主机程序和 9 项 Python 检查（`ctest`） |
 | 电路板 | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | 运行位置 | Waveshare ESP32-S3-Touch-LCD-7C-BOX；主机测试可在任何计算机上运行 |
 | 真实硬件 | 暂无：固件可以构建（ESP-IDF 5.5.5，CI 未检查），但还没有在板上运行 |
@@ -62,7 +62,7 @@
 | 协议与数据 | 🟡 | 与服务器和语音服务 ARMOR-VOICE-AI 的交互已对照模拟测试；采用按键说话，另有可选的唤醒词（默认关闭），仅对照模拟测试，语音挑战的号码显示在屏幕上。 |
 | 界面 | 🟠 | 网页已在真实浏览器中对模拟运行过；屏幕、触摸和声音依据 Waveshare 的示例编写，等待首次上电。 |
 | 硬件 | 🔴 | 固件尚未在板子上运行过：还没有在真实设备上运行过。 |
-| 安全 | 🟡 | 设置码、登录限制、蓝牙 PIN、胁迫处理和签名更新已在主机上测试；没有经过独立审查。 |
+| 安全 | 🟠 | 设置码、登录限制、蓝牙 PIN、胁迫处理和签名更新已在主机上测试；没有经过独立审查。 |
 | 更新 | 🟠 | 哈希和签名检查在主机上通过；空中更新从未在板子上运行过。 |
 | 集成 | 🟠 | 消息已对照 ARMOR-COMMON 的共享模式验证；与服务器和语音服务的连接尚未从板子上试过。其 MQTT 客户端在测试中与真实的 Mosquitto 对接。 |
 | 文档 | 🟢 | 八种语言、固件指南、接线说明和更新日志均为最新。 |
@@ -214,7 +214,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-`ctest` 运行 38 个主机测试程序和 9 个 Python 检查；主机程序统计的检查共 338597 项，使用 `-Werror` 构建。
+`ctest` 运行 38 个主机测试程序和 9 个 Python 检查；主机程序使用 `-Werror` 构建。
 
 Python 检查：八种语言的面板文字、任务、保存路径、受锁保护的蓝牙会话以及面板调用的路由（部分节点还包括 HTTP 状态码或字体字形）
 

@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Language">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-338597%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-38%20host%20programs-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.9-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
@@ -41,7 +41,7 @@
 | 成熟度 | 機能する |
 | 役割 | ARMOR-SERVER 用の壁掛けタッチパネル（ファミリー：Clients、親：ARMOR-SERVER） |
 | 技術 | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| テスト | 338597 件の検査（ホスト用プログラム 38 本と Python 検査 9 個、`ctest`） |
+| テスト | ホスト用プログラム 38 本と Python 検査 9 個（`ctest`） |
 | 基板 | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | 動作環境 | Waveshare ESP32-S3-Touch-LCD-7C-BOX、ホストテストは任意のコンピューター |
 | 実機での確認 | まだありません：ファームウェアはビルドできます（ESP-IDF 5.5.5、CI では未確認）が、ボード上では動作していません |
@@ -62,7 +62,7 @@
 | プロトコルとデータ | 🟡 | サーバーおよび音声サービス ARMOR-VOICE-AI とのやり取りは模擬に対してテストしています。プッシュトゥトークで、任意のウェイクワード（既定ではオフ）は模擬に対してのみテストし、音声チャレンジの番号は画面に表示します。 |
 | インターフェース | 🟠 | Web ページは実ブラウザーで模擬に対して動かしました。画面、タッチ、音声は Waveshare のサンプルをもとに書いたもので、初回の電源投入を待っています。 |
 | ハードウェア | 🔴 | ファームウェアはボード上で動かしていません。実機ではまだ何も動かしていません。 |
-| セキュリティ | 🟡 | 設定コード、ログイン制限、Bluetooth の PIN、脅迫時の扱い、署名付きアップデートはホストでテスト済みです。独立したレビューはまだありません。 |
+| セキュリティ | 🟠 | 設定コード、ログイン制限、Bluetooth の PIN、脅迫時の扱い、署名付きアップデートはホストでテスト済みです。独立したレビューはまだありません。 |
 | アップデート | 🟠 | ハッシュと署名の確認はホストで通ります。無線アップデートはボード上で一度も実行していません。 |
 | 連携 | 🟠 | メッセージは ARMOR-COMMON の共有スキーマに対して検証されています。サーバーおよび音声サービスとの接続は、ボードからはまだ試していません。MQTT クライアントはテストで本物の Mosquitto を相手に動かしています。 |
 | ドキュメント | 🟢 | 8 言語、ファームウェアガイド、配線メモ、変更履歴は最新です。 |
@@ -214,7 +214,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-ホスト用テストプログラム 38 個と Python の検査 6 個を `ctest` で実行します。ホストのプログラムが数えた検査は 338597 件で、`-Werror` でビルドします。
+ホスト用テストプログラム 38 個と Python の検査 6 個を `ctest` で実行します。ホストのプログラムは `-Werror` でビルドします。
 
 Python の検査：8 言語のパネル文言、タスク、保存パス、ロック下の Bluetooth セッション、パネルが呼ぶルート（ノードによっては HTTP コードやフォントのグリフも）
 
