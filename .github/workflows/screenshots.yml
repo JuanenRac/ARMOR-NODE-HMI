@@ -68,7 +68,8 @@ jobs:
           ARMOR_SHOTS_CHANNEL: chromium
         run: |
           python -m pip install --quiet pillow
-          python tools/capture_screenshots.py --out "$RUNNER_TEMP/screenshots" \n            --simulator-shots "$RUNNER_TEMP/simulator-png"
+          python tools/capture_screenshots.py --out "$RUNNER_TEMP/screenshots" \
+            --simulator-shots "$RUNNER_TEMP/simulator-png"
 
       - name: List the pictures
         run: |
