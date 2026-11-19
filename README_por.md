@@ -62,7 +62,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Protocolos e dados | 🟡 | A troca com o servidor e com o serviço de voz ARMOR-VOICE-AI é testada contra simulações; é premir para falar, mais uma palavra de ativação opcional (desligada por defeito) testada apenas contra simulações, e o número do desafio de voz aparece no ecrã. |
 | Interface | 🟠 | A página web correu contra uma simulação num navegador real; o ecrã, o toque e o som foram escritos a partir dos exemplos da Waveshare e esperam a primeira ligação. |
 | Hardware | 🔴 | O firmware não funcionou na placa: nada funcionou ainda em equipamentos reais. |
-| Segurança | 🟡 | O código de configuração, o limite de acessos, o PIN Bluetooth, o tratamento da coação e as atualizações assinadas estão testados no anfitrião; não houve revisão independente. |
+| Segurança | 🟠 | O código de configuração, o limite de acessos, o PIN Bluetooth, o tratamento da coação e as atualizações assinadas estão testados no anfitrião; não houve revisão independente. |
 | Atualizações | 🟠 | As verificações de hash e de assinatura passam no anfitrião; uma atualização pelo ar nunca foi executada numa placa. |
 | Integração | 🟠 | As mensagens são validadas contra os esquemas partilhados do ARMOR-COMMON; a ligação ao servidor e ao serviço de voz não foi experimentada a partir de uma placa. O seu cliente MQTT é exercitado contra um Mosquitto real nos testes. |
 | Documentação | 🟢 | Oito idiomas, o guia do firmware, as notas de cablagem e o registo de alterações estão atualizados. |
