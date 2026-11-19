@@ -62,7 +62,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Protocols and data | 🟡 | The exchange with the server and with the speech service ARMOR-VOICE-AI is tested against stand-ins; it is push to talk, plus an optional wake word (off by default) that has only run against stand-ins, and the number of the spoken challenge is shown on the screen. |
 | Interface | 🟠 | The web page runs against a stand-in in a real browser; the screen, the touch and the sound are written from Waveshare's examples and wait for their first power-up. |
 | Hardware | 🔴 | The firmware has not run on the board: nothing has run on real equipment yet. |
-| Security | 🟡 | The set-up code, the login limit, the Bluetooth PIN, the duress handling and the signed updates are tested on the host; there has been no independent review. |
+| Security | 🟠 | The set-up code, the login limit, the Bluetooth PIN, the duress handling and the signed updates are tested on the host; there has been no independent review. |
 | Updates | 🟠 | The hash and signature checks pass on the host; an update over the air has never been run on a board. |
 | Integration | 🟠 | The messages are validated against the shared schemas of ARMOR-COMMON; the link to the server and to the speech service has not been tried from a board. Its MQTT client is played against a real Mosquitto in the tests. |
 | Documentation | 🟢 | Eight languages, the firmware guide, the wiring notes and the changelog are up to date. |
