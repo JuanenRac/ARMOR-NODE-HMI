@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Sprache">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-338597%20checks-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-38%20host%20programs-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.4.9-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Reifegrad">
 </p>
@@ -41,7 +41,7 @@
 | Reifegrad | Funktionsfähig |
 | Rolle | Wand-Touchpanel für ARMOR-SERVER (Familie: Clients, übergeordnet: ARMOR-SERVER) |
 | Technik | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Tests | 338597 Prüfungen in 38 Host-Programmen und 9 Python-Prüfungen (`ctest`) |
+| Tests | 38 Host-Programmen und 9 Python-Prüfungen (`ctest`) |
 | Platine | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Läuft auf | Ein Waveshare ESP32-S3-Touch-LCD-7C-BOX; Host-Tests auf jedem Computer |
 | Auf echter Hardware | Noch keiner: die Firmware baut (ESP-IDF 5.5.5, von der CI nicht geprüft), lief aber nicht auf der Platine |
@@ -214,7 +214,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-38 Host-Testprogramme und 9 Python-Prüfungen laufen unter `ctest`; 338597 Prüfungen, gezählt von den Host-Programmen, mit `-Werror` gebaut.
+38 Host-Testprogramme und 9 Python-Prüfungen laufen unter `ctest`, mit `-Werror` gebaut.
 
 Python-Prüfungen: die Panel-Texte in acht Sprachen, die Tasks, die Speicherpfade, die Bluetooth-Sitzung unter ihrer Sperre und die vom Panel aufgerufenen Routen (und in manchen Knoten die HTTP-Codes oder die Glyphen der Schriften)
 

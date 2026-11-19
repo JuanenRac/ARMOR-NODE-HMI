@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Language-C%2B%2B17-00599c.svg" alt="Linguaggio">
   <img src="https://img.shields.io/badge/Board-ESP32--S3--Touch--LCD--7C--BOX-e7352c.svg" alt="Board">
   <img src="https://img.shields.io/badge/Checks-1%2C759-2ea44f.svg" alt="Checks">
-  <img src="https://img.shields.io/badge/Tests-338597%20checks-2ea44f.svg" alt="Test">
+  <img src="https://img.shields.io/badge/Tests-38%20host%20programs-2ea44f.svg" alt="Test">
   <img src="https://img.shields.io/badge/Version-0.4.9-0f6cbd.svg" alt="Versione">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturità">
 </p>
@@ -41,7 +41,7 @@
 | Maturità | Funzionale |
 | Ruolo | Pannello touch a parete per ARMOR-SERVER (famiglia: Clients, padre: ARMOR-SERVER) |
 | Tecnologia | C++17, ESP-IDF 5.5.5, LVGL, ESP32-S3 |
-| Test | 338597 verifiche in 38 programmi host e 9 verifiche Python (`ctest`) |
+| Test | 38 programmi host e 9 verifiche Python (`ctest`) |
 | Scheda | Waveshare ESP32-S3-Touch-LCD-7C-BOX (800x480, GT911) |
 | Gira su | Una Waveshare ESP32-S3-Touch-LCD-7C-BOX; test su host su qualsiasi computer |
 | Su hardware reale | Ancora nessuno: il firmware si compila (ESP-IDF 5.5.5, non verificato dalla CI) ma non è girato sulla scheda |
@@ -214,7 +214,7 @@ cmake -S tests -B build/host && cmake --build build/host && ctest --test-dir bui
 python -I tools/armor_ci_validate.py
 ```
 
-38 programmi di test su host e 9 verifiche Python girano con `ctest`; 338597 verifiche contate dai programmi host, compilati con `-Werror`.
+38 programmi di test su host e 9 verifiche Python girano con `ctest`, compilati con `-Werror`.
 
 Verifiche Python: i testi del pannello in otto lingue, i task, i percorsi di salvataggio, la sessione Bluetooth sotto il suo lock e i percorsi chiamati dal pannello (e, in alcuni nodi, i codici HTTP o i glifi dei caratteri)
 
