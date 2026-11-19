@@ -11,6 +11,10 @@
 
 It runs tools/make_screenshots.mjs (headless Microsoft Edge through Playwright; see the header of that file for what it needs), then keeps only the screens of
 docs/screenshots.json and shrinks every picture that weighs more than the limit (at most 400 KB each) by reducing its palette. Pillow is needed for that last step.
+
+The pictures of the wall screen (wall-disarmed.png, wall-alarm.png) are not taken by the browser: the screen simulator draws them (simulator/, then
+simulator/ppm_to_png.py). Pass the folder that holds its PNG files (the language folders, as ppm_to_png.py writes them) with --simulator-shots DIR to copy them too;
+without it they are skipped and said so.
 """
 from __future__ import annotations
 
@@ -25,6 +29,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 MAX_BYTES = 400 * 1024
 TARGET_BYTES = 380 * 1024
+# the pictures that come from the screen simulator: file of the README -> (language folder, picture) of simulator/ppm_to_png.py
+SIMULATOR_SCREENS = {"wall-disarmed.png": ("en", "disarmed.png"), "wall-alarm.png": ("en", "alarm.png")}
 
 
 def shrink(source: Path, target: Path) -> int:
@@ -47,6 +53,7 @@ def shrink(source: Path, target: Path) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", type=Path, default=REPO / "images" / "screenshots")
+    parser.add_argument("--simulator-shots", type=Path, default=None, help="folder with the PNG files of the screen simulator (<language>/<scene>.png), for the wall screen")
     args = parser.parse_args(argv)
     screens = json.loads((REPO / "docs" / "screenshots.json").read_text(encoding="utf-8"))["screens"]
     args.out.mkdir(parents=True, exist_ok=True)
@@ -54,7 +61,14 @@ def main(argv: list[str] | None = None) -> int:
         subprocess.run(["node", str(REPO / "tools" / "make_screenshots.mjs"), "--out", raw], cwd=REPO, check=True)
         for screen in screens:
             name = screen["file"]
-            source = Path(raw) / name
+            if name in SIMULATOR_SCREENS:
+                if args.simulator_shots is None:
+                    print(f"skipped: {name} is drawn by the screen simulator (pass --simulator-shots DIR)")
+                    continue
+                language, scene = SIMULATOR_SCREENS[name]
+                source = args.simulator_shots / language / scene
+            else:
+                source = Path(raw) / name
             if not source.is_file():
                 print(f"missing: {name}")
                 return 1

@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The screenshots of the README can be taken on a GitHub runner:** the manual workflow `screenshots.yml` (started by hand only, read-only token, no secrets) starts the stand-in of the node, takes the pages of the web panel with the Chromium of Playwright, draws the two pictures of the wall screen with the screen simulator, and keeps the pictures as an artifact; `ARMOR_SHOTS_CHANNEL=chromium` makes the script take that Chromium; `tools/capture_screenshots.py` takes the wall pictures from the simulator output (`--simulator-shots DIR`) instead of failing on them, which is why a run on a computer without the simulator stopped at `missing: wall-disarmed.png`; `docs/SCREENSHOTS.md` says how to start it and use them.
+
 ## [0.5.0] - Signed node orders, fixed pairing PIN, a locked fingerprint check, set-up password and slot copy locks
 
 - **The web panel of the node loads again:** a comma missing in the texts of the panel (`panel/text.js`) after the explanation of the erase of a refused firmware stopped the whole page script, so the panel showed nothing; the line is fixed.
