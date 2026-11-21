@@ -32,6 +32,7 @@ add_executable(test_wake_stream test_wake_stream.cpp)
 add_executable(test_wake_local test_wake_local.cpp)
 add_executable(test_wake_tflite test_wake_tflite.cpp)
 add_executable(test_wake_runtime test_wake_runtime.cpp)
+add_executable(test_screens_edges test_screens_edges.cpp)
 
 add_executable(test_logic test_logic.cpp)
 
@@ -94,6 +95,7 @@ add_test(NAME control COMMAND test_control ${CMAKE_CURRENT_SOURCE_DIR}/../../ARM
 add_test(NAME wire COMMAND test_wire ${CMAKE_CURRENT_SOURCE_DIR}/../../ARMOR-COMMON/conformance/wire_cases.tsv)
 add_test(NAME wire_full COMMAND test_wire_full ${CMAKE_CURRENT_SOURCE_DIR}/../../ARMOR-COMMON/conformance/wire_full_cases.tsv)
 add_test(NAME diag COMMAND test_diag)
+add_test(NAME screens_edges COMMAND test_screens_edges)
 add_test(NAME logic COMMAND test_logic)
 
 # the panel's texts, and the glyphs of the screen's fonts for every character the screen can draw
