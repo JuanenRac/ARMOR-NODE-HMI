@@ -11,6 +11,13 @@ typedef host_mqtt_client* esp_mqtt_client_handle_t;
 
 enum esp_mqtt_event_id_t { MQTT_EVENT_ANY = -1, MQTT_EVENT_ERROR = 0, MQTT_EVENT_CONNECTED, MQTT_EVENT_DISCONNECTED, MQTT_EVENT_SUBSCRIBED, MQTT_EVENT_UNSUBSCRIBED, MQTT_EVENT_PUBLISHED, MQTT_EVENT_DATA };
 
+struct esp_mqtt_error_codes_t {
+  int error_type;
+  int connect_return_code;
+  int esp_transport_sock_errno;
+  esp_err_t esp_tls_last_esp_err;
+};
+
 struct esp_mqtt_event_t {
   esp_mqtt_event_id_t event_id;
   esp_mqtt_client_handle_t client;
@@ -20,6 +27,7 @@ struct esp_mqtt_event_t {
   int topic_len;
   int current_data_offset;
   int total_data_len;
+  esp_mqtt_error_codes_t* error_handle;
 };
 typedef esp_mqtt_event_t* esp_mqtt_event_handle_t;
 

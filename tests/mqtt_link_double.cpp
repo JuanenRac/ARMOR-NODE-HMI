@@ -122,6 +122,7 @@ void note_broker_connected() { ++g_health_notes; }
 }  // namespace armor::node_health
 
 namespace armor::memory {
+membudget::Snapshot snapshot() { return {}; }
 bool start_task(TaskFunction_t function, const char* name, std::uint32_t stack_bytes, void* argument, UBaseType_t priority, TaskHandle_t* handle, bool) {
   return xTaskCreate(function, name, stack_bytes, argument, priority, handle) == pdTRUE;
 }
