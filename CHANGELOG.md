@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A web request that does not end is said:** when the panel's server has been on the same request for 20 seconds, one error line names it, with the internal memory at that moment, and the health report takes it to the server although the panel does not answer. A request that took 5 seconds or more is a warning in the log. The firmware upload and the core dump download are left out. Tested on a computer; not tried on a board.
+- **No answer of the panel is sent while the sessions are locked** (a refused sign-in, a changed password): a slow browser could hold up the requests of everybody who was signed in. Tested on a computer; not tried on a board.
+
 ## [0.5.2] - Update check fix, Bluetooth memory released and clearer broker logs
 
 - **The look for a new version no longer answers "the request is too large":** GitHub's answer about a release grows with its files and its notes and passed the 24 kB the node kept. It is now read piece by piece as it arrives and only the tag and the names and addresses of the files are kept, so its length no longer matters (up to 512 kB). Tested on a computer with a real answer; not tried on a board.
